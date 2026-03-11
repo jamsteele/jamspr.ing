@@ -1328,8 +1328,8 @@ function checkCharacterClick(pos){
 // ---- Wind ----
 function updateWind(){
   windTimer++;gustCooldown--;
-  if(gustCooldown<=0&&Math.random()<0.012){
-    windTarget=(Math.random()-0.3)*4;gustCooldown=60+Math.floor(Math.random()*150);
+  if(gustCooldown<=0&&Math.random()<0.006){
+    windTarget=(Math.random()-0.3)*4;gustCooldown=120+Math.floor(Math.random()*300);
     if(isFullyBloomed&&Math.abs(windTarget)>1.0) blossoms.forEach(b=>{if(Math.random()<0.15)spawnPetal(b.x,b.y,windTarget*0.5,-1);});
   }
   windStrength+=(windTarget-windStrength)*0.02;windTarget*=0.995;
