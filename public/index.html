@@ -1472,7 +1472,7 @@ function handleTap(e){
   });
   if(bloomedSomething){updateUI();if(totalBloomed>=totalBranchZones&&!isFullyBloomed){isFullyBloomed=true;updateUI();setTimeout(()=>{blossoms.forEach(b=>{if(Math.random()<0.3)spawnPetal(b.x,b.y,(Math.random()-0.5)*2,-2);});},500);}return;}
   if(isFullyBloomed){
-    blossoms.forEach(b=>{if(!b.canShake)return;const dist=Math.sqrt((pos.x-b.x)**2+(pos.y-b.y)**2);if(dist<50&&Math.random()<0.5)spawnPetal(b.x,b.y,(Math.random()-0.5)*1.0,(Math.random()-0.5)*0.3);});
+    blossoms.forEach(b=>{if(!b.canShake)return;const dist=Math.sqrt((pos.x-b.x)**2+(pos.y-b.y)**2);if(dist<50&&Math.random()<0.25)spawnPetal(b.x,b.y,(Math.random()-0.5)*1.0,(Math.random()-0.5)*0.3);});
     petals.forEach(p=>{const dist=Math.sqrt((pos.x-p.x)**2+(pos.y-p.y)**2);if(dist<60){const angle=Math.atan2(p.y-pos.y,p.x-pos.x);const force=(60-dist)/60*3;p.vx+=Math.cos(angle)*force;p.vy+=Math.sin(angle)*force-1;if(p.grounded){p.grounded=false;p.vy=-3;}}});
   }
 }
@@ -1498,7 +1498,7 @@ function handleMove(e){
     return;
   }
   petals.forEach(p=>{const dist=Math.sqrt((pos.x-p.x)**2+(pos.y-p.y)**2);if(dist<70){const force=(70-dist)/70;p.vx+=mouseVX*force*0.3;p.vy+=mouseVY*force*0.3-force*0.5;if(p.grounded){p.grounded=false;p.vy=-2-Math.random()*2;}}});
-  blossoms.forEach(b=>{if(!b.canShake)return;const dist=Math.sqrt((pos.x-b.x)**2+(pos.y-b.y)**2);if(dist<40&&Math.random()<0.2)spawnPetal(b.x,b.y,mouseVX*0.08,0.2+Math.random()*0.3);});
+  blossoms.forEach(b=>{if(!b.canShake)return;const dist=Math.sqrt((pos.x-b.x)**2+(pos.y-b.y)**2);if(dist<40&&Math.random()<0.1)spawnPetal(b.x,b.y,mouseVX*0.08,0.2+Math.random()*0.3);});
 }
 function handleDown(e){
   const pos=getCanvasPos(e);
@@ -1619,11 +1619,32 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
 });
 
 // ---- Resize ----
+let _resizeTimer;
 function resizeCanvas(){
   const rect=gameContainer.getBoundingClientRect();
-  canvas.width=rect.width*2;canvas.height=rect.height*2;
-  W=canvas.width;H=canvas.height;
-  generateTree();
+  const newW=rect.width*2,newH=rect.height*2;
+  const firstLoad=!W||!H;
+  const oldW=W||newW,oldH=H||newH;
+  canvas.width=newW;canvas.height=newH;
+  W=newW;H=newH;
+  if(firstLoad){
+    generateTree();
+  } else {
+    // Preserve bloom state across resize
+    const scaleX=W/oldW,scaleY=H/oldH;
+    const bloomedIdx=branches.map((b,i)=>b.bloomed?i:-1).filter(i=>i>=0);
+    const savedPetals=petals.map(p=>({...p,x:p.x*scaleX,y:p.y*scaleY,groundY:p.groundY*scaleY}));
+    const savedWishes=wishes.map(w=>({...w,x:w.x*scaleX,y:w.y*scaleY,tagX:w.tagX*scaleX,tagY:w.tagY*scaleY}));
+    generateTree();
+    bloomedIdx.forEach(i=>{if(branches[i]&&branches[i].canBloom){branches[i].bloomed=true;branches[i].bloomProgress=1;spawnBlossoms(branches[i]);}});
+    totalBloomed=bloomedIdx.filter(i=>branches[i]&&branches[i].canBloom).length;
+    isFullyBloomed=totalBloomed>=totalBranchZones;
+    petals.push(...savedPetals);
+    wishes.push(...savedWishes);
+    updateUI();
+  }
+  dog.y=H*0.660;
+  dog.x=Math.max(W*0.1,Math.min(W*0.9,dog.x||W*0.5));
 }
 
 // ---- Ambient bg petals ----
@@ -1638,7 +1659,7 @@ function initBgPetals(){
 }
 
 // ---- Init ----
-window.addEventListener('resize',resizeCanvas);
+window.addEventListener('resize',()=>{clearTimeout(_resizeTimer);_resizeTimer=setTimeout(resizeCanvas,150);});
 initBgPetals();
 resizeCanvas();
 initClouds();
