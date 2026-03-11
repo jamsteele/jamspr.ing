@@ -1665,12 +1665,16 @@ function resizeCanvas(){
   } else {
     const scaleX=W/oldW,scaleY=H/oldH;
     const bloomedIdx=branches.map((b,i)=>b.bloomed?i:-1).filter(i=>i>=0);
+    // Save blossoms directly so they restore at current opacity (no fade-in flash)
+    const savedBlossoms=blossoms.map(b=>({...b,x:b.x*scaleX,y:b.y*scaleY,baseX:b.baseX*scaleX,baseY:b.baseY*scaleY}));
     const savedPetals=petals.map(p=>({...p,x:p.x*scaleX,y:p.y*scaleY,groundY:p.groundY*scaleY}));
     const savedWishes=wishes.map(w=>({...w,x:w.x*scaleX,y:w.y*scaleY,tagX:w.tagX*scaleX,tagY:w.tagY*scaleY}));
     _generateTreeSeeded();
-    bloomedIdx.forEach(i=>{if(branches[i]&&branches[i].canBloom){branches[i].bloomed=true;branches[i].bloomProgress=1;spawnBlossoms(branches[i]);}});
+    // Restore branch bloom state without re-spawning blossoms (avoids opacity:0 fade-in)
+    bloomedIdx.forEach(i=>{if(branches[i]&&branches[i].canBloom){branches[i].bloomed=true;branches[i].bloomProgress=1;}});
     totalBloomed=bloomedIdx.filter(i=>branches[i]&&branches[i].canBloom).length;
     isFullyBloomed=totalBloomed>=totalBranchZones;
+    blossoms.push(...savedBlossoms);
     petals.push(...savedPetals);
     wishes.push(...savedWishes);
     updateUI();
