@@ -1341,6 +1341,12 @@ function drawBranch(b){
   const d=Math.max(0.25,1-b.depth*0.12);
   ctx.strokeStyle=`rgb(${Math.floor(80*d)},${Math.floor(55*d)},${Math.floor(45*d)})`;
   ctx.lineWidth=b.thickness;ctx.lineCap='round';ctx.stroke();
+  // Subtle pulse on unbloomed tips when >85% in bloom — helps find the last few
+  if(b.canBloom&&!b.bloomed&&totalBranchZones>0&&totalBloomed/totalBranchZones>=0.85){
+    const pulse=(Math.sin(Date.now()*0.004)+1)/2;
+    ctx.beginPath();ctx.arc(b.x2,b.y2,10+pulse*8,0,Math.PI*2);
+    ctx.fillStyle=`rgba(255,175,200,${0.12+pulse*0.22})`;ctx.fill();
+  }
 }
 function drawLeaf(l){
   ctx.save();ctx.translate(l.x,l.y);ctx.rotate(l.angle);ctx.globalAlpha=l.opacity;
