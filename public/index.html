@@ -1507,7 +1507,7 @@ function handleTap(e){
     const dist=Math.sqrt((pos.x-l.x)**2+(pos.y-l.y)**2);
     if(dist<45){branch.bloomed=true;branch.bloomProgress=1;totalBloomed++;spawnBlossoms(branch);alreadyBloomed.add(l.branchIdx);bloomedSomething=true;}
   });
-  if(bloomedSomething){updateUI();if(totalBloomed/totalBranchZones>=0.99&&!isFullyBloomed){branches.forEach(b=>{if(b.canBloom&&!b.bloomed){b.bloomed=true;b.bloomProgress=1;totalBloomed++;spawnBlossoms(b);}});isFullyBloomed=true;updateUI();setTimeout(()=>{blossoms.forEach(b=>{if(Math.random()<0.3)spawnPetal(b.x,b.y,(Math.random()-0.5)*2,-2);});},500);}return;}
+  if(bloomedSomething){updateUI();if(totalBloomed/totalBranchZones>=0.95&&!isFullyBloomed){branches.forEach(b=>{if(b.canBloom&&!b.bloomed){b.bloomed=true;b.bloomProgress=1;totalBloomed++;spawnBlossoms(b);}});isFullyBloomed=true;updateUI();setTimeout(()=>{blossoms.forEach(b=>{if(Math.random()<0.3)spawnPetal(b.x,b.y,(Math.random()-0.5)*2,-2);});},500);}return;}
   if(isFullyBloomed){
     blossoms.forEach(b=>{if(!b.canShake)return;const dist=Math.sqrt((pos.x-b.x)**2+(pos.y-b.y)**2);if(dist<50&&Math.random()<0.25)spawnPetal(b.x,b.y,(Math.random()-0.5)*1.0,(Math.random()-0.5)*0.3);});
     petals.forEach(p=>{const dist=Math.sqrt((pos.x-p.x)**2+(pos.y-p.y)**2);if(dist<60){const angle=Math.atan2(p.y-pos.y,p.x-pos.x);const force=(60-dist)/60*3;p.vx+=Math.cos(angle)*force;p.vy+=Math.sin(angle)*force-1;if(p.grounded){p.grounded=false;p.vy=-3;}}});
@@ -1531,7 +1531,7 @@ function handleMove(e){
       const dist=Math.sqrt((pos.x-l.x)**2+(pos.y-l.y)**2);
       if(dist<45){branch.bloomed=true;branch.bloomProgress=1;totalBloomed++;spawnBlossoms(branch);alreadyBloomed.add(l.branchIdx);}
     });
-    if(alreadyBloomed.size>0){updateUI();if(totalBloomed/totalBranchZones>=0.99&&!isFullyBloomed){branches.forEach(b=>{if(b.canBloom&&!b.bloomed){b.bloomed=true;b.bloomProgress=1;totalBloomed++;spawnBlossoms(b);}});isFullyBloomed=true;updateUI();setTimeout(()=>{blossoms.forEach(b=>{if(Math.random()<0.3)spawnPetal(b.x,b.y,(Math.random()-0.5)*2,-2);});},500);}}
+    if(alreadyBloomed.size>0){updateUI();if(totalBloomed/totalBranchZones>=0.95&&!isFullyBloomed){branches.forEach(b=>{if(b.canBloom&&!b.bloomed){b.bloomed=true;b.bloomProgress=1;totalBloomed++;spawnBlossoms(b);}});isFullyBloomed=true;updateUI();setTimeout(()=>{blossoms.forEach(b=>{if(Math.random()<0.3)spawnPetal(b.x,b.y,(Math.random()-0.5)*2,-2);});},500);}}
     return;
   }
   petals.forEach(p=>{const dist=Math.sqrt((pos.x-p.x)**2+(pos.y-p.y)**2);if(dist<70){const force=(70-dist)/70;p.vx+=mouseVX*force*0.3;p.vy+=mouseVY*force*0.3-force*0.5;if(p.grounded){p.grounded=false;p.vy=-2-Math.random()*2;}}});
