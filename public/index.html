@@ -406,7 +406,14 @@
   .playlist-header span { font-size: 18px; }
   .playlist-header h3 { font-size: 14px; font-weight: 500; color: #5c3d52; }
   .playlist-tracks { display: flex; flex-direction: column; gap: 6px; }
-  .playlist-track { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #a0889a; }
+  .playlist-track { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; color: #a0889a; }
+  .track-title { flex: 1; min-width: 0; }
+  .track-links { display: flex; gap: 5px; flex-shrink: 0; }
+  .track-platform-btn { display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; opacity: 0.75; transition: opacity 0.2s, transform 0.15s; text-decoration: none; }
+  .track-platform-btn:hover { opacity: 1; transform: scale(1.15); }
+  .track-platform-btn.spotify { background: #1DB954; }
+  .track-platform-btn.apple { background: #fc3c44; }
+  .track-platform-btn.youtube { background: #FF0000; }
   .track-bar {
     width: 3px; height: 12px;
     background: #d4a0b8; border-radius: 2px;
@@ -484,31 +491,42 @@
       <h3>on repeat</h3>
     </div>
     <div class="playlist-tracks">
-      <a href="https://song.link/s/3tgd6md5mmQDTHUZVjE6lF" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;display:block;">
-        <div class="playlist-track">
-          <span>DREAMS COME TRUE — excape.</span>
+      <div class="playlist-track">
+        <span class="track-title">DREAMS COME TRUE — excape.</span>
+        <div class="track-links">
+          <a href="https://open.spotify.com/track/3tgd6md5mmQDTHUZVjE6lF" target="_blank" rel="noopener" class="track-platform-btn spotify" title="Spotify"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
+          <a href="https://music.apple.com/us/album/dreams-come-true-single/1864666479" target="_blank" rel="noopener" class="track-platform-btn apple" title="Apple Music"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.762-.69c-.927-.143-1.874-.1-2.811.03L7.647.49a3.47 3.47 0 00-.492.058 2.595 2.595 0 00-1.885 1.32 3.19 3.19 0 00-.28.77c-.096.416-.107.84-.107 1.268v12.83A3.47 3.47 0 004 17.648a3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 001 21.408C1 23.374 2.61 24 4 24a3.5 3.5 0 003.5-3.5V9.5l11-1.5V16a3.47 3.47 0 00-.883-.12 3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 0014 19.408c0 1.966 1.61 2.592 3 2.592a3.5 3.5 0 003.5-3.5L20.5 5.5l3.494-.001z"/></svg></a>
         </div>
-      </a>
-      <a href="https://song.link/s/479xhIMpUhIw1cjUXe6OO4" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;display:block;">
-        <div class="playlist-track">
-          <span>Warm Magic — Jadu Heart</span>
+      </div>
+      <div class="playlist-track">
+        <span class="track-title">Warm Magic — Jadu Heart</span>
+        <div class="track-links">
+          <a href="https://open.spotify.com/track/479xhIMpUhIw1cjUXe6OO4" target="_blank" rel="noopener" class="track-platform-btn spotify" title="Spotify"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
+          <a href="https://music.apple.com/gb/song/warm-magic/1099893509?i=1099893967" target="_blank" rel="noopener" class="track-platform-btn apple" title="Apple Music"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.762-.69c-.927-.143-1.874-.1-2.811.03L7.647.49a3.47 3.47 0 00-.492.058 2.595 2.595 0 00-1.885 1.32 3.19 3.19 0 00-.28.77c-.096.416-.107.84-.107 1.268v12.83A3.47 3.47 0 004 17.648a3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 001 21.408C1 23.374 2.61 24 4 24a3.5 3.5 0 003.5-3.5V9.5l11-1.5V16a3.47 3.47 0 00-.883-.12 3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 0014 19.408c0 1.966 1.61 2.592 3 2.592a3.5 3.5 0 003.5-3.5L20.5 5.5l3.494-.001z"/></svg></a>
         </div>
-      </a>
-      <a href="https://song.link/s/0fJO3Wb7HjiLottJ73DB1P" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;display:block;">
-        <div class="playlist-track">
-          <span>Platonic Romance — DRAMA</span>
+      </div>
+      <div class="playlist-track">
+        <span class="track-title">Platonic Romance — DRAMA</span>
+        <div class="track-links">
+          <a href="https://open.spotify.com/track/0fJO3Wb7HjiLottJ73DB1P" target="_blank" rel="noopener" class="track-platform-btn spotify" title="Spotify"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
+          <a href="https://music.apple.com/ca/album/platonic-romance/1841970378" target="_blank" rel="noopener" class="track-platform-btn apple" title="Apple Music"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.762-.69c-.927-.143-1.874-.1-2.811.03L7.647.49a3.47 3.47 0 00-.492.058 2.595 2.595 0 00-1.885 1.32 3.19 3.19 0 00-.28.77c-.096.416-.107.84-.107 1.268v12.83A3.47 3.47 0 004 17.648a3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 001 21.408C1 23.374 2.61 24 4 24a3.5 3.5 0 003.5-3.5V9.5l11-1.5V16a3.47 3.47 0 00-.883-.12 3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 0014 19.408c0 1.966 1.61 2.592 3 2.592a3.5 3.5 0 003.5-3.5L20.5 5.5l3.494-.001z"/></svg></a>
         </div>
-      </a>
-      <a href="https://song.link/s/4Fug2ZITfyngpFf0PYMCgc" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;display:block;">
-        <div class="playlist-track">
-          <span>Loud Places (feat. Romy) — Jamie xx</span>
+      </div>
+      <div class="playlist-track">
+        <span class="track-title">Loud Places (feat. Romy) — Jamie xx</span>
+        <div class="track-links">
+          <a href="https://open.spotify.com/track/4Fug2ZITfyngpFf0PYMCgc" target="_blank" rel="noopener" class="track-platform-btn spotify" title="Spotify"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
+          <a href="https://music.apple.com/us/song/loud-places-feat-romy/1525506990" target="_blank" rel="noopener" class="track-platform-btn apple" title="Apple Music"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.762-.69c-.927-.143-1.874-.1-2.811.03L7.647.49a3.47 3.47 0 00-.492.058 2.595 2.595 0 00-1.885 1.32 3.19 3.19 0 00-.28.77c-.096.416-.107.84-.107 1.268v12.83A3.47 3.47 0 004 17.648a3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 001 21.408C1 23.374 2.61 24 4 24a3.5 3.5 0 003.5-3.5V9.5l11-1.5V16a3.47 3.47 0 00-.883-.12 3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 0014 19.408c0 1.966 1.61 2.592 3 2.592a3.5 3.5 0 003.5-3.5L20.5 5.5l3.494-.001z"/></svg></a>
         </div>
-      </a>
-      <a href="https://song.link/s/4o0LyB69tylqDG6eTGhmig" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;display:block;">
-        <div class="playlist-track">
-          <span>Fire for You — Cannons</span>
+      </div>
+      <div class="playlist-track">
+        <span class="track-title">Fire for You — Cannons</span>
+        <div class="track-links">
+          <a href="https://open.spotify.com/track/4o0LyB69tylqDG6eTGhmig" target="_blank" rel="noopener" class="track-platform-btn spotify" title="Spotify"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
+          <a href="https://music.apple.com/us/song/fire-for-you/1525019208" target="_blank" rel="noopener" class="track-platform-btn apple" title="Apple Music"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.762-.69c-.927-.143-1.874-.1-2.811.03L7.647.49a3.47 3.47 0 00-.492.058 2.595 2.595 0 00-1.885 1.32 3.19 3.19 0 00-.28.77c-.096.416-.107.84-.107 1.268v12.83A3.47 3.47 0 004 17.648a3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 001 21.408C1 23.374 2.61 24 4 24a3.5 3.5 0 003.5-3.5V9.5l11-1.5V16a3.47 3.47 0 00-.883-.12 3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 0014 19.408c0 1.966 1.61 2.592 3 2.592a3.5 3.5 0 003.5-3.5L20.5 5.5l3.494-.001z"/></svg></a>
+          <a href="https://www.youtube.com/watch?v=u4HQevc9JE0" target="_blank" rel="noopener" class="track-platform-btn youtube" title="YouTube"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
         </div>
-      </a>
+      </div>
     </div>
   </div>
   <div class="section-label">what i'm working on</div>
