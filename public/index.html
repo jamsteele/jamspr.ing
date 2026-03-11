@@ -1081,13 +1081,13 @@ function drawSailboat(){
   ctx.restore();
 }
 
-// ---- Sailboat 2 (slightly smaller & faster, background) ----
-const sailboat2={x:0,y:0,speed:0.20,waitTimer:0};
-function initSailboat2(){sailboat2.y=H*(0.470+Math.random()*0.016);sailboat2.x=W+50;sailboat2.waitTimer=1500+Math.floor(Math.random()*900);}
+// ---- Sailboat 2 (smaller & slower, further away near horizon) ----
+const sailboat2={x:0,y:0,speed:0.10,waitTimer:0};
+function initSailboat2(){sailboat2.y=H*(0.448+Math.random()*0.010);sailboat2.x=W+50;sailboat2.waitTimer=1500+Math.floor(Math.random()*900);}
 function updateSailboat2(){
   if(sailboat2.waitTimer>0){sailboat2.waitTimer--;return;}
   sailboat2.x-=sailboat2.speed;
-  if(sailboat2.x<-55){sailboat2.x=W+50;sailboat2.y=H*(0.470+Math.random()*0.016);sailboat2.waitTimer=720+Math.floor(Math.random()*720);}
+  if(sailboat2.x<-55){sailboat2.x=W+50;sailboat2.y=H*(0.448+Math.random()*0.010);sailboat2.waitTimer=720+Math.floor(Math.random()*720);}
 }
 function drawSailboat2(){
   ctx.save();ctx.translate(sailboat2.x,sailboat2.y);ctx.scale(0.80,0.80);
