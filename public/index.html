@@ -1580,9 +1580,25 @@ document.getElementById('resetBtn').addEventListener('click',resetTree);
 document.getElementById('shareBtn').addEventListener('click', async () => {
   const btn = document.getElementById('shareBtn');
 
-  // Draw one clean frame to canvas before capturing
-  // (animation loop keeps running so current frame is always fresh)
-  const dataUrl = canvas.toDataURL('image/png');
+  // Composite: paint the .game-container CSS gradient behind the transparent canvas,
+  // so the exported image matches exactly what the user sees in the browser.
+  const offscreen = document.createElement('canvas');
+  offscreen.width = canvas.width;
+  offscreen.height = canvas.height;
+  const offCtx = offscreen.getContext('2d');
+  const bg = offCtx.createLinearGradient(0, 0, 0, offscreen.height);
+  bg.addColorStop(0.00, '#c8ddf5');
+  bg.addColorStop(0.20, '#d8e8f8');
+  bg.addColorStop(0.35, '#b8d4ef');
+  bg.addColorStop(0.50, '#8ab8c8');
+  bg.addColorStop(0.60, '#6da8b8');
+  bg.addColorStop(0.72, '#88b888');
+  bg.addColorStop(0.82, '#6aad6a');
+  bg.addColorStop(1.00, '#5a9050');
+  offCtx.fillStyle = bg;
+  offCtx.fillRect(0, 0, offscreen.width, offscreen.height);
+  offCtx.drawImage(canvas, 0, 0);
+  const dataUrl = offscreen.toDataURL('image/png');
 
   // Use Web Share API only on mobile (native share sheet)
   const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
