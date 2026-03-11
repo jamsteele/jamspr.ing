@@ -941,7 +941,7 @@ function drawBird() {
 const geese={x:0,y:0,speed:0,waitTimer:0,wingPhase:0,active:false,scale:1,alpha:0.70};
 function initGeese(){geese.active=false;geese.waitTimer=2400+Math.floor(Math.random()*3000);}
 function updateGeese(){
-  if(!geese.active){if(--geese.waitTimer<=0){geese.x=-180;geese.y=H*(0.08+Math.random()*0.09);geese.speed=0.43+Math.random()*0.23;geese.wingPhase=0;geese.active=true;}return;}
+  if(!geese.active){if(--geese.waitTimer<=0){geese.x=-180;geese.y=H*(0.08+Math.random()*0.09);geese.speed=0.28+Math.random()*0.14;geese.wingPhase=0;geese.active=true;}return;}
   geese.wingPhase+=0.09;geese.x+=geese.speed;
   // Scale & fade to simulate flying in/out of the distance
   const prog=(geese.x+180)/(W+360);
