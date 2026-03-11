@@ -1432,7 +1432,15 @@ function drawWaterItems(){
 
 // ---- Draw ----
 function draw(){
-  ctx.clearRect(0,0,W,H);
+  if(_isRecording){
+    const bg=ctx.createLinearGradient(0,0,0,H);
+    bg.addColorStop(0.00,'#c8ddf5');bg.addColorStop(0.20,'#d8e8f8');bg.addColorStop(0.35,'#b8d4ef');
+    bg.addColorStop(0.50,'#8ab8c8');bg.addColorStop(0.60,'#6da8b8');bg.addColorStop(0.72,'#88b888');
+    bg.addColorStop(0.82,'#6aad6a');bg.addColorStop(1.00,'#5a9050');
+    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  } else {
+    ctx.clearRect(0,0,W,H);
+  }
   drawMountains();drawClouds();drawWater();drawWaterItems();drawSeawall();drawGround();drawDog();drawFlowers();
   const sorted=[...branches].sort((a,b)=>a.depth-b.depth);sorted.forEach(drawBranch);
   leaves.forEach(drawLeaf);
@@ -1577,61 +1585,111 @@ wishInput.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.pr
 document.getElementById('resetBtn').addEventListener('click',resetTree);
 
 // ---- Share / Camera button ----
+// ---- Share as 7-second video ----
+let _isRecording = false;
 document.getElementById('shareBtn').addEventListener('click', async () => {
   const btn = document.getElementById('shareBtn');
+  if (_isRecording) return;
 
-  // Composite: paint the .game-container CSS gradient behind the transparent canvas,
-  // so the exported image matches exactly what the user sees in the browser.
-  const offscreen = document.createElement('canvas');
-  offscreen.width = canvas.width;
-  offscreen.height = canvas.height;
-  const offCtx = offscreen.getContext('2d');
-  const bg = offCtx.createLinearGradient(0, 0, 0, offscreen.height);
-  bg.addColorStop(0.00, '#c8ddf5');
-  bg.addColorStop(0.20, '#d8e8f8');
-  bg.addColorStop(0.35, '#b8d4ef');
-  bg.addColorStop(0.50, '#8ab8c8');
-  bg.addColorStop(0.60, '#6da8b8');
-  bg.addColorStop(0.72, '#88b888');
-  bg.addColorStop(0.82, '#6aad6a');
-  bg.addColorStop(1.00, '#5a9050');
-  offCtx.fillStyle = bg;
-  offCtx.fillRect(0, 0, offscreen.width, offscreen.height);
-  offCtx.drawImage(canvas, 0, 0);
-  const dataUrl = offscreen.toDataURL('image/png');
+  const label = btn.querySelector('span:last-child');
+  const DURATION = 7000;
 
-  // Use Web Share API only on mobile (native share sheet)
-  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  if (isMobile && navigator.share) {
+  // Fall back to photo share if captureStream/MediaRecorder unavailable
+  if (typeof canvas.captureStream !== 'function' || typeof MediaRecorder === 'undefined') {
+    const offscreen = document.createElement('canvas');
+    offscreen.width = canvas.width; offscreen.height = canvas.height;
+    const offCtx = offscreen.getContext('2d');
+    const bg = offCtx.createLinearGradient(0, 0, 0, offscreen.height);
+    bg.addColorStop(0.00,'#c8ddf5');bg.addColorStop(0.20,'#d8e8f8');bg.addColorStop(0.35,'#b8d4ef');
+    bg.addColorStop(0.50,'#8ab8c8');bg.addColorStop(0.60,'#6da8b8');bg.addColorStop(0.72,'#88b888');
+    bg.addColorStop(0.82,'#6aad6a');bg.addColorStop(1.00,'#5a9050');
+    offCtx.fillStyle=bg; offCtx.fillRect(0,0,offscreen.width,offscreen.height); offCtx.drawImage(canvas,0,0);
+    const dataUrl = offscreen.toDataURL('image/png');
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile && navigator.share) {
+      try {
+        const blob = await (await fetch(dataUrl)).blob();
+        const file = new File([blob],'cherry-blossom-tree.png',{type:'image/png'});
+        if (navigator.canShare && navigator.canShare({files:[file]})) {
+          await navigator.share({files:[file],title:'My Cherry Blossom Tree 🌸',text:'made a wish on a cherry blossom tree ✨'});
+          return;
+        }
+      } catch(err) { if(err.name==='AbortError') return; }
+    }
+    const link = document.createElement('a'); link.download='cherry-blossom-tree.png'; link.href=dataUrl; link.click();
+    btn.classList.add('confirmed'); label.textContent='saved!';
+    setTimeout(()=>{ btn.classList.remove('confirmed'); label.textContent='share'; }, 2000);
+    return;
+  }
+
+  // Pick best MIME type (mp4 for Safari/iOS, webm for Chrome)
+  const mimeType = ['video/mp4','video/webm;codecs=vp8,opus','video/webm']
+    .find(t => { try { return MediaRecorder.isTypeSupported(t); } catch(e){ return false; } }) || 'video/webm';
+  const ext = mimeType.startsWith('video/mp4') ? 'mp4' : 'webm';
+
+  // Countdown UI
+  _isRecording = true;
+  btn.disabled = true;
+  let remaining = Math.ceil(DURATION / 1000);
+  label.textContent = `${remaining}s`;
+  const countdown = setInterval(() => {
+    remaining--;
+    label.textContent = remaining > 0 ? `${remaining}s` : '...';
+  }, 1000);
+
+  // Record live canvas (draw() bakes gradient into pixels while _isRecording=true)
+  const stream = canvas.captureStream(30);
+  const recorder = new MediaRecorder(stream, { mimeType });
+  const chunks = [];
+  recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+  recorder.start();
+
+  await new Promise(resolve => setTimeout(resolve, DURATION));
+  recorder.stop();
+  clearInterval(countdown);
+  _isRecording = false;
+  await new Promise(resolve => { recorder.onstop = resolve; });
+
+  label.textContent = 'sharing...';
+
+  const blob = new Blob(chunks, { type: mimeType });
+
+  if (navigator.share) {
     try {
-      const blob = await (await fetch(dataUrl)).blob();
-      const file = new File([blob], 'my-cherry-blossom-tree.png', { type: 'image/png' });
+      const file = new File([blob], `cherry-blossom-tree.${ext}`, { type: mimeType });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
           title: 'My Cherry Blossom Tree 🌸',
           text: 'made a wish on a cherry blossom tree ✨',
         });
+        label.textContent = 'share';
+        btn.disabled = false;
         return;
       }
-    } catch (err) {
-      // User cancelled or sharing failed — fall through to download
-      if (err.name === 'AbortError') return;
+    } catch(err) {
+      if (err.name === 'AbortError') {
+        label.textContent = 'share';
+        btn.disabled = false;
+        return;
+      }
     }
   }
 
-  // Fallback: download as PNG
+  // Fallback: download
+  const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.download = 'cherry-blossom-tree.png';
-  link.href = dataUrl;
+  link.download = `cherry-blossom-tree.${ext}`;
+  link.href = url;
   link.click();
+  URL.revokeObjectURL(url);
 
-  // Brief confirmation flash on the button
   btn.classList.add('confirmed');
-  btn.querySelector('span:last-child').textContent = 'saved!';
+  label.textContent = 'saved!';
   setTimeout(() => {
     btn.classList.remove('confirmed');
-    btn.querySelector('span:last-child').textContent = 'share';
+    label.textContent = 'share';
+    btn.disabled = false;
   }, 2000);
 });
 
