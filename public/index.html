@@ -458,10 +458,6 @@
           <span class="share-btn-icon">📷</span>
           <span>share</span>
         </button>
-        <button class="share-btn" id="shareLinkBtn" title="Share this page">
-          <span class="share-btn-icon">🔗</span>
-          <span>share this page</span>
-        </button>
       </div>
       <div class="wish-count" id="wishCount"></div>
     </div>
@@ -1735,29 +1731,6 @@ wishModal.addEventListener('click',(e)=>{if(e.target===wishModal)wishModal.style
 wishInput.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();document.getElementById('wishSubmit').click();}});
 document.getElementById('resetBtn').addEventListener('click',resetTree);
 
-// ---- Share this page button ----
-document.getElementById('shareLinkBtn').addEventListener('click', async () => {
-  const btn = document.getElementById('shareLinkBtn');
-  const label = btn.querySelector('span:last-child');
-  const url = window.location.href;
-  try {
-    if (navigator.share) {
-      await navigator.share({ title: "Jill's Link in Bio 🌸", url });
-    } else {
-      await navigator.clipboard.writeText(url);
-      btn.classList.add('confirmed');
-      label.textContent = 'copied!';
-      setTimeout(() => { btn.classList.remove('confirmed'); label.textContent = 'share this page'; }, 2000);
-    }
-  } catch(e) {
-    if (e.name !== 'AbortError') {
-      await navigator.clipboard.writeText(url).catch(()=>{});
-      btn.classList.add('confirmed');
-      label.textContent = 'copied!';
-      setTimeout(() => { btn.classList.remove('confirmed'); label.textContent = 'share this page'; }, 2000);
-    }
-  }
-});
 
 // ---- Share / Camera button ----
 // ---- Share as 7-second video ----
