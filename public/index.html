@@ -1118,6 +1118,7 @@ function drawSailboat2(){
   ctx.restore();
 }
 
+
 // ---- Orca ----
 const orca={phase:'hidden',x:0,y:0,rise:0,peakTimer:0,breathTimer:0,vx:0,blowParticles:[]};
 function initOrca(){orca.phase='hidden';orca.breathTimer=1500+Math.floor(Math.random()*900);}
@@ -1379,6 +1380,7 @@ function checkCharacterClick(pos){
   if(sailboat2.waitTimer<=0&&sailboat2.x>-80&&sailboat2.x<W+80){
     if((x-sailboat2.x)**2+(y-sailboat2.y)**2<55*55){triggerSailboat2Gust();return true;}
   }
+
   // Ferry
   if(ferry.waitTimer<=0&&ferry.x>-100&&ferry.x<W+100){
     if((x-ferry.x)**2+(y-ferry.y)**2<85*85){triggerFerryElectric();return true;}
