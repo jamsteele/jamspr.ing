@@ -28,8 +28,8 @@
   }
   @keyframes bgFloat {
     0% { transform: translateY(0) rotate(0deg); opacity: 0.08; }
-    50% { transform: translateY(-30px) rotate(180deg); opacity: 0.18; }
-    100% { transform: translateY(0) rotate(360deg); opacity: 0.08; }
+    40% { transform: translateY(-40px) translateX(12px) rotate(160deg); opacity: 0.2; }
+    100% { transform: translateY(20px) translateX(-8px) rotate(360deg); opacity: 0.08; }
   }
   .container {
     position: relative;
@@ -1893,7 +1893,7 @@ function resizeCanvas(){
 
 // ---- Ambient bg petals ----
 function initBgPetals(){
-  for(let i=0;i<12;i++){
+  for(let i=0;i<22;i++){
     const p=document.createElement('div');p.className='bg-petal';
     p.style.left=Math.random()*100+'%';p.style.top=Math.random()*100+'%';
     p.style.setProperty('--dur',(Math.random()*5+4)+'s');p.style.animationDelay=Math.random()*5+'s';
