@@ -965,7 +965,7 @@ function drawGeese(){
 }
 
 // ---- Ferry ----
-const ferry={x:-110,y:0,speed:0.45,waitTimer:0,sparkTimer:0,sparkParticles:[]};
+const ferry={x:-110,y:0,speed:0.45,waitTimer:0,sparkTimer:0,sparkParticles:[],confettiParticles:[]};
 function initFerry(){ferry.y=H*(0.535+Math.random()*0.025);ferry.x=-110;ferry.waitTimer=90+Math.floor(Math.random()*180);ferry.ferryType=Math.random()<0.5?'bcferry':'aquabus';}
 function updateFerry(){
   // Update electric spark particles
@@ -974,6 +974,13 @@ function updateFerry(){
     p.x+=p.vx;p.y+=p.vy;p.vy+=0.08;p.vx*=0.95;
     p.life-=p.decay;
     if(p.life<=0)ferry.sparkParticles.splice(i,1);
+  }
+  // Update confetti particles
+  for(let i=ferry.confettiParticles.length-1;i>=0;i--){
+    const p=ferry.confettiParticles[i];
+    p.x+=p.vx;p.y+=p.vy;p.vy+=0.055;p.vx*=0.98;p.rot+=p.rotV;
+    p.life-=p.decay;
+    if(p.life<=0)ferry.confettiParticles.splice(i,1);
   }
   if(ferry.waitTimer>0){ferry.waitTimer--;return;}
   // Spawn sparks from sparkTimer
@@ -1011,6 +1018,18 @@ function drawFerry(){
       ctx.globalAlpha*=0.6;ctx.strokeStyle=p.color;ctx.lineWidth=1;
       ctx.beginPath();ctx.moveTo(p.x-p.size*1.4,p.y);ctx.lineTo(p.x+p.size*1.4,p.y);ctx.stroke();
       ctx.beginPath();ctx.moveTo(p.x,p.y-p.size*1.4);ctx.lineTo(p.x,p.y+p.size*1.4);ctx.stroke();
+    });
+    ctx.restore();
+  }
+  // Draw confetti particles (world space)
+  if(ferry.confettiParticles.length>0){
+    ctx.save();
+    ferry.confettiParticles.forEach(p=>{
+      ctx.globalAlpha=Math.max(0,p.life)*0.92;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);
+      ctx.fillStyle=p.color;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
     });
     ctx.restore();
   }
@@ -1356,7 +1375,23 @@ function triggerSailboatGust(){
 }
 function triggerFerryElectric(){
   if(ferry.x<-80||ferry.x>W+80)return;
-  ferry.sparkTimer=48;
+  if(ferry.ferryType==='aquabus'){
+    const cols=['#e8282a','#f47920','#fded00','#00a650','#0072ce','#7b1fa2','#ff69b4','#ffffff'];
+    for(let i=0;i<32;i++){
+      const angle=(Math.random()-0.5)*Math.PI*1.4-Math.PI/2;
+      const speed=2+Math.random()*5;
+      ferry.confettiParticles.push({
+        x:ferry.x+(Math.random()-0.5)*60,y:ferry.y-20,
+        vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,
+        rot:Math.random()*Math.PI*2,rotV:(Math.random()-0.5)*0.28,
+        life:1,decay:0.008+Math.random()*0.008,
+        w:4+Math.random()*4,h:2.5+Math.random()*2,
+        color:cols[Math.floor(Math.random()*cols.length)]
+      });
+    }
+  } else {
+    ferry.sparkTimer=48;
+  }
 }
 
 function checkCharacterClick(pos){
