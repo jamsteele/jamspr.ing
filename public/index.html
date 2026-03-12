@@ -445,7 +445,7 @@
     <p>sorry i'm not home right now, i'm walking into <span style="white-space:nowrap">spiderwebs 🕸️</span></p>
   </div>
   <div class="game-section">
-    <div class="game-label">tap the branches</div>
+    <div class="game-label">touch the branches</div>
     <div class="game-container" id="gameContainer">
       <canvas class="game-canvas" id="gameCanvas"></canvas>
     </div>
@@ -1709,8 +1709,8 @@ function updateUI(){
   const counter=document.getElementById('bloomCounter');
   const hint=document.getElementById('gameHint');
   const wishBtn=document.getElementById('wishBtn');
-  if(totalBloomed===0){counter.textContent='';hint.textContent='tap the bare branches to make them bloom';}
-  else if(totalBloomed<totalBranchZones){const pct=Math.round((totalBloomed/totalBranchZones)*100);counter.textContent=`${pct}% in bloom`;hint.textContent='keep tapping to bloom more branches';}
+  if(totalBloomed===0){counter.textContent='';hint.textContent='touch the bare branches to make them bloom';}
+  else if(totalBloomed<totalBranchZones){const pct=Math.round((totalBloomed/totalBranchZones)*100);counter.textContent=`${pct}% in bloom`;hint.textContent='keep touching to bloom more branches';}
   else{counter.textContent='full bloom 🌸';hint.textContent='swirl the petals... or make a wish 🎋';wishBtn.classList.add('visible');updateWishCount();}
 }
 
