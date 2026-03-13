@@ -22,15 +22,15 @@
     height: 8px;
     background: radial-gradient(ellipse at 30% 30%, #f5c6d0, #e8a0b4);
     border-radius: 50% 0 50% 50%;
-    opacity: 0.15;
+    opacity: 0.45;
     pointer-events: none;
     z-index: 0;
     animation: bgFloat var(--dur) ease-in-out infinite;
   }
   @keyframes bgFloat {
-    0% { transform: translateY(0) rotate(0deg); opacity: 0.08; }
-    40% { transform: translateY(-40px) translateX(12px) rotate(160deg); opacity: 0.2; }
-    100% { transform: translateY(20px) translateX(-8px) rotate(360deg); opacity: 0.08; }
+    0% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+    40% { transform: translateY(-40px) translateX(12px) rotate(160deg); opacity: 0.55; }
+    100% { transform: translateY(20px) translateX(-8px) rotate(360deg); opacity: 0.3; }
   }
   .container {
     position: relative;
@@ -547,6 +547,11 @@
   </div>
   <div class="section-label">find me in the wild</div>
   <div class="links-grid">
+    <a href="https://www.instagram.com/jamspring/" target="_blank" rel="noopener" class="link-button">
+      <span class="link-icon">📸</span>
+      <span>Instagram</span>
+      <span class="link-arrow">→</span>
+    </a>
     <a href="https://strava.app.link/FSpDAXcUp1b" target="_blank" rel="noopener" class="link-button">
       <span class="link-icon">🏃🏻‍♀️</span>
       <span>Strava</span>
@@ -1894,7 +1899,7 @@ function resizeCanvas(){
 
 // ---- Ambient bg petals ----
 function initBgPetals(){
-  for(let i=0;i<22;i++){
+  for(let i=0;i<38;i++){
     const p=document.createElement('div');p.className='bg-petal';
     p.style.left=Math.random()*100+'%';p.style.top=Math.random()*100+'%';
     p.style.setProperty('--dur',(Math.random()*5+4)+'s');p.style.animationDelay=Math.random()*5+'s';
