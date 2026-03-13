@@ -1612,7 +1612,7 @@ function draw(){
     ctx.restore();
   }
   update();
-  requestAnimationFrame(draw);
+  if(!document.hidden) requestAnimationFrame(draw);
 }
 
 // ---- Input ----
@@ -1910,6 +1910,7 @@ function initBgPetals(){
 }
 
 // ---- Init ----
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) requestAnimationFrame(draw); });
 window.addEventListener('resize',()=>{clearTimeout(_resizeTimer);_resizeTimer=setTimeout(resizeCanvas,150);});
 initBgPetals();
 resizeCanvas();
