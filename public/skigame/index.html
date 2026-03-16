@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Whistler Descent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: #1a1a2e;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+    height: 100dvh;
+    width: 100%;
+    max-width: 100vw;
+    font-family: 'Montserrat', 'Segoe UI', system-ui, sans-serif;
+    overflow: hidden;
+    touch-action: none;
+    -webkit-overflow-scrolling: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+  }
+  @media (min-height: 600px) and (min-width: 500px) {
+    html, body { align-items: center; }
+  }
+  canvas {
+    border-radius: 8px;
+    box-shadow: 0 0 40px rgba(100, 180, 255, 0.3);
+    display: block;
+  }
+  @media (max-width: 499px) {
+    canvas { border-radius: 0; box-shadow: none; }
+    .sign-frame { transform: scale(0.82); transform-origin: center center; }
+    .screen { padding: 12px 16px 14px; }
+    .screen h1 { font-size: 26px; margin-bottom: 0; }
+    .screen h2 { margin: 4px 0; }
+    .screen p { margin: 3px 0; }
+    .screen button { margin-top: 8px; padding: 10px 16px; }
+  }
+  #game-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  #ui-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+  }
+  #ui-overlay > div { pointer-events: auto; }
+  /* Sign frame — two tall posts with crossbeam on top */
+  .sign-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: auto;
+    position: relative;
+    padding: 0 30px; /* space for posts on sides */
+    /* centered by flexbox parent */
+  }
+  /* Horizontal crossbeam — sits on top of posts */
+  .sign-crossbeam {
+    width: calc(100% + 44px);
+    height: 22px;
+    background:
+      repeating-linear-gradient(0deg,
+        rgba(0,0,0,0) 0px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0) 4px
+      ),
+      radial-gradient(ellipse 12px 10px at 30% 50%, rgba(40,20,0,0.2) 0%, transparent 70%),
+      radial-gradient(ellipse 10px 8px at 75% 50%, rgba(40,20,0,0.15) 0%, transparent 70%),
+      linear-gradient(180deg, #8B5E3C 0%, #a0703c 20%, #b07840 50%, #a0703c 80%, #8B5E3C 100%);
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+    position: relative;
+    z-index: 3;
+  }
+  /* Left post — full height alongside sign */
+  .sign-post-left, .sign-post-right {
+    position: absolute;
+    width: 22px;
+    top: 8px; /* start behind crossbeam */
+    bottom: -10px; /* extend below sign */
+    background:
+      repeating-linear-gradient(0deg,
+        rgba(0,0,0,0) 0px, rgba(0,0,0,0.04) 3px, rgba(0,0,0,0) 6px
+      ),
+      radial-gradient(ellipse 8px 14px at 50% 30%, rgba(40,20,0,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 6px 10px at 50% 70%, rgba(40,20,0,0.12) 0%, transparent 70%),
+      linear-gradient(90deg, #7a4e2a 0%, #9a6838 25%, #a87040 50%, #9a6838 75%, #7a4e2a 100%);
+    border-radius: 8px;
+    box-shadow: 2px 4px 8px rgba(0,0,0,0.35);
+    z-index: 0;
+  }
+  .sign-post-left { left: 4px; }
+  .sign-post-right { right: 4px; }
+  /* The sign panel (dark blue like trail signs) */
+  .screen {
+    text-align: center;
+    color: #fff;
+    background: linear-gradient(180deg, #1a3a5c 0%, #152e4a 50%, #0f2440 100%);
+    padding: 16px 20px 20px;
+    border-radius: 2px;
+    border: 3px solid #0a1a2e;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.05),
+      inset 0 -1px 0 rgba(0,0,0,0.2),
+      0 4px 16px rgba(0,0,0,0.5);
+    max-width: 320px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    margin-top: -4px;
+  }
+  .screen::before {
+    content: '';
+    position: absolute;
+    top: 4px; left: 4px; right: 4px; bottom: 4px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 1px;
+    pointer-events: none;
+  }
+  .screen::after { content: none; }
+  .screen h1 {
+    font-size: 30px;
+    margin-bottom: 2px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+  .screen .location {
+    font-size: 11px;
+    color: #7ab;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .screen h2 {
+    font-size: 22px;
+    margin-bottom: 12px;
+    font-weight: 400;
+    color: #fff;
+  }
+  .screen p {
+    font-size: 14px;
+    margin: 5px 0;
+    color: #b0c8dc;
+  }
+  .screen .subtitle {
+    font-size: 12px;
+    color: #6a8aa0;
+    margin-top: 10px;
+  }
+  .screen .high-score {
+    font-size: 13px;
+    color: #ffd700;
+    margin-top: 8px;
+    font-weight: 600;
+    text-shadow: 0 0 6px rgba(255,215,0,0.3);
+  }
+  .difficulty-arrows {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin: 8px 0 4px;
+  }
+  .difficulty-arrows .arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 11px;
+    color: #b0c8dc;
+    gap: 2px;
+  }
+  .difficulty-arrows .arrow-symbol {
+    font-size: 18px;
+    font-weight: 800;
+  }
+  .sign-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.12);
+    margin: 10px 0;
+  }
+  button {
+    margin-top: 16px;
+    padding: 12px 36px;
+    font-size: 18px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    background: linear-gradient(180deg, #4fc3f7, #2196f3);
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+    font-family: 'Montserrat', 'Segoe UI', system-ui, sans-serif;
+    box-shadow: 0 3px 10px rgba(33,150,243,0.3);
+  }
+  button:hover { background: linear-gradient(180deg, #81d4fa, #42a5f5); transform: scale(1.03); }
+  .stats { margin-top: 12px; font-size: 14px; color: #b0c8dc; }
+  .stats span { display: inline-block; margin: 0 8px; }
+  .new-best { color: #ffd700; font-size: 13px; margin-top: 6px; font-weight: 700; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
+  .village-banner {
+    font-size: 14px;
+    color: #7ab;
+    margin-top: 4px;
+    font-style: italic;
+  }
+  /* Mobile controls — hidden on desktop */
+  #mobile-controls {
+    display: none;
+    position: fixed;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    left: 0; right: 0;
+    justify-content: space-between;
+    padding: 0 calc(24px + env(safe-area-inset-left, 0px));
+    pointer-events: none;
+    z-index: 100;
+  }
+  .ctrl-btn {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(59,130,246,0.35);
+    backdrop-filter: blur(4px);
+    border: 2px solid rgba(59,130,246,0.5);
+    color: rgba(255,255,255,0.9);
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.1s;
+  }
+  .ctrl-btn:active, .ctrl-btn.pressed {
+    background: rgba(59,130,246,0.6);
+    color: #fff;
+  }
+  @media (pointer: coarse) {
+    #mobile-controls { display: flex; }
+  }
+</style>
+</head>
+<body>
+<div id="game-wrapper">
+<canvas id="game"></canvas>
+<div id="ui-overlay">
+  <div id="start-screen" class="sign-frame">
+    <div class="sign-post-left"></div>
+    <div class="sign-post-right"></div>
+    <div class="sign-crossbeam"></div>
+    <div class="screen">
+      <h1>⛷️ Whistler Descent</h1>
+      <div class="location">Whistler Blackcomb, BC</div>
+      <h2>Peak to Village!</h2>
+      <div class="sign-divider"></div>
+      <div class="difficulty-arrows">
+        <div class="arrow"><span class="arrow-symbol" style="color:#22c55e">●</span>Green</div>
+        <div class="arrow"><span class="arrow-symbol" style="color:#3b82f6">■</span>Blue</div>
+        <div class="arrow"><span class="arrow-symbol" style="color:#222;text-shadow:0 0 4px rgba(255,255,255,0.4)">◆</span>Black</div>
+      </div>
+      <div class="sign-divider"></div>
+      <p>⬅️ ➡️ Steer · Hit jumps to fly!</p>
+      <p>🌲 Dodge obstacles · ⭐ Grab snacks!</p>
+      <p class="subtitle">Touch: tap left/right side of screen</p>
+      <p class="high-score" id="start-high-score"></p>
+      <button onclick="startGame()">Drop In</button>
+    </div>
+  </div>
+  <div id="game-over-screen" class="sign-frame" style="display:none;">
+    <div class="sign-post-left"></div>
+    <div class="sign-post-right"></div>
+    <div class="sign-crossbeam"></div>
+    <div class="screen">
+      <h1 id="go-title">🏔️ Run Complete!</h1>
+      <div class="village-banner" id="go-village"></div>
+      <div class="sign-divider"></div>
+      <h2 id="final-distance"></h2>
+      <div id="final-rating" style="margin-bottom:6px"></div>
+      <div class="stats">
+        <span>⭐ <b id="final-score"></b></span>
+        <span>🦌 <b id="final-near"></b></span>
+        <span>🪂 <b id="final-jumps"></b></span>
+      </div>
+      <div class="sign-divider"></div>
+      <p class="new-best" id="new-best" style="display:none">🏆 NEW HIGH SCORE!</p>
+      <p class="high-score" id="end-high-score"></p>
+      <button onclick="startGame()">Drop In Again</button>
+    </div>
+  </div>
+</div>
+</div>
+<div id="mobile-controls">
+  <div class="ctrl-btn" id="btn-left">&#9664;</div>
+  <div class="ctrl-btn" id="btn-right">&#9654;</div>
+</div>
+
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+// Load bear PNG
+const bearImg = new Image();
+bearImg.src = 'black_bear_emoji_small.png';
+let bearImgLoaded = false;
+bearImg.onload = () => { bearImgLoaded = true; };
+
+// Load moose PNG
+const mooseImg = new Image();
+mooseImg.src = 'moose_emoji_small.png';
+let mooseImgLoaded = false;
+mooseImg.onload = () => { mooseImgLoaded = true; };
+
+const W = 480;
+let H = 720;
+
+
+function resize() {
+  const maxW = 480, maxH = 720;
+  const vw = window.innerWidth;
+  const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  const isMobile = vw < 500;
+  if (isMobile) {
+    // On mobile, fill the entire screen
+    canvas.width = maxW;
+    canvas.height = Math.round(maxW * (vh / vw));
+    H = canvas.height;
+    canvas.style.width = vw + 'px';
+    canvas.style.height = vh + 'px';
+  } else {
+    const scale = Math.min(vw / maxW, vh / maxH, 1);
+    canvas.width = maxW;
+    canvas.height = maxH;
+    H = maxH;
+    canvas.style.width = Math.floor(maxW * scale) + 'px';
+    canvas.style.height = Math.floor(maxH * scale) + 'px';
+  }
+  canvas.style.marginLeft = '0';
+  document.body.scrollLeft = 0;
+  document.body.scrollTop = 0;
+  window.scrollTo(0, 0);
+}
+resize();
+window.addEventListener('resize', resize);
+
+// Trail difficulty ratings
+function getTrailRating(spd) {
+  if (spd < 4)  return { symbol: '●',  name: 'Green Circle',  color: '#22c55e', bg: 'rgba(34,197,94,0.7)' };
+  if (spd < 6)  return { symbol: '■',  name: 'Blue Square',   color: '#3b82f6', bg: 'rgba(59,130,246,0.7)' };
+  if (spd < 9)  return { symbol: '◆',  name: 'Black Diamond', color: '#111',    bg: 'rgba(30,30,30,0.8)' };
+  return             { symbol: '◆◆', name: 'Double Black',  color: '#111',    bg: 'rgba(30,30,30,0.8)', double: true };
+}
+
+// High score
+function getHighScore() {
+  return parseInt(localStorage.getItem('whistler-highscore') || '0', 10);
+}
+function saveHighScore(s) {
+  const prev = getHighScore();
+  if (s > prev) { localStorage.setItem('whistler-highscore', s); return true; }
+  return false;
+}
+const hs = getHighScore();
+if (hs > 0) document.getElementById('start-high-score').textContent = `🏆 Best: ${hs}`;
+
+// Game state
+let state = 'start';
+let skier, obstacles, collectibles, particles, snowflakes, floatingTexts, mountains, fogPatches, clouds;
+let distance, score, nearMisses, jumpCount, coinsCollected, crashedInto;
+let speed = 0, maxSpeed, speedAccel;
+let spawnTimer, spawnInterval, coinTimer, fogTimer;
+let keys = {};
+let confetti = [];
+let touchSide = null;
+let frameCount = 0;
+// Initialize visuals for start screen
+particles = []; floatingTexts = []; fogPatches = [];
+mountains = generateMountains();
+clouds = generateClouds();
+snowflakes = Array.from({ length: 80 }, () => {
+  const depth = Math.random();
+  return {
+    x: Math.random() * W, y: Math.random() * H,
+    size: 0.8 + depth * 3.5,
+    speed: 0.5 + depth * 3,
+    drift: (Math.random() - 0.5) * (0.3 + depth * 0.8),
+    depth,
+  };
+});
+let screenShake = 0;
+let combo = 0;
+let comboTimer = 0;
+let lastMilestone = 0;
+let milestoneFlash = 0;
+let milestoneText = '';
+let lastDifficulty = 'Green Circle';
+
+// Obstacle types — PNW Whistler style
+const OBSTACLE_TYPES = [
+  { type: 'cedar',      emoji: '🌲', size: 36, weight: 28, points: 10, minDist: 0 },
+  { type: 'hemlock',    emoji: '🎄', size: 34, weight: 16, points: 10, minDist: 0 },
+  { type: 'rock',       emoji: '🪨', size: 28, weight: 15, points: 15, minDist: 100 },
+  { type: 'jump',       emoji: '⛰️',  size: 40, weight: 12, isJump: true, minDist: 50 },
+  { type: 'mogul',      emoji: '⚪', size: 20, weight: 6,  isMogul: true, minDist: 100 },
+  { type: 'snowboarder',emoji: '🏂', size: 30, weight: 14, points: 20, moves: true, minDist: 200 },
+  { type: 'skier',      emoji: '⛷️', size: 30, weight: 8,  points: 20, moves: true, minDist: 400 },
+  { type: 'deer',       emoji: '🦌', size: 36, weight: 6,  points: 50, moves: true, minDist: 800 },
+  { type: 'bear',       emoji: '🐻', size: 38, weight: 3,  points: 75, moves: true, minDist: 1200 },
+  { type: 'moose',      emoji: '🫎', size: 44, weight: 2,  points: 100, moves: true, minDist: 1500 },
+];
+
+const COLLECTIBLE_TYPES = [
+  { emoji: '⭐', size: 24, points: 50,  weight: 50 },
+  { emoji: '🧇', size: 24, points: 150, weight: 12 }, // Crystal Hut waffle!
+  { emoji: '🍫', size: 22, points: 100, weight: 15 },
+];
+
+function weightedRandom(types) {
+  const total = types.reduce((s, t) => s + t.weight, 0);
+  let r = Math.random() * total;
+  for (const t of types) { r -= t.weight; if (r <= 0) return t; }
+  return types[0];
+}
+
+// Whistler/Blackcomb dual-peak mountain profile
+function generateMountains() {
+  const layers = [];
+  const farPeaks = [];
+  const whistlerCenter = W * 0.35;
+  const blackcombCenter = W * 0.7;
+  farPeaks.push({ x: -30, h: 30 });
+  farPeaks.push({ x: whistlerCenter - 60, h: 55 });
+  farPeaks.push({ x: whistlerCenter - 20, h: 85 });
+  farPeaks.push({ x: whistlerCenter, h: 95 });
+  farPeaks.push({ x: whistlerCenter + 25, h: 80 });
+  farPeaks.push({ x: whistlerCenter + 60, h: 50 });
+  farPeaks.push({ x: (whistlerCenter + blackcombCenter) / 2, h: 35 });
+  farPeaks.push({ x: blackcombCenter - 50, h: 55 });
+  farPeaks.push({ x: blackcombCenter - 15, h: 90 });
+  farPeaks.push({ x: blackcombCenter, h: 100 });
+  farPeaks.push({ x: blackcombCenter + 20, h: 82 });
+  farPeaks.push({ x: blackcombCenter + 55, h: 45 });
+  farPeaks.push({ x: W + 30, h: 25 });
+  layers.push({ peaks: farPeaks, speed: 0.05, color: 0, offset: 0 });
+
+  const midPeaks = [];
+  for (let i = 0; i <= 10; i++) {
+    midPeaks.push({ x: (i / 10) * (W + 80) - 40, h: 25 + Math.random() * 35 });
+  }
+  layers.push({ peaks: midPeaks, speed: 0.15, color: 1, offset: 0 });
+
+  const nearPeaks = [];
+  for (let i = 0; i <= 14; i++) {
+    nearPeaks.push({ x: (i / 14) * (W + 60) - 30, h: 15 + Math.random() * 25 });
+  }
+  layers.push({ peaks: nearPeaks, speed: 0.25, color: 2, offset: 0 });
+
+  return layers;
+}
+
+// Generate cloud wisps
+function generateClouds() {
+  const c = [];
+  for (let i = 0; i < 5; i++) {
+    c.push({
+      x: Math.random() * W,
+      y: H * 0.03 + Math.random() * H * 0.1,
+      w: 60 + Math.random() * 120,
+      h: 12 + Math.random() * 18,
+      speed: 0.15 + Math.random() * 0.3,
+      opacity: 0.15 + Math.random() * 0.2,
+    });
+  }
+  return c;
+}
+
+function initGame() {
+  skier = {
+    x: W / 2, y: H * 0.33, neutralY: H * 0.33, w: 24, h: 32,
+    vx: 0, jumping: false, jumpHeight: 0, jumpVel: 0,
+    jumpCooldown: 0, trail: [], invincible: 0, landingBoost: 0,
+  };
+  obstacles = [];
+  collectibles = [];
+  particles = [];
+  floatingTexts = [];
+  fogPatches = [];
+  mountains = generateMountains();
+  clouds = generateClouds();
+  // Depth-layered snowflakes: depth 0 = far (small, slow), depth 1 = close (big, fast)
+  snowflakes = Array.from({ length: 80 }, () => {
+    const depth = Math.random();
+    return {
+      x: Math.random() * W, y: Math.random() * H,
+      size: 0.8 + depth * 3.5,
+      speed: 0.5 + depth * 3,
+      drift: (Math.random() - 0.5) * (0.3 + depth * 0.8),
+      depth,
+    };
+  });
+  distance = 0; score = 0; nearMisses = 0; jumpCount = 0; coinsCollected = 0; crashedInto = '';
+  speed = 2; maxSpeed = 12; speedAccel = 0.002;
+  spawnTimer = -90; spawnInterval = 60;
+  coinTimer = 0; fogTimer = 0;
+  frameCount = 0; screenShake = 0;
+  combo = 0; comboTimer = 0;
+  lastMilestone = 0; milestoneFlash = 0;
+  lastDifficulty = 'Green Circle';
+  confetti = [];
+}
+
+function spawnFloatingText(x, y, text, color) {
+  floatingTexts.push({ x, y, text, color, life: 50, maxLife: 50, vy: -2, scale: 1.4 });
+}
+
+function spawnConfetti(x, y, count) {
+  const colors = ['#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff', '#ff6eb4', '#a855f7', '#ff9f43', '#00d2d3'];
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const spd = 1.5 + Math.random() * 3.5;
+    confetti.push({
+      x: x + (Math.random() - 0.5) * 80,
+      y: y + (Math.random() - 0.5) * 40,
+      vx: Math.cos(angle) * spd,
+      vy: Math.sin(angle) * spd - 2,
+      rot: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.3,
+      w: 5 + Math.random() * 6,
+      h: 3 + Math.random() * 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      life: 160 + Math.floor(Math.random() * 80),
+    });
+  }
+}
+
+function startGame() {
+  initGame();
+  state = 'playing';
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('game-over-screen').style.display = 'none';
+}
+
+function gameOver() {
+  state = 'over';
+  screenShake = 12;
+  const isNew = saveHighScore(score);
+  const dist = Math.floor(distance);
+
+  // Après-ski callouts — Whistler village spots
+  const apresMessages = [
+    'Time for GLC patio beers. 🍻',
+    'Head to the Longhorn for a pint. 🍻',
+    'Merlin\'s is calling — cheap pitchers await. 🍻',
+    'Dubh Linn Gate for fish & chips.',
+    'Dusty\'s nachos. You\'ve earned it.',
+    'Crystal Hut waffle energy depleted.',
+    'Splitz burger run.',
+    'Handlebar pizza time.',
+    'El Furniture mini donuts. You deserve it. 🍩',
+    'Mogul\'s for breakfast tomorrow.',
+  ];
+  const apres = apresMessages[Math.floor(Math.random() * apresMessages.length)];
+
+  // Bear crash messages
+  const bearMessages = [
+    'That bear is NOT hibernating. 🐻',
+    'Somebody forgot to tell the bear it\'s ski season. 🐻',
+    'Bear: 1, Skier: 0. 🐻',
+    'Pro tip: bears don\'t yield to skiers. 🐻',
+    'That\'s what you get for carrying chocolate. 🍫🐻',
+    'Bear just woke up and chose violence. 🐻',
+  ];
+
+  const mooseMessages = [
+    'You just hit a MOOSE. That\'s on you. 🫎',
+    'Moose: immovable object. You: very stoppable force. 🫎',
+    'That moose didn\'t even flinch. 🫎',
+    'Pro tip: moose have the right of way. Always. 🫎',
+    '1,500 lbs says you lose. 🫎',
+  ];
+
+  let villageMsg = '';
+  if (crashedInto === 'moose') {
+    villageMsg = mooseMessages[Math.floor(Math.random() * mooseMessages.length)] + ' ' + apres;
+  } else if (crashedInto === 'bear') {
+    villageMsg = bearMessages[Math.floor(Math.random() * bearMessages.length)] + ' ' + apres;
+  } else if (dist >= 2000) villageMsg = `Made it to the Village! ${apres}`;
+  else if (dist >= 1500) villageMsg = `Almost to the Village... ${apres}`;
+  else if (dist >= 1000) villageMsg = `Mid-mountain wipeout. ${apres}`;
+  else if (dist >= 500) villageMsg = `Yard sale on the upper mountain. ${apres}`;
+  else villageMsg = `Wiped out near the top. ${apres}`;
+
+  const rating = getTrailRating(speed);
+  const madeVillage = dist >= 2000;
+  document.getElementById('go-title').textContent = madeVillage ? '🏘️ Welcome to the Village!' : '🏔️ Run Complete!';
+  if (madeVillage) {
+    // Big celebration — staggered confetti bursts everywhere
+    for (let i = 0; i < 12; i++) {
+      setTimeout(() => {
+        spawnConfetti(Math.random() * W, -20, 60);
+        spawnConfetti(Math.random() * W, Math.random() * H * 0.3, 40);
+      }, i * 300);
+    }
+  }
+  document.getElementById('go-village').textContent = villageMsg;
+  document.getElementById('final-distance').textContent = `${dist}m down Whistler`;
+  document.getElementById('final-rating').innerHTML =
+    `<span style="color:${rating.color};font-size:20px;font-weight:bold">${rating.symbol}</span> ` +
+    `<span style="color:#aaa;font-size:14px">${rating.name} difficulty at wipeout</span>`;
+  document.getElementById('final-score').textContent = score;
+  document.getElementById('final-near').textContent = nearMisses;
+  document.getElementById('final-jumps').textContent = jumpCount;
+  document.getElementById('new-best').style.display = isNew ? '' : 'none';
+  document.getElementById('end-high-score').textContent = `🏆 Best: ${getHighScore()}`;
+  document.getElementById('game-over-screen').style.display = 'flex';
+}
+
+// Input — prevent arrow keys from scrolling the page
+document.addEventListener('keydown', e => {
+  if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) {
+    e.preventDefault();
+  }
+  keys[e.key] = true;
+  if (e.key === ' ' && (state === 'start' || state === 'over')) startGame();
+});
+document.addEventListener('keyup', e => keys[e.key] = false);
+
+// Prevent any scrolling/bouncing on mobile
+document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+document.addEventListener('gesturestart', e => e.preventDefault());
+document.addEventListener('gesturechange', e => e.preventDefault());
+
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  touchSide = ((e.touches[0].clientX - rect.left) / rect.width) < 0.5 ? 'left' : 'right';
+}, { passive: false });
+canvas.addEventListener('touchend', e => { e.preventDefault(); touchSide = null; }, { passive: false });
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  touchSide = ((e.touches[0].clientX - rect.left) / rect.width) < 0.5 ? 'left' : 'right';
+}, { passive: false });
+
+// Mobile button controls
+const btnLeft = document.getElementById('btn-left');
+const btnRight = document.getElementById('btn-right');
+btnLeft.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); touchSide = 'left'; btnLeft.classList.add('pressed'); }, { passive: false });
+btnLeft.addEventListener('touchend', e => { e.preventDefault(); e.stopPropagation(); touchSide = null; btnLeft.classList.remove('pressed'); }, { passive: false });
+btnRight.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); touchSide = 'right'; btnRight.classList.add('pressed'); }, { passive: false });
+btnRight.addEventListener('touchend', e => { e.preventDefault(); e.stopPropagation(); touchSide = null; btnRight.classList.remove('pressed'); }, { passive: false });
+
+function spawnObstacle() {
+  const available = OBSTACLE_TYPES.filter(t => distance >= t.minDist);
+  const type = weightedRandom(available);
+  const margin = 40;
+  const baseX = margin + Math.random() * (W - margin * 2);
+
+  if ((type.type === 'cedar' || type.type === 'hemlock') && Math.random() < 0.25) {
+    const clusterSize = 2 + Math.floor(Math.random() * 3);
+    for (let c = 0; c < clusterSize; c++) {
+      const treeType = Math.random() < 0.5 ? OBSTACLE_TYPES[0] : OBSTACLE_TYPES[1];
+      const ox = baseX + (Math.random() - 0.5) * 50;
+      const oy = H + 40 + (Math.random() - 0.5) * 30;
+      if (ox > margin && ox < W - margin) {
+        obstacles.push({
+          ...treeType,
+          x: ox, y: oy, hit: false,
+          moveDir: 0, moveSpeed: 0,
+          wobble: Math.random() * Math.PI * 2,
+        });
+      }
+    }
+    return;
+  }
+
+  // Mogul field — staggered diamond grid like a real resort bump run
+  if (type.type === 'mogul' && Math.random() < 0.6) {
+    const mogulType = OBSTACLE_TYPES.find(t => t.type === 'mogul');
+    const cols = 3 + Math.floor(Math.random() * 2); // 3-4 columns
+    const rows = 3 + Math.floor(Math.random() * 3); // 3-5 rows
+    const spacingX = 44;
+    const spacingY = 36;
+    const fieldW = (cols - 1) * spacingX;
+    const centerX = Math.max(80, Math.min(W - 80, baseX));
+    const startX = centerX - fieldW / 2;
+    const startY = H + 40;
+    for (let r = 0; r < rows; r++) {
+      const offset = (r % 2 === 1) ? spacingX / 2 : 0; // stagger odd rows
+      const rowCols = (r % 2 === 1) ? cols - 1 : cols;  // odd rows have one fewer
+      for (let c = 0; c < rowCols; c++) {
+        const mx = startX + offset + c * spacingX;
+        const my = startY + r * spacingY;
+        if (mx > 30 && mx < W - 30) {
+          obstacles.push({
+            ...mogulType,
+            x: mx, y: my, hit: false,
+            moveDir: 0, moveSpeed: 0,
+            wobble: Math.random() * Math.PI * 2,
+          });
+        }
+      }
+    }
+    return;
+  }
+
+  obstacles.push({
+    ...type,
+    x: baseX,
+    y: H + 40,
+    hit: false,
+    moveDir: type.moves ? (Math.random() < 0.5 ? -1 : 1) : 0,
+    moveSpeed: type.moves ? (Math.random() * 1.5 + 0.5) : 0,
+    wobble: Math.random() * Math.PI * 2,
+  });
+
+  // Animal spawn alerts
+  if (type.type === 'bear') {
+    const bearAlerts = [
+      '🐻 That bear is NOT hibernating!',
+      '🐻 Somebody forgot to tell the bear it\'s ski season!',
+      '🐻 Pro tip: bears don\'t yield to skiers!',
+    ];
+    milestoneText = bearAlerts[Math.floor(Math.random() * bearAlerts.length)];
+    milestoneFlash = 120;
+  } else if (type.type === 'deer') {
+    const deerAlerts = [
+      '🦌 Deer on the run!',
+      '🦌 Watch out — deer crossing!',
+      '🦌 Bambi doesn\'t care about your line!',
+    ];
+    milestoneText = deerAlerts[Math.floor(Math.random() * deerAlerts.length)];
+    milestoneFlash = 100;
+  } else if (type.type === 'moose') {
+    const mooseAlerts = [
+      '🫎 MOOSE ON THE MOUNTAIN!',
+      '🫎 That is an ACTUAL moose!',
+      '🫎 1,500 lbs of don\'t-mess-with-me!',
+    ];
+    milestoneText = mooseAlerts[Math.floor(Math.random() * mooseAlerts.length)];
+    milestoneFlash = 140;
+  }
+}
+
+function spawnCollectible() {
+  const type = weightedRandom(COLLECTIBLE_TYPES);
+  const margin = 50;
+  collectibles.push({
+    ...type,
+    x: margin + Math.random() * (W - margin * 2),
+    y: H + 30,
+    bobOffset: Math.random() * Math.PI * 2,
+  });
+}
+
+function spawnFogPatch() {
+  fogPatches.push({
+    x: Math.random() * W,
+    y: H + 100,
+    w: 200 + Math.random() * 250,
+    h: 120 + Math.random() * 100,
+    opacity: 0.25 + Math.random() * 0.35,
+    driftX: (Math.random() - 0.5) * 0.8,
+  });
+}
+
+function spawnParticles(x, y, color, count) {
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 6,
+      vy: (Math.random() - 0.5) * 6 - 2,
+      life: 30 + Math.random() * 20, maxLife: 50,
+      color, size: Math.random() * 4 + 2,
+    });
+  }
+}
+
+// More dramatic powder spray — billowy puffs
+function spawnSnowSpray(x, y, direction) {
+  for (let i = 0; i < 8; i++) {
+    const angle = direction * (Math.random() * 0.8 + 0.3);
+    particles.push({
+      x: x + direction * 10, y: y + 10 + Math.random() * 6,
+      vx: direction * (Math.random() * 4 + 1.5),
+      vy: (Math.random() - 0.7) * 3,
+      life: 20 + Math.random() * 15, maxLife: 35,
+      color: '#ffffff', size: Math.random() * 5 + 2,
+    });
+  }
+}
+
+// Landing impact burst
+function spawnLandingImpact(x, y) {
+  for (let i = 0; i < 18; i++) {
+    const angle = (i / 18) * Math.PI * 2;
+    const spd = Math.random() * 4 + 1;
+    particles.push({
+      x, y: y + 14,
+      vx: Math.cos(angle) * spd,
+      vy: Math.sin(angle) * spd * 0.5 - Math.random() * 2,
+      life: 25 + Math.random() * 15, maxLife: 40,
+      color: '#ffffff', size: Math.random() * 5 + 2,
+    });
+  }
+  // Central plume
+  for (let i = 0; i < 6; i++) {
+    particles.push({
+      x: x + (Math.random() - 0.5) * 20, y: y + 14,
+      vx: (Math.random() - 0.5) * 2,
+      vy: -Math.random() * 4 - 1,
+      life: 20 + Math.random() * 10, maxLife: 30,
+      color: '#ddeeff', size: Math.random() * 6 + 3,
+    });
+  }
+}
+
+function update() {
+  if (state !== 'playing') {
+    frameCount++;
+    if (screenShake > 0) screenShake *= 0.85;
+    // Still update clouds, snowflakes, and confetti when not playing
+    if (clouds) {
+      for (const c of clouds) {
+        c.x += c.speed * 0.3;
+        if (c.x > W + c.w) c.x = -c.w;
+      }
+    }
+    if (snowflakes) {
+      for (const s of snowflakes) {
+        s.y += s.speed * 0.5;
+        s.x += s.drift + Math.sin(frameCount * 0.02 + s.x) * (0.1 + s.depth * 0.3);
+        if (s.y > H + 10) { s.y = -10; s.x = Math.random() * W; }
+        if (s.x < 0) s.x = W;
+        if (s.x > W) s.x = 0;
+      }
+    }
+    for (let i = confetti.length - 1; i >= 0; i--) {
+      const c = confetti[i];
+      c.x += c.vx; c.y += c.vy; c.vy += 0.08; c.vx *= 0.99;
+      c.rot += c.rotSpeed;
+      c.life--;
+      if (c.life <= 0) confetti.splice(i, 1);
+    }
+    return;
+  }
+  frameCount++;
+  if (screenShake > 0) screenShake *= 0.85;
+
+  speed = Math.min(maxSpeed, speed + speedAccel);
+  // Landing boost adds temporary speed surge — obstacles scroll faster too
+  const landBoost = skier ? skier.landingBoost : 0;
+  const scrollSpeed = speed * (1 + landBoost * 0.5);
+  distance += scrollSpeed * 0.3;
+
+
+  // Difficulty milestones
+  const milestoneMessages = [
+    { dist: 100,  text: '🪨 Watch for rocks!' },
+    { dist: 200,  text: '🏂 Snowboarders ahead!' },
+    { dist: 400,  text: '⛷️ No friends on a powder day!' },
+    { dist: 600,  text: '🏔️ Getting steeper!' },
+    { dist: 800,  text: '🦌 Deer on the run!' },
+    { dist: 1000, text: '💯 Legit run!' },
+    { dist: 1200, text: '🌫️ Steeps and deeps!' },
+    { dist: 1600, text: '🧇 Earn your turns!' },
+    { dist: 2000, text: '🔥 FULL SEND!', celebrate: true },
+    { dist: 2500, text: '🏔️ Epic descent!' },
+    { dist: 3000, text: '⚡ LEGENDARY!', celebrate: true },
+    { dist: 3500, text: '👑 Sending it to the Village!', celebrate: true },
+  ];
+  for (const m of milestoneMessages) {
+    if (distance >= m.dist && lastMilestone < m.dist) {
+      lastMilestone = m.dist;
+      milestoneFlash = 100;
+      milestoneText = m.text;
+      if (m.celebrate) {
+        spawnConfetti(skier.x, skier.y - 40, 15);
+        spawnConfetti(W * 0.25, skier.y - 20, 10);
+        spawnConfetti(W * 0.75, skier.y - 20, 10);
+      }
+      break;
+    }
+  }
+  const km = Math.floor(distance / 1000) * 1000;
+  if (km >= 2000 && km > lastMilestone) {
+    lastMilestone = km;
+    milestoneFlash = 90;
+    milestoneText = `${km}m — KEEP GOING!`;
+  }
+  if (milestoneFlash > 0) milestoneFlash--;
+
+  if (comboTimer > 0) { comboTimer--; if (comboTimer <= 0) combo = 0; }
+
+  // Skier movement
+  const accel = 0.8, friction = 0.88, maxVx = 7;
+  let moveLeft = keys['ArrowLeft'] || keys['a'] || keys['A'] || touchSide === 'left';
+  let moveRight = keys['ArrowRight'] || keys['d'] || keys['D'] || touchSide === 'right';
+  if (moveLeft) skier.vx -= accel;
+  if (moveRight) skier.vx += accel;
+  skier.vx *= friction;
+  skier.vx = Math.max(-maxVx, Math.min(maxVx, skier.vx));
+  skier.x += skier.vx;
+
+  // Billowy powder spray on hard turns
+  if (!skier.jumping && Math.abs(skier.vx) > 3 && frameCount % 2 === 0) {
+    spawnSnowSpray(skier.x, skier.y, skier.vx > 0 ? -1 : 1);
+  }
+
+  const pad = 20;
+  if (skier.x < pad) { skier.x = pad; skier.vx = 0; }
+  if (skier.x > W - pad) { skier.x = W - pad; skier.vx = 0; }
+
+  // Jump — longer hang time, land further down then drift back
+  if (skier.jumping) {
+    skier.jumpVel -= 0.25;
+    skier.jumpHeight += skier.jumpVel;
+    if (skier.jumpHeight <= 0) {
+      skier.jumpHeight = 0;
+      skier.jumping = false;
+      skier.jumpCooldown = 20;
+      skier.landingBoost = 1.0; // landing speed boost (decays to 0)
+      spawnLandingImpact(skier.x, skier.y);
+    }
+  }
+  // Landing boost: skier slides down screen fast then decelerates back to neutral
+  if (skier.landingBoost > 0.01) {
+    skier.y += skier.landingBoost * 4; // push down screen
+    skier.y = Math.min(H * 0.55, skier.y);
+    skier.landingBoost *= 0.92; // decelerate
+    if (skier.landingBoost < 0.01) skier.landingBoost = 0;
+  } else if (!skier.jumping && Math.abs(skier.y - skier.neutralY) > 1) {
+    // Drift back to neutral after boost ends
+    skier.y += (skier.neutralY - skier.y) * 0.04;
+  }
+  if (skier.jumpCooldown > 0) skier.jumpCooldown--;
+  if (skier.invincible > 0) skier.invincible--;
+
+  if (!skier.jumping && frameCount % 2 === 0) {
+    skier.trail.push({ x: skier.x, y: skier.y + 16 });
+    if (skier.trail.length > 40) skier.trail.shift();
+  }
+
+  // Spawn obstacles
+  spawnTimer++;
+  const adjustedInterval = Math.max(18, spawnInterval - distance * 0.015);
+  if (spawnTimer >= adjustedInterval) {
+    spawnTimer = 0;
+    spawnObstacle();
+    const clusterChance = Math.min(0.4, distance * 0.0003);
+    if (Math.random() < clusterChance) {
+      setTimeout(() => { if (state === 'playing') spawnObstacle(); }, 100);
+    }
+  }
+
+  // Spawn collectibles
+  coinTimer++;
+  if (coinTimer >= 70 + Math.random() * 40) { coinTimer = 0; spawnCollectible(); }
+
+  // Spawn fog
+  if (distance > 800) {
+    fogTimer++;
+    const fogInterval = Math.max(100, 300 - (distance - 800) * 0.05);
+    if (fogTimer >= fogInterval) {
+      fogTimer = 0;
+      spawnFogPatch();
+    }
+  }
+
+  // Update fog patches
+  for (let i = fogPatches.length - 1; i >= 0; i--) {
+    const f = fogPatches[i];
+    f.y -= scrollSpeed * 0.7;
+    f.x += f.driftX;
+    if (f.y < -f.h - 50) fogPatches.splice(i, 1);
+  }
+
+  // Update collectibles
+  for (let i = collectibles.length - 1; i >= 0; i--) {
+    const c = collectibles[i];
+    c.y -= scrollSpeed;
+    c.bobOffset += 0.08;
+    if (c.y < -40) { collectibles.splice(i, 1); continue; }
+    const dx = Math.abs(c.x - skier.x), dy = Math.abs(c.y - skier.y);
+    if (dx < 24 && dy < 24) {
+      score += c.points;
+      coinsCollected++;
+      spawnParticles(c.x, c.y, '#ffd700', 8);
+      spawnFloatingText(c.x, c.y, `+${c.points}`, '#ffd700');
+      collectibles.splice(i, 1);
+    }
+  }
+
+  // Update obstacles
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+    const ob = obstacles[i];
+    ob.y -= scrollSpeed;
+    if (ob.moveDir) {
+      ob.wobble += 0.05;
+      ob.x += ob.moveDir * ob.moveSpeed;
+      if (ob.x < 30 || ob.x > W - 30) ob.moveDir *= -1;
+    }
+    if (ob.y < -60) {
+      if (!ob.hit && !ob.isJump && !ob.isMogul) {
+        score += ob.points || 10;
+        const dx = Math.abs(ob.x - skier.x);
+        if (dx < ob.size * 1.5) {
+          nearMisses++;
+          combo++;
+          comboTimer = 90;
+          const comboMultiplier = Math.min(combo, 5);
+          const bonus = 25 * comboMultiplier;
+          score += bonus;
+          spawnParticles(skier.x, skier.y, '#ffd700', 5);
+          spawnFloatingText(skier.x, skier.y - 20,
+            combo >= 2 ? `${combo}x COMBO +${bonus}` : `CLOSE! +${bonus}`,
+            combo >= 2 ? '#ff6600' : '#ffd700');
+        }
+      }
+      obstacles.splice(i, 1);
+      continue;
+    }
+    if (!ob.hit) {
+      const dx = Math.abs(ob.x - skier.x), dy = Math.abs(ob.y - skier.y);
+      const hitDist = (ob.size + skier.w) * 0.4;
+      if (dx < hitDist && dy < hitDist + 8) {
+        if (ob.isJump) {
+          if (!skier.jumping && skier.jumpCooldown <= 0) {
+            skier.jumping = true;
+            skier.jumpVel = 7 + speed * 0.4;
+            skier.jumpHeight = 1;
+            jumpCount++;
+            ob.hit = true;
+            const jumpPts = 50 + Math.floor(speed * 5);
+            score += jumpPts;
+            spawnParticles(skier.x, skier.y + 16, '#87ceeb', 12);
+            spawnFloatingText(skier.x, skier.y - 20, `JUMP! +${jumpPts}`, '#4db8e8');
+          }
+        } else if (ob.isMogul) {
+          if (!skier.jumping && skier.jumpCooldown <= 0) {
+            skier.jumping = true;
+            skier.jumpVel = 3 + speed * 0.2;
+            skier.jumpHeight = 1;
+            ob.hit = true;
+            const mogulPts = 15 + Math.floor(speed * 2);
+            score += mogulPts;
+            spawnParticles(skier.x, skier.y + 10, '#e8e8e8', 6);
+            spawnFloatingText(skier.x, skier.y - 15, `MOGUL +${mogulPts}`, '#a0d0e8');
+          }
+        } else if (skier.jumping && skier.jumpHeight > 10) {
+          const pts = (ob.points || 10) * 3;
+          score += pts;
+          spawnParticles(ob.x, ob.y, '#ffd700', 8);
+          spawnFloatingText(ob.x, ob.y, `JUMPED! +${pts}`, '#00e5ff');
+          ob.hit = true;
+        } else if (!skier.invincible) {
+          spawnParticles(skier.x, skier.y, '#ff4444', 15);
+          spawnParticles(skier.x, skier.y, '#ffffff', 10);
+          screenShake = 15;
+          crashedInto = ob.type;
+          gameOver();
+          return;
+        }
+      }
+    }
+  }
+
+  // Update particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.vx *= 0.98;
+    p.life--;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+
+  // Update confetti
+  for (let i = confetti.length - 1; i >= 0; i--) {
+    const c = confetti[i];
+    c.x += c.vx + Math.sin(c.life * 0.1) * 0.8; c.y += c.vy; c.vy += 0.04; c.vx *= 0.99;
+    c.rot += c.rotSpeed;
+    c.life--;
+    if (c.life <= 0) confetti.splice(i, 1);
+  }
+
+  // Update floating texts — scale animation
+  for (let i = floatingTexts.length - 1; i >= 0; i--) {
+    const ft = floatingTexts[i];
+    ft.y += ft.vy; ft.life--;
+    // Scale eases from 1.4 → 1.0 quickly, then stays at 1.0
+    const elapsed = ft.maxLife - ft.life;
+    ft.scale = elapsed < 8 ? 1 + 0.4 * (1 - elapsed / 8) : 1.0;
+    if (ft.life <= 0) floatingTexts.splice(i, 1);
+  }
+
+  // Update snowflakes — depth-based speed, capped to avoid blur
+  const sfScrollCap = Math.min(scrollSpeed, 8);
+  for (const s of snowflakes) {
+    s.y -= sfScrollCap * (0.2 + s.depth * 0.6) + s.speed;
+    s.x += s.drift + Math.sin(frameCount * 0.02 + s.x) * (0.1 + s.depth * 0.3);
+    if (s.y < -10) { s.y = H + 10; s.x = Math.random() * W; }
+    if (s.x < 0) s.x = W;
+    if (s.x > W) s.x = 0;
+  }
+
+  // Update clouds
+  for (const c of clouds) {
+    c.x += c.speed;
+    if (c.x > W + c.w) c.x = -c.w;
+  }
+
+  for (const layer of mountains) { layer.offset += scrollSpeed * layer.speed * 0.1; }
+
+  for (const t of skier.trail) { t.y -= scrollSpeed; }
+  skier.trail = skier.trail.filter(t => t.y > -10);
+}
+
+// Draw a PNW cedar/hemlock tree — dense, overlapping tiers
+function drawPNWTree(x, y, size, isHemlock) {
+  const h = size * 1.3;
+  const trunkW = size * 0.06;
+  const tiers = isHemlock ? 6 : 5;
+
+  ctx.fillStyle = '#4e342e';
+  ctx.fillRect(x - trunkW, y + size * 0.1, trunkW * 2, h * 0.15);
+
+  const baseGreen = isHemlock ? '#14532d' : '#166534';
+  const midGreen = isHemlock ? '#1a6b3a' : '#1b7d3e';
+  const lightGreen = isHemlock ? '#22803a' : '#22863f';
+  const greens = [baseGreen, midGreen, lightGreen, baseGreen, midGreen, lightGreen];
+
+  for (let i = 0; i < tiers; i++) {
+    const t = i / (tiers - 1);
+    const tierY = y + size * 0.1 - t * h;
+    const tierW = size * (0.45 - t * 0.28);
+    const overlap = h / tiers * 0.4;
+
+    ctx.fillStyle = greens[i % greens.length];
+    ctx.beginPath();
+    ctx.moveTo(x, tierY - h / tiers * 0.55);
+    ctx.lineTo(x - tierW, tierY + overlap);
+    ctx.lineTo(x + tierW, tierY + overlap);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  const topY = y + size * 0.1 - h;
+  ctx.beginPath();
+  ctx.moveTo(x, topY - h / tiers * 0.4);
+  ctx.lineTo(x - size * 0.08, topY + 3);
+  ctx.lineTo(x + size * 0.08, topY + 3);
+  ctx.closePath();
+  ctx.fill();
+}
+
+// Rounded rectangle helper for glass HUD
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function draw() {
+  ctx.save();
+
+  if (screenShake > 0.5) {
+    ctx.translate((Math.random() - 0.5) * screenShake, (Math.random() - 0.5) * screenShake);
+  }
+
+  // Blue sky gradient
+  const snowGrad = ctx.createLinearGradient(0, 0, 0, H);
+  snowGrad.addColorStop(0, '#5ba3d9');
+  snowGrad.addColorStop(0.08, '#7bb8e3');
+  snowGrad.addColorStop(0.15, '#a8d4f0');
+  snowGrad.addColorStop(0.3, '#d6eaf5');
+  snowGrad.addColorStop(0.6, '#e8f0f5');
+  snowGrad.addColorStop(1, '#f0f5f8');
+  ctx.fillStyle = snowGrad;
+  ctx.fillRect(-10, -10, W + 20, H + 20);
+
+  // Subtle snow terrain undulation bands
+  const visualSpeed = Math.min(speed, 7); // Cap visual scroll to reduce blur at high speed
+  const bandOffset = (frameCount * visualSpeed * 0.5) % 120;
+  for (let y = H * 0.18 - 120 + bandOffset; y < H + 120; y += 120) {
+    const grad = ctx.createLinearGradient(0, y, 0, y + 60);
+    grad.addColorStop(0, 'rgba(180, 210, 240, 0.0)');
+    grad.addColorStop(0.3, 'rgba(180, 210, 240, 0.06)');
+    grad.addColorStop(0.5, 'rgba(190, 215, 240, 0.08)');
+    grad.addColorStop(0.7, 'rgba(180, 210, 240, 0.06)');
+    grad.addColorStop(1, 'rgba(180, 210, 240, 0.0)');
+    ctx.fillStyle = grad;
+    // Slight wave shape
+    ctx.beginPath();
+    ctx.moveTo(-10, y);
+    for (let x = 0; x <= W + 10; x += 40) {
+      const wave = Math.sin(x * 0.015 + frameCount * 0.01) * 8;
+      ctx.lineTo(x, y + wave);
+    }
+    for (let x = W + 10; x >= -10; x -= 40) {
+      const wave = Math.sin(x * 0.015 + frameCount * 0.01) * 8;
+      ctx.lineTo(x, y + 60 + wave);
+    }
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // Mountains
+  const mtColors = [
+    'rgba(80, 110, 150, 0.7)',
+    'rgba(40, 75, 55, 0.5)',
+    'rgba(60, 95, 65, 0.35)',
+  ];
+  for (const layer of mountains) {
+    ctx.fillStyle = mtColors[layer.color];
+    ctx.beginPath();
+    ctx.moveTo(-10, H * 0.15);
+    for (const peak of layer.peaks) {
+      const yo = Math.sin(layer.offset * 0.01 + peak.x * 0.01) * 3;
+      ctx.lineTo(peak.x, H * 0.15 - peak.h + yo);
+    }
+    ctx.lineTo(W + 10, H * 0.15);
+    ctx.closePath();
+    ctx.fill();
+
+    if (layer.color === 0) {
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      for (const peak of layer.peaks) {
+        if (peak.h < 60) continue;
+        const yo = Math.sin(layer.offset * 0.01 + peak.x * 0.01) * 3;
+        const py = H * 0.15 - peak.h + yo;
+        ctx.beginPath();
+        ctx.moveTo(peak.x, py);
+        ctx.lineTo(peak.x - 15, py + 20);
+        ctx.lineTo(peak.x + 15, py + 20);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+  }
+
+  // Cloud wisps — semi-transparent, drifting across mountain peaks
+  if (clouds) {
+    for (const c of clouds) {
+      ctx.save();
+      ctx.globalAlpha = c.opacity;
+      const grd = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.w * 0.5);
+      grd.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+      grd.addColorStop(0.4, 'rgba(255, 255, 255, 0.4)');
+      grd.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.ellipse(c.x, c.y, c.w * 0.5, c.h * 0.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Second puff for cloud shape
+      ctx.beginPath();
+      ctx.ellipse(c.x + c.w * 0.25, c.y - c.h * 0.15, c.w * 0.3, c.h * 0.4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  // Start screen decorations — trees and skiers peeking out around the sign
+  if (state === 'start') {
+    // Trees framing the sign — visible in margins and below
+    const startTrees = [
+      // Top area above sign
+      { x: 30, y: H * 0.15, s: 26, h: true }, { x: 80, y: H * 0.18, s: 22 },
+      { x: W - 35, y: H * 0.16, s: 24 }, { x: W - 80, y: H * 0.14, s: 20, h: true },
+      // Left margin
+      { x: 18, y: H * 0.35, s: 28 }, { x: 35, y: H * 0.5, s: 32, h: true },
+      { x: 15, y: H * 0.65, s: 30 },
+      // Right margin
+      { x: W - 18, y: H * 0.33, s: 26, h: true }, { x: W - 38, y: H * 0.48, s: 30 },
+      { x: W - 15, y: H * 0.62, s: 28, h: true },
+      // Bottom area below sign — tree line
+      { x: 30, y: H * 0.88, s: 34 }, { x: 75, y: H * 0.92, s: 38, h: true },
+      { x: 130, y: H * 0.95, s: 36 }, { x: 190, y: H * 0.93, s: 32 },
+      { x: 250, y: H * 0.97, s: 40, h: true }, { x: 310, y: H * 0.94, s: 34 },
+      { x: 370, y: H * 0.96, s: 38 }, { x: 420, y: H * 0.91, s: 36, h: true },
+      { x: W - 25, y: H * 0.89, s: 32 },
+    ];
+    for (const t of startTrees) {
+      drawPNWTree(t.x, t.y, t.s, !!t.h);
+    }
+
+    // Animated skiers/snowboarders in visible margins
+    ctx.font = '20px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const t = frameCount * 0.02;
+    ctx.fillText('⛷️', 25 + Math.sin(t) * 8, H * 0.42 + Math.cos(t) * 2);
+    ctx.fillText('🏂', W - 25 + Math.sin(t + 2) * 8, H * 0.55 + Math.cos(t + 2) * 2);
+
+    // A rock
+    ctx.font = '20px serif';
+    ctx.fillText('🪨', W - 30, H * 0.72);
+    ctx.fillText('🪨', 22, H * 0.78);
+  }
+
+  // Ski trail
+  const trailSnowLine = H * 0.15;
+  if (skier.trail.length > 1) {
+    ctx.strokeStyle = 'rgba(160, 180, 200, 0.4)';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    let started = false;
+    for (let i = 0; i < skier.trail.length; i++) {
+      const t = skier.trail[i];
+      if (t.y < trailSnowLine) { started = false; continue; }
+      if (!started) { ctx.moveTo(t.x - 4, t.y); started = true; } else ctx.lineTo(t.x - 4, t.y);
+    }
+    ctx.stroke();
+    ctx.beginPath();
+    started = false;
+    for (let i = 0; i < skier.trail.length; i++) {
+      const t = skier.trail[i];
+      if (t.y < trailSnowLine) { started = false; continue; }
+      if (!started) { ctx.moveTo(t.x + 4, t.y); started = true; } else ctx.lineTo(t.x + 4, t.y);
+    }
+    ctx.stroke();
+  }
+
+  // Far snowflakes (depth < 0.4) — behind obstacles
+  for (const s of snowflakes) {
+    if (s.depth >= 0.4) continue;
+    const alpha = 0.15 + s.depth * 0.3;
+    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Collectibles
+  const collectSnowLine = H * 0.15;
+  for (const c of collectibles) {
+    if (c.y < collectSnowLine) continue;
+    ctx.save();
+    const bob = Math.sin(c.bobOffset) * 4;
+    ctx.fillStyle = 'rgba(255, 215, 0, 0.2)';
+    ctx.beginPath();
+    ctx.arc(c.x, c.y + bob, 16, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.font = `${c.size}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.globalAlpha = 1.0;
+    ctx.fillStyle = '#000';
+    ctx.fillText(c.emoji, c.x, c.y + bob);
+    ctx.restore();
+  }
+
+  // Obstacles
+  const snowLine = H * 0.15;
+  for (const ob of obstacles) {
+    if (ob.hit && !ob.isJump && !ob.isMogul) continue;
+    if (ob.y < snowLine) continue;
+    ctx.save();
+
+    // Shadow — dark ellipse under stationary obstacles only (trees, rocks, jump)
+    if (!ob.isJump && !ob.isMogul && !ob.moves) {
+      ctx.fillStyle = 'rgba(0,0,0,0.15)';
+      ctx.beginPath();
+      ctx.ellipse(ob.x, ob.y + ob.size * 0.45, ob.size * 0.45, ob.size * 0.13, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    if (ob.isMogul) {
+      // Snow mound — small white bump
+      const mw = 14, mh = 6;
+      const alpha = ob.hit ? 0.4 : 1.0;
+      ctx.globalAlpha = alpha;
+      // Subtle shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.08)';
+      ctx.beginPath();
+      ctx.ellipse(ob.x, ob.y + 3, mw + 1, 3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Mound body
+      ctx.fillStyle = '#e8eef4';
+      ctx.beginPath();
+      ctx.ellipse(ob.x, ob.y, mw, mh, 0, Math.PI, Math.PI * 2);
+      ctx.fill();
+      // Snow highlight on top
+      ctx.fillStyle = '#f4f8fc';
+      ctx.beginPath();
+      ctx.ellipse(ob.x - 2, ob.y - 1, mw * 0.6, mh * 0.5, 0, Math.PI, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
+    } else if (ob.type === 'cedar' || ob.type === 'hemlock') {
+      drawPNWTree(ob.x, ob.y, ob.size, ob.type === 'hemlock');
+    } else if (ob.isJump) {
+      // Blue rectangle ramp — top-down view
+      const rw = 32, rh = 10;
+
+      // Shadow under ramp
+      ctx.fillStyle = 'rgba(0,0,0,0.1)';
+      ctx.beginPath();
+      ctx.ellipse(ob.x, ob.y + rh + 3, rw + 2, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ramp body — solid blue rectangle
+      ctx.fillStyle = ob.hit ? 'rgba(70, 160, 220, 0.4)' : '#4db8e8';
+      roundRect(ob.x - rw, ob.y - rh, rw * 2, rh * 2, 3);
+      ctx.fill();
+
+      // Lighter top edge highlight
+      if (!ob.hit) {
+        ctx.fillStyle = '#7ad0f5';
+        roundRect(ob.x - rw + 2, ob.y - rh + 2, rw * 2 - 4, rh * 0.7, 2);
+        ctx.fill();
+
+        // Subtle pulsing glow
+        ctx.save();
+        ctx.globalAlpha = 0.12 + Math.sin(frameCount * 0.08) * 0.06;
+        const glow = ctx.createRadialGradient(ob.x, ob.y, 0, ob.x, ob.y, rw + 12);
+        glow.addColorStop(0, 'rgba(80, 200, 255, 0.4)');
+        glow.addColorStop(1, 'rgba(80, 200, 255, 0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(ob.x, ob.y, rw + 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    } else if (ob.type === 'bear' && bearImgLoaded) {
+      const bw = ob.size * 1.4;
+      const bh = bw * (bearImg.naturalHeight / bearImg.naturalWidth);
+      ctx.save();
+      if (ob.moveDir > 0) {
+        ctx.translate(ob.x, ob.y);
+        ctx.scale(-1, 1);
+        ctx.drawImage(bearImg, -bw / 2, -bh / 2, bw, bh);
+      } else {
+        ctx.drawImage(bearImg, ob.x - bw / 2, ob.y - bh / 2, bw, bh);
+      }
+      ctx.restore();
+    } else if (ob.type === 'moose' && mooseImgLoaded) {
+      const mw = ob.size * 1.4;
+      const mh = mw * (mooseImg.naturalHeight / mooseImg.naturalWidth);
+      ctx.save();
+      if (ob.moveDir > 0) {
+        ctx.translate(ob.x, ob.y);
+        ctx.scale(-1, 1);
+        ctx.drawImage(mooseImg, -mw / 2, -mh / 2, mw, mh);
+      } else {
+        ctx.drawImage(mooseImg, ob.x - mw / 2, ob.y - mh / 2, mw, mh);
+      }
+      ctx.restore();
+    } else {
+      ctx.font = `${ob.size}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.globalAlpha = 1.0;
+      ctx.fillStyle = '#000';
+      ctx.fillText(ob.emoji, ob.x, ob.y);
+    }
+
+    ctx.restore();
+  }
+
+  // Fog patches
+  for (const f of fogPatches) {
+    const grd = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.w * 0.5);
+    grd.addColorStop(0, `rgba(200, 210, 220, ${f.opacity})`);
+    grd.addColorStop(0.6, `rgba(210, 220, 230, ${f.opacity * 0.5})`);
+    grd.addColorStop(1, 'rgba(220, 230, 240, 0)');
+    ctx.fillStyle = grd;
+    ctx.fillRect(f.x - f.w * 0.5, f.y - f.h * 0.5, f.w, f.h);
+  }
+
+  // Speed lines at high speeds
+  if (state === 'playing' && speed > 6) {
+    const intensity = Math.min(1, (speed - 6) / 6);
+    ctx.strokeStyle = `rgba(255, 255, 255, ${0.05 + intensity * 0.07})`;
+    ctx.lineWidth = 1;
+    const lineSpeed = Math.min(speed * 2, 16);
+    for (let i = 0; i < 5; i++) {
+      const lx = (Math.sin(i * 1.7 + frameCount * 0.1) * 0.5 + 0.5) * W;
+      const ly = ((frameCount * lineSpeed + i * 137) % (H + 100)) - 50;
+      const len = 20 + intensity * 40;
+      ctx.beginPath();
+      ctx.moveTo(lx, ly);
+      ctx.lineTo(lx, ly + len);
+      ctx.stroke();
+    }
+  }
+
+  // Particles
+  for (const p of particles) {
+    const alpha = p.life / p.maxLife;
+    ctx.fillStyle = p.color + Math.floor(alpha * 255).toString(16).padStart(2, '0');
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Close snowflakes (depth >= 0.4) — in front of obstacles, fade at high speed
+  const snowFade = speed > 6 ? Math.max(0.3, 1 - (speed - 6) / 8) : 1;
+  for (const s of snowflakes) {
+    if (s.depth < 0.4) continue;
+    const alpha = (0.3 + s.depth * 0.4) * snowFade;
+    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Floating texts — with scale animation
+  for (const ft of floatingTexts) {
+    const alpha = ft.life / ft.maxLife;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(ft.x, ft.y);
+    ctx.scale(ft.scale, ft.scale);
+    ctx.font = "bold 16px 'Montserrat', system-ui";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+    ctx.lineWidth = 3;
+    ctx.strokeText(ft.text, 0, 0);
+    ctx.fillStyle = ft.color;
+    ctx.fillText(ft.text, 0, 0);
+    ctx.restore();
+  }
+
+  // Skier
+  if (state === 'playing' || state === 'over') {
+    ctx.save();
+    const sx = skier.x, sy = skier.y - skier.jumpHeight;
+
+    ctx.translate(sx, sy);
+    ctx.rotate(skier.vx * 0.04);
+
+    if (skier.invincible && frameCount % 6 < 3) ctx.globalAlpha = 0.4;
+
+    ctx.font = '32px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('⛷️', 0, 0);
+    ctx.restore();
+  }
+
+  // Glass-style HUD
+  if (state === 'playing') {
+    const hudFont = "'Montserrat', system-ui, sans-serif";
+
+    // Left HUD panel — distance, score, high score
+    ctx.save();
+    roundRect(10, 10, 145, 100, 10);
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold 17px ${hudFont}`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`📏 ${Math.floor(distance)}m`, 22, 32);
+
+    ctx.font = `bold 16px ${hudFont}`;
+    ctx.fillText(`⭐ ${score}`, 22, 60);
+
+    const hsVal = getHighScore();
+    if (hsVal > 0) {
+      ctx.font = `600 12px ${hudFont}`;
+      if (score >= hsVal) {
+        ctx.fillStyle = '#ffd700';
+        ctx.fillText(`🏆 NEW BEST!`, 22, 88);
+      } else {
+        ctx.fillStyle = 'rgba(255, 215, 0, 0.7)';
+        ctx.fillText(`🏆 Best: ${hsVal}`, 22, 88);
+      }
+    }
+    ctx.restore();
+
+    // Right HUD — speed
+    ctx.save();
+    const rating = getTrailRating(speed);
+    const speedKmh = Math.floor(speed * 12);
+    roundRect(W - 100, 10, 90, 32, 10);
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold 14px ${hudFont}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`${speedKmh} km/h`, W - 55, 26);
+    ctx.restore();
+
+    // Trail difficulty — prominent centered indicator
+    ctx.save();
+    const ratingColor = rating.symbol === '●' ? '#22c55e' : rating.symbol === '■' ? '#3b82f6' : '#222';
+    const ratingTextColor = rating.symbol === '●' ? '#fff' : rating.symbol === '■' ? '#fff' : '#fff';
+    const ratingW = ctx.measureText ? 0 : 0; // measure below
+    ctx.font = `bold 12px ${hudFont}`;
+    const nameW = ctx.measureText(rating.name).width;
+    const pillW = nameW + 40;
+    const pillX = W / 2 - pillW / 2;
+
+    roundRect(pillX, 10, pillW, 26, 13);
+    ctx.fillStyle = ratingColor;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Symbol
+    ctx.fillStyle = ratingTextColor;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.font = `bold 14px ${hudFont}`;
+    ctx.fillText(rating.symbol, pillX + 10, 23);
+
+    // Name
+    ctx.font = `bold 11px ${hudFont}`;
+    ctx.textAlign = 'right';
+    ctx.fillText(rating.name, pillX + pillW - 10, 23);
+    ctx.restore();
+
+    // Combo indicator
+    if (combo >= 2 && comboTimer > 0) {
+      ctx.save();
+      roundRect(W - 135, 52, 125, 30, 8);
+      ctx.fillStyle = 'rgba(255, 100, 0, 0.5)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 150, 50, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.font = `bold 13px ${hudFont}`;
+      ctx.fillText(`🔥 ${combo}x COMBO`, W - 16, 67);
+      ctx.restore();
+    }
+
+    // Jump indicator
+    if (skier.jumping) {
+      ctx.save();
+      roundRect(W / 2 - 55, 10, 110, 32, 10);
+      ctx.fillStyle = 'rgba(0, 150, 255, 0.4)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(100, 200, 255, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = `bold 13px ${hudFont}`;
+      ctx.fillText('🪂 AIRBORNE!', W / 2, 26);
+      ctx.restore();
+    }
+
+    // Milestone flash
+    if (milestoneFlash > 0) {
+      const alpha = Math.min(1, milestoneFlash / 30);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.font = `bold 15px ${hudFont}`;
+      const mw = ctx.measureText(milestoneText).width + 40;
+      const msY = skier.y - 70;
+      roundRect(W / 2 - mw / 2, msY - 16, mw, 32, 8);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.fill();
+      ctx.fillStyle = '#ffd700';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(milestoneText, W / 2, msY);
+      ctx.restore();
+    }
+  }
+
+  ctx.restore();
+
+  // Confetti — rendered last, on top of everything
+  for (const c of confetti) {
+    const alpha = Math.min(1, c.life / 30);
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.rotate(c.rot);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = c.color;
+    ctx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+    ctx.restore();
+  }
+}
+
+let lastTime = 0;
+function gameLoop(ts) {
+  requestAnimationFrame(gameLoop);
+  if (ts - lastTime < 16) return;
+  lastTime = ts;
+  update();
+  draw();
+}
+requestAnimationFrame(gameLoop);
+
+setInterval(() => {
+  if (state === 'playing' && document.hidden) { update(); draw(); }
+}, 16);
+</script>
+</body>
+</html>
