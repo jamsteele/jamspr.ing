@@ -1951,7 +1951,7 @@ function sanitizeName(raw) {
 }
 
 const LB_LIMIT = 10;
-let _lbSubmitted = false, _lbScore = 0, _lbDist = 0, _sessionBest = 0;
+let _lbSubmitted = false, _lbScore = 0, _lbDist = 0, _sessionBest = 0, _sessionName = null;
 
 function renderLeaderboard(data, highlightName) {
   const el = document.getElementById('lb-entries');
@@ -2029,6 +2029,7 @@ async function submitToLeaderboard() {
     }
 
     _lbSubmitted = true;
+    _sessionName = name;
     localStorage.setItem('whistler-playername', name);
     document.getElementById('lb-name-area').style.display = 'none';
     statusEl.style.color = '#6bcb77'; statusEl.textContent = '✓ Score saved!';
@@ -2060,10 +2061,17 @@ async function initLeaderboard(runScore, runDist) {
     const qualifies = isSessionBest && (!data || data.length < LB_LIMIT || runScore > data[data.length - 1].score);
     if (qualifies) {
       const input = document.getElementById('score-name-input');
-      input.value = localStorage.getItem('whistler-playername') || '';
       const btn = document.getElementById('submit-score-btn');
       btn.disabled = false; btn.textContent = 'Submit';
-      document.getElementById('lb-name-area').style.display = '';
+      if (_sessionName) {
+        // Name already known — auto-submit silently
+        input.value = _sessionName;
+        submitToLeaderboard();
+      } else {
+        // First time — show the name prompt
+        input.value = localStorage.getItem('whistler-playername') || '';
+        document.getElementById('lb-name-area').style.display = '';
+      }
     } else {
       const cutoff = data[data.length - 1].score;
       const statusEl = document.getElementById('lb-status');
