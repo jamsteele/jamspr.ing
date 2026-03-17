@@ -301,7 +301,7 @@
   </div>
 </div>
 </div>
-<div id="mobile-controls">
+<div id="mobile-controls" style="visibility:hidden;">
   <div class="ctrl-btn" id="btn-left">&#9664;</div>
   <div class="ctrl-btn" id="btn-right">&#9654;</div>
 </div>
@@ -322,26 +322,40 @@ mooseImg.src = 'moose_emoji_small.png';
 let mooseImgLoaded = false;
 mooseImg.onload = () => { mooseImgLoaded = true; };
 
+// Pre-render skier emoji to offscreen canvas — avoids macOS fillText color washout
+const skierOffscreen = (() => {
+  const oc = document.createElement('canvas');
+  oc.width = 96; oc.height = 96;
+  const octx = oc.getContext('2d');
+  octx.font = '72px serif';
+  octx.textAlign = 'center';
+  octx.textBaseline = 'middle';
+  octx.fillText('⛷️', 48, 52);
+  return oc;
+})();
+
 const W = 480;
 let H = 720;
 
 
 function resize() {
+  const dpr = window.devicePixelRatio || 1;
   const maxW = 480, maxH = 720;
   const vw = window.innerWidth;
   const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
   const isMobile = vw < 500;
   if (isMobile) {
     // On mobile, fill the entire screen
-    canvas.width = maxW;
-    canvas.height = Math.round(maxW * (vh / vw));
-    H = canvas.height;
+    const logicalH = Math.round(maxW * (vh / vw));
+    canvas.width = Math.round(maxW * dpr);
+    canvas.height = Math.round(logicalH * dpr);
+    H = logicalH;
     canvas.style.width = vw + 'px';
     canvas.style.height = vh + 'px';
   } else {
     const scale = Math.min(vw / maxW, vh / maxH, 1);
-    canvas.width = maxW;
-    canvas.height = maxH;
+    canvas.width = Math.round(maxW * dpr);
+    canvas.height = Math.round(maxH * dpr);
     H = maxH;
     canvas.style.width = Math.floor(maxW * scale) + 'px';
     canvas.style.height = Math.floor(maxH * scale) + 'px';
@@ -549,6 +563,7 @@ function startGame() {
   state = 'playing';
   document.getElementById('start-screen').style.display = 'none';
   document.getElementById('game-over-screen').style.display = 'none';
+  document.getElementById('mobile-controls').style.visibility = 'visible';
 }
 
 function gameOver() {
@@ -611,7 +626,7 @@ function gameOver() {
   else if (dist >= 1500) villageMsg = `Almost to the Village... so sendy. ${apres}`;
   else if (dist >= 1000) villageMsg = `Gnarly wipeout mid-mountain. ${apres}`;
   else if (dist >= 500) villageMsg = `Yard sale on the upper mountain. Total gorby move. ${apres}`;
-  else villageMsg = `Wiped out near the top. Zero steeze. Close your gorby gap! ${apres}`;
+  else villageMsg = `Wiped out near the top. Zero steeze. ${apres}`;
 
   const rating = getTrailRating(speed);
   const madeVillage = dist >= 2000;
@@ -636,6 +651,7 @@ function gameOver() {
   document.getElementById('new-best').style.display = isNew ? '' : 'none';
   document.getElementById('end-high-score').textContent = `🏆 Best: ${getHighScore()}`;
   document.getElementById('game-over-screen').style.display = 'flex';
+  document.getElementById('mobile-controls').style.visibility = 'hidden';
 }
 
 // Input — prevent arrow keys from scrolling the page
@@ -911,7 +927,7 @@ function update() {
   for (const m of milestoneMessages) {
     if (distance >= m.dist && lastMilestone < m.dist) {
       lastMilestone = m.dist;
-      milestoneFlash = 100;
+      milestoneFlash = 180;
       milestoneText = m.text;
       if (m.celebrate) {
         spawnConfetti(skier.x, skier.y - 40, 15);
@@ -937,7 +953,7 @@ function update() {
       `${km}m — KNEE DEEP!`,
       `${km}m — WHITE ROOM!`,
     ];
-    milestoneFlash = 90;
+    milestoneFlash = 160;
     milestoneText = keepGoingMsgs[Math.floor(Math.random() * keepGoingMsgs.length)];
   }
   if (milestoneFlash > 0) milestoneFlash--;
@@ -1170,43 +1186,66 @@ function update() {
   skier.trail = skier.trail.filter(t => t.y > -10);
 }
 
-// Draw a PNW cedar/hemlock tree — dense, overlapping tiers
+// Draw a PNW cedar/hemlock tree — curved tiers with snow and depth shading
 function drawPNWTree(x, y, size, isHemlock) {
-  const h = size * 1.3;
-  const trunkW = size * 0.06;
-  const tiers = isHemlock ? 6 : 5;
+  const h = size * 1.4;
+  const trunkW = Math.max(1.5, size * 0.055);
+  const tiers = isHemlock ? 7 : 6;
 
-  ctx.fillStyle = '#4e342e';
-  ctx.fillRect(x - trunkW, y + size * 0.1, trunkW * 2, h * 0.15);
+  // Trunk with subtle gradient
+  const trunkGrad = ctx.createLinearGradient(x - trunkW, 0, x + trunkW, 0);
+  trunkGrad.addColorStop(0, '#2e1a0e');
+  trunkGrad.addColorStop(0.4, '#4a2c1a');
+  trunkGrad.addColorStop(1, '#2e1a0e');
+  ctx.fillStyle = trunkGrad;
+  ctx.fillRect(x - trunkW, y + size * 0.05, trunkW * 2, h * 0.18);
 
-  const baseGreen = isHemlock ? '#14532d' : '#166534';
-  const midGreen = isHemlock ? '#1a6b3a' : '#1b7d3e';
-  const lightGreen = isHemlock ? '#22803a' : '#22863f';
-  const greens = [baseGreen, midGreen, lightGreen, baseGreen, midGreen, lightGreen];
+  const darkGreen  = isHemlock ? '#0d3320' : '#0e3d25';
+  const midGreen   = isHemlock ? '#134a2c' : '#165533';
+  const lightGreen = isHemlock ? '#1a5e35' : '#1c6b3d';
+  const greens = [darkGreen, midGreen, lightGreen, darkGreen, midGreen, lightGreen];
 
   for (let i = 0; i < tiers; i++) {
     const t = i / (tiers - 1);
-    const tierY = y + size * 0.1 - t * h;
-    const tierW = size * (0.45 - t * 0.28);
-    const overlap = h / tiers * 0.4;
+    const tierY = y + size * 0.05 - t * h;
+    // Slight deterministic width variation per tier — avoids perfectly uniform tiers
+    const wVar = 1 + (((i * 17 + (isHemlock ? 7 : 3)) % 7) - 3) * 0.025;
+    const tierW = size * (0.48 - t * 0.33) * wVar;
+    const tierH = h / tiers;
+    const tipY = tierY - tierH * 0.6;
+    const baseY = tierY + tierH * 0.75;
 
+    // Foliage body — quadratic curves give branches a natural droop
     ctx.fillStyle = greens[i % greens.length];
     ctx.beginPath();
-    ctx.moveTo(x, tierY - h / tiers * 0.55);
-    ctx.lineTo(x - tierW, tierY + overlap);
-    ctx.lineTo(x + tierW, tierY + overlap);
+    ctx.moveTo(x, tipY);
+    ctx.quadraticCurveTo(x + tierW * 0.65, tipY + (baseY - tipY) * 0.55, x + tierW, baseY);
+    ctx.lineTo(x - tierW, baseY);
+    ctx.quadraticCurveTo(x - tierW * 0.65, tipY + (baseY - tipY) * 0.55, x, tipY);
+    ctx.closePath();
+    ctx.fill();
+
+    // Shadow on right half — adds depth
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.beginPath();
+    ctx.moveTo(x, tipY);
+    ctx.quadraticCurveTo(x + tierW * 0.65, tipY + (baseY - tipY) * 0.55, x + tierW, baseY);
+    ctx.lineTo(x, baseY);
+    ctx.closePath();
+    ctx.fill();
+
+    // Snow sitting on top of each branch tier
+    const snowW = tierW * 0.58;
+    const snowBaseY = tipY + (baseY - tipY) * 0.4;
+    ctx.fillStyle = 'rgba(235,245,255,0.62)';
+    ctx.beginPath();
+    ctx.moveTo(x, tipY);
+    ctx.quadraticCurveTo(x + snowW * 0.55, tipY + (snowBaseY - tipY) * 0.65, x + snowW, snowBaseY);
+    ctx.lineTo(x - snowW, snowBaseY);
+    ctx.quadraticCurveTo(x - snowW * 0.55, tipY + (snowBaseY - tipY) * 0.65, x, tipY);
     ctx.closePath();
     ctx.fill();
   }
-
-  ctx.fillStyle = 'rgba(255,255,255,0.35)';
-  const topY = y + size * 0.1 - h;
-  ctx.beginPath();
-  ctx.moveTo(x, topY - h / tiers * 0.4);
-  ctx.lineTo(x - size * 0.08, topY + 3);
-  ctx.lineTo(x + size * 0.08, topY + 3);
-  ctx.closePath();
-  ctx.fill();
 }
 
 // Rounded rectangle helper for glass HUD
@@ -1225,6 +1264,8 @@ function roundRect(x, y, w, h, r) {
 }
 
 function draw() {
+  const dpr = window.devicePixelRatio || 1;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.save();
 
   if (screenShake > 0.5) {
@@ -1596,10 +1637,8 @@ function draw() {
 
     if (skier.invincible && frameCount % 6 < 3) ctx.globalAlpha = 0.4;
 
-    ctx.font = '32px serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('⛷️', 0, 0);
+    const sz = 44;
+    ctx.drawImage(skierOffscreen, -sz / 2, -sz / 2, sz, sz);
     ctx.restore();
   }
 
