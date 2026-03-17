@@ -585,8 +585,20 @@ function initGame() {
   coinTimer = 0; fogTimer = 0;
   frameCount = 0; screenShake = 0;
   combo = 0; comboTimer = 0;
-  lastMilestone = 0; milestoneFlash = 0;
+  lastMilestone = 0;
   lastDifficulty = 'Green Circle';
+  const dropInHype = [
+    '🎿 Dropping in — sending it!',
+    '🏔️ Line locked. Let\'s shred!',
+    '❄️ Freshies! Let\'s gooo!',
+    '🎿 Dropping in — full send!',
+    '🏂 Steezy lines only. Let\'s go!',
+    '❄️ Pow day. Time to rip!',
+    '🎿 Skis on snow — sending it!',
+    '🏔️ Peak to Village. Let\'s shred!',
+  ];
+  milestoneText = dropInHype[Math.floor(Math.random() * dropInHype.length)];
+  milestoneFlash = 160;
   confetti = [];
 }
 
