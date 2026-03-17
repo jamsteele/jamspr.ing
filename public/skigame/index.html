@@ -2011,6 +2011,7 @@ async function submitToLeaderboard() {
       if (existing.score >= _lbScore) {
         // Already have a better score — no need to save
         _lbSubmitted = true;
+        _sessionName = name;
         document.getElementById('lb-name-area').style.display = 'none';
         statusEl.style.color = '#7ab';
         statusEl.textContent = `${name} already has ${existing.score.toLocaleString()} on the board!`;
