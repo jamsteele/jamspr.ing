@@ -249,6 +249,37 @@
   @media (pointer: coarse) {
     #mobile-controls { display: flex; }
   }
+  #fullscreen-btn {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(4px);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.85);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 200;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.15s;
+  }
+  #fullscreen-btn:hover { background: rgba(0,0,0,0.55); }
+  #game-wrapper:-webkit-full-screen,
+  #game-wrapper:fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 </style>
 <script data-goatcounter="https://jamspr-ing.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
@@ -300,6 +331,7 @@
   </div>
 </div>
 </div>
+<button id="fullscreen-btn" title="Fullscreen">⛶</button>
 <div id="mobile-controls" style="visibility:hidden;">
   <div class="ctrl-btn" id="btn-left">&#9664;</div>
   <div class="ctrl-btn" id="btn-right">&#9654;</div>
@@ -308,6 +340,31 @@
 <script>
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
+
+// Fullscreen toggle
+const fsBtn = document.getElementById('fullscreen-btn');
+const fsTarget = document.getElementById('game-wrapper');
+fsBtn.addEventListener('click', () => {
+  const el = document.fullscreenElement || document.webkitFullscreenElement;
+  if (!el) {
+    const req = fsTarget.requestFullscreen || fsTarget.webkitRequestFullscreen;
+    if (req) req.call(fsTarget).catch(() => {});
+  } else {
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    if (exit) exit.call(document).catch(() => {});
+  }
+});
+const onFsChange = () => {
+  const el = document.fullscreenElement || document.webkitFullscreenElement;
+  fsBtn.textContent = el ? '✕' : '⛶';
+  setTimeout(resize, 100); // re-fit canvas after fullscreen transition
+};
+document.addEventListener('fullscreenchange', onFsChange);
+document.addEventListener('webkitfullscreenchange', onFsChange);
+
+// Hide fullscreen button on iOS — API not supported
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+if (isIOS) fsBtn.style.display = 'none';
 
 // Load bear PNG
 const bearImg = new Image();
@@ -563,6 +620,7 @@ function startGame() {
   document.getElementById('start-screen').style.display = 'none';
   document.getElementById('game-over-screen').style.display = 'none';
   document.getElementById('mobile-controls').style.visibility = 'visible';
+  document.getElementById('fullscreen-btn').style.display = 'none';
 }
 
 function gameOver() {
@@ -651,6 +709,7 @@ function gameOver() {
   document.getElementById('end-high-score').textContent = `🏆 Best: ${getHighScore()}`;
   document.getElementById('game-over-screen').style.display = 'flex';
   document.getElementById('mobile-controls').style.visibility = 'hidden';
+  if (!isIOS) document.getElementById('fullscreen-btn').style.display = 'flex';
 }
 
 // Input — prevent arrow keys from scrolling the page
