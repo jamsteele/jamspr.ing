@@ -271,6 +271,54 @@
     transition: background 0.15s;
   }
   #fullscreen-btn:hover { background: rgba(0,0,0,0.55); }
+  /* Leaderboard */
+  .lb-section { margin-top: 6px; }
+  .lb-title {
+    font-size: 11px; font-weight: 700; color: #7ab;
+    letter-spacing: 2px; text-transform: uppercase;
+    text-align: center; margin-bottom: 8px;
+  }
+  .lb-input-row {
+    display: flex; gap: 6px; align-items: center; margin-bottom: 4px;
+  }
+  #score-name-input {
+    flex: 1; min-width: 0;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px; color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px; padding: 7px 8px; outline: none;
+    -webkit-appearance: none;
+  }
+  #score-name-input::placeholder { color: rgba(255,255,255,0.3); }
+  #score-name-input:focus { border-color: rgba(79,195,247,0.6); }
+  #submit-score-btn {
+    margin-top: 0; padding: 7px 12px; font-size: 13px;
+    flex-shrink: 0; border-radius: 4px;
+  }
+  .lb-status {
+    font-size: 11px; color: #6bcb77;
+    text-align: center; min-height: 16px; margin-bottom: 4px;
+  }
+  #lb-entries {
+    max-height: 280px; overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  #lb-entries::-webkit-scrollbar { width: 3px; }
+  #lb-entries::-webkit-scrollbar-track { background: transparent; }
+  #lb-entries::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+  .lb-entry {
+    display: flex; align-items: center;
+    padding: 4px 2px; font-size: 12px; color: #b0c8dc;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .lb-entry:last-child { border-bottom: none; }
+  .lb-rank { color: #6a8aa0; width: 24px; flex-shrink: 0; font-size: 11px; }
+  .lb-name { flex: 1; padding: 0 4px; color: #fff; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lb-score { color: #ffd700; font-weight: 700; flex-shrink: 0; }
+  .lb-entry.lb-you .lb-rank, .lb-entry.lb-you .lb-name, .lb-entry.lb-you .lb-score { color: #4fc3f7; }
+  .lb-loading { font-size: 11px; color: #6a8aa0; text-align: center; padding: 8px 0; }
+
   #game-wrapper:-webkit-full-screen,
   #game-wrapper:fullscreen {
     width: 100vw !important;
@@ -282,6 +330,7 @@
   }
 </style>
 <script data-goatcounter="https://jamspr-ing.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 <div id="game-wrapper">
@@ -327,6 +376,20 @@
       <p class="new-best" id="new-best" style="display:none">🏆 NEW HIGH SCORE!</p>
       <p class="high-score" id="end-high-score"></p>
       <button onclick="startGame()">Drop In Again</button>
+      <div class="sign-divider"></div>
+      <div class="lb-section">
+        <div class="lb-title">🏆 Leaderboard</div>
+        <div id="lb-name-area">
+          <div class="lb-input-row">
+            <input type="text" id="score-name-input" placeholder="Your name" maxlength="20"
+              autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" inputmode="text"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();submitToLeaderboard();}">
+            <button id="submit-score-btn" onclick="submitToLeaderboard()">Submit</button>
+          </div>
+        </div>
+        <div class="lb-status" id="lb-status"></div>
+        <div id="lb-entries"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -724,10 +787,12 @@ function gameOver() {
   document.getElementById('game-over-screen').style.display = 'flex';
   document.getElementById('mobile-controls').style.visibility = 'hidden';
   if (!isIOS) document.getElementById('fullscreen-btn').style.display = 'flex';
+  initLeaderboard(score, Math.floor(distance));
 }
 
 // Input — prevent arrow keys from scrolling the page
 document.addEventListener('keydown', e => {
+  if (document.activeElement && document.activeElement.id === 'score-name-input') return;
   if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) {
     e.preventDefault();
   }
@@ -1867,6 +1932,146 @@ requestAnimationFrame(gameLoop);
 setInterval(() => {
   if (state === 'playing' && document.hidden) { update(); draw(); }
 }, 16);
+
+// ── Leaderboard ──────────────────────────────────────────────────
+const _sb = window.supabase.createClient(
+  'https://dvqnpyzvoivblpkyhekb.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2cW5weXp2b2l2Ymxwa3loZWtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3MTk1ODUsImV4cCI6MjA4OTI5NTU4NX0.vJnxiZ6Nmc_AmqLPUgkqQWXt1ekPE0UrHWFz9vZpvlI'
+);
+
+const _BAD = ['shit','fuck','fuk','ass','bitch','cunt','cock','dick','pussy','bastard','crap','piss','slut','whore','fag','nigger','nigga'];
+function sanitizeName(raw) {
+  const name = raw.trim()
+    .replace(/[<>&"'`]/g, '')
+    .replace(/[^\w\s\-\.]/gu, '')
+    .slice(0, 20).trim();
+  const lower = name.toLowerCase().replace(/\s+/g, '');
+  for (const w of _BAD) { if (lower.includes(w)) return null; }
+  return name.length >= 1 ? name : null;
+}
+
+const LB_LIMIT = 10;
+let _lbSubmitted = false, _lbScore = 0, _lbDist = 0;
+
+function renderLeaderboard(data, highlightName) {
+  const el = document.getElementById('lb-entries');
+  if (!data || data.length === 0) {
+    el.innerHTML = '<div class="lb-loading">No scores yet — be the first! 🏔️</div>';
+    return;
+  }
+  el.innerHTML = data.map((entry, i) => {
+    const isYou = _lbSubmitted && highlightName &&
+      entry.name === highlightName && entry.score === _lbScore;
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`;
+    const safeName = entry.name.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return `<div class="lb-entry${isYou ? ' lb-you' : ''}">
+      <span class="lb-rank">${medal}</span>
+      <span class="lb-name">${safeName}</span>
+      <span class="lb-score">${entry.score.toLocaleString()}</span>
+    </div>`;
+  }).join('');
+}
+
+async function fetchAndRenderLeaderboard(highlightName) {
+  const el = document.getElementById('lb-entries');
+  el.innerHTML = '<div class="lb-loading">Loading...</div>';
+  try {
+    const { data, error } = await _sb.from('scores')
+      .select('name, score, distance')
+      .order('score', { ascending: false })
+      .limit(LB_LIMIT);
+    if (error) throw error;
+    renderLeaderboard(data, highlightName);
+  } catch (e) {
+    el.innerHTML = '<div class="lb-loading">Couldn\'t load scores.</div>';
+  }
+}
+
+async function submitToLeaderboard() {
+  if (_lbSubmitted) return;
+  const input = document.getElementById('score-name-input');
+  const statusEl = document.getElementById('lb-status');
+  const btn = document.getElementById('submit-score-btn');
+  const name = sanitizeName(input.value);
+  if (!name) {
+    statusEl.style.color = '#ff6b6b';
+    statusEl.textContent = input.value.trim() ? '⚠️ Keep it clean, please.' : '⚠️ Enter your name first.';
+    input.focus();
+    return;
+  }
+  btn.disabled = true; btn.textContent = '...';
+  statusEl.style.color = '#6a8aa0'; statusEl.textContent = 'Saving...';
+  try {
+    // Check if name already exists
+    const { data: existing, error: fetchErr } = await _sb.from('scores')
+      .select('id, score').eq('name', name).maybeSingle();
+    if (fetchErr) throw fetchErr;
+
+    if (existing) {
+      if (existing.score >= _lbScore) {
+        // Already have a better score — no need to save
+        _lbSubmitted = true;
+        document.getElementById('lb-name-area').style.display = 'none';
+        statusEl.style.color = '#7ab';
+        statusEl.textContent = `${name} already has ${existing.score.toLocaleString()} on the board!`;
+        fetchAndRenderLeaderboard(name);
+        return;
+      }
+      // Update with the new better score
+      const { error: updateErr } = await _sb.from('scores')
+        .update({ score: _lbScore, distance: _lbDist }).eq('id', existing.id);
+      if (updateErr) throw updateErr;
+    } else {
+      // New name — insert
+      const { error: insertErr } = await _sb.from('scores')
+        .insert({ name, score: _lbScore, distance: _lbDist });
+      if (insertErr) throw insertErr;
+    }
+
+    _lbSubmitted = true;
+    localStorage.setItem('whistler-playername', name);
+    document.getElementById('lb-name-area').style.display = 'none';
+    statusEl.style.color = '#6bcb77'; statusEl.textContent = '✓ Score saved!';
+    fetchAndRenderLeaderboard(name);
+  } catch (e) {
+    console.error('Leaderboard save error:', e);
+    btn.disabled = false; btn.textContent = 'Submit';
+    statusEl.style.color = '#ff6b6b'; statusEl.textContent = 'Error saving. Try again.';
+  }
+}
+
+async function initLeaderboard(runScore, runDist) {
+  _lbSubmitted = false; _lbScore = runScore; _lbDist = runDist;
+  document.getElementById('lb-name-area').style.display = 'none';
+  document.getElementById('lb-status').textContent = '';
+  document.getElementById('lb-entries').innerHTML = '<div class="lb-loading">Loading...</div>';
+
+  try {
+    const { data, error } = await _sb.from('scores')
+      .select('name, score, distance')
+      .order('score', { ascending: false })
+      .limit(LB_LIMIT);
+    if (error) throw error;
+    renderLeaderboard(data, null);
+
+    // Show name input only if score qualifies for top 10
+    const qualifies = !data || data.length < LB_LIMIT || runScore > data[data.length - 1].score;
+    if (qualifies) {
+      const input = document.getElementById('score-name-input');
+      input.value = localStorage.getItem('whistler-playername') || '';
+      const btn = document.getElementById('submit-score-btn');
+      btn.disabled = false; btn.textContent = 'Submit';
+      document.getElementById('lb-name-area').style.display = '';
+    } else {
+      const cutoff = data[data.length - 1].score;
+      const statusEl = document.getElementById('lb-status');
+      statusEl.style.color = '#6a8aa0';
+      statusEl.textContent = `Need ${(cutoff + 1).toLocaleString()}+ pts to make the board.`;
+    }
+  } catch (e) {
+    document.getElementById('lb-entries').innerHTML = '<div class="lb-loading">Couldn\'t load scores.</div>';
+  }
+}
 </script>
 </body>
 </html>
