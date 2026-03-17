@@ -1951,7 +1951,7 @@ function sanitizeName(raw) {
 }
 
 const LB_LIMIT = 10;
-let _lbSubmitted = false, _lbScore = 0, _lbDist = 0;
+let _lbSubmitted = false, _lbScore = 0, _lbDist = 0, _sessionBest = 0;
 
 function renderLeaderboard(data, highlightName) {
   const el = document.getElementById('lb-entries');
@@ -2054,8 +2054,10 @@ async function initLeaderboard(runScore, runDist) {
     if (error) throw error;
     renderLeaderboard(data, null);
 
-    // Show name input only if score qualifies for top 10
-    const qualifies = !data || data.length < LB_LIMIT || runScore > data[data.length - 1].score;
+    // Show name input only if score qualifies for top 10 AND is a new session best
+    const isSessionBest = runScore > _sessionBest;
+    _sessionBest = Math.max(_sessionBest, runScore);
+    const qualifies = isSessionBest && (!data || data.length < LB_LIMIT || runScore > data[data.length - 1].score);
     if (qualifies) {
       const input = document.getElementById('score-name-input');
       input.value = localStorage.getItem('whistler-playername') || '';
