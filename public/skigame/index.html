@@ -808,6 +808,7 @@ function spawnObstacle() {
     hit: false,
     moveDir: type.moves ? (Math.random() < 0.5 ? -1 : 1) : 0,
     moveSpeed: type.moves ? (Math.random() * 1.5 + 0.5) : 0,
+    moveVy: (type.type === 'skier' || type.type === 'snowboarder') ? (Math.random() * 0.8 + 0.4) : 0,
     wobble: Math.random() * Math.PI * 2,
   });
 
@@ -1126,6 +1127,7 @@ function update() {
       ob.x += ob.moveDir * ob.moveSpeed;
       if (ob.x < 30 || ob.x > W - 30) ob.moveDir *= -1;
     }
+    if (ob.moveVy) ob.y += ob.moveVy;
     if (ob.y < -60) {
       if (!ob.hit && !ob.isJump && !ob.isMogul) {
         score += ob.points || 10;
