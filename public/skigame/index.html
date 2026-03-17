@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Whistler Descent</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛷️</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -579,6 +580,8 @@ function gameOver() {
     'Pro tip: bears don\'t yield to skiers. 🐻',
     'That\'s what you get for carrying chocolate. 🍫🐻',
     'Bear just woke up and chose violence. 🐻',
+    'Gnarly bear encounter. Zero steeze. 🐻',
+    'You tried to send it past a bear. Bad call. 🐻',
   ];
 
   const mooseMessages = [
@@ -587,6 +590,8 @@ function gameOver() {
     'That moose didn\'t even flinch. 🫎',
     'Pro tip: moose have the right of way. Always. 🫎',
     '1,500 lbs says you lose. 🫎',
+    'Full send into a moose. Gnarly. 🫎',
+    'Not even a butter could save you from that moose. 🫎',
   ];
 
   let villageMsg = '';
@@ -594,11 +599,19 @@ function gameOver() {
     villageMsg = mooseMessages[Math.floor(Math.random() * mooseMessages.length)] + ' ' + apres;
   } else if (crashedInto === 'bear') {
     villageMsg = bearMessages[Math.floor(Math.random() * bearMessages.length)] + ' ' + apres;
-  } else if (dist >= 2000) villageMsg = `Made it to the Village! ${apres}`;
-  else if (dist >= 1500) villageMsg = `Almost to the Village... ${apres}`;
-  else if (dist >= 1000) villageMsg = `Mid-mountain wipeout. ${apres}`;
-  else if (dist >= 500) villageMsg = `Yard sale on the upper mountain. ${apres}`;
-  else villageMsg = `Wiped out near the top. ${apres}`;
+  } else if (dist >= 2000) {
+    const villageWins = [
+      `Made it to the Village! Full send! ${apres}`,
+      `Shredded the gnar all the way down! ${apres}`,
+      `Legendary descent — pure champagne powder! ${apres}`,
+      `Freshies top to bottom! Bluebird day! ${apres}`,
+    ];
+    villageMsg = villageWins[Math.floor(Math.random() * villageWins.length)];
+  }
+  else if (dist >= 1500) villageMsg = `Almost to the Village... so sendy. ${apres}`;
+  else if (dist >= 1000) villageMsg = `Gnarly wipeout mid-mountain. ${apres}`;
+  else if (dist >= 500) villageMsg = `Yard sale on the upper mountain. Total gorby move. ${apres}`;
+  else villageMsg = `Wiped out near the top. Zero steeze. Close your gorby gap! ${apres}`;
 
   const rating = getTrailRating(speed);
   const madeVillage = dist >= 2000;
@@ -730,6 +743,7 @@ function spawnObstacle() {
       '🐻 That bear is NOT hibernating!',
       '🐻 Somebody forgot to tell the bear it\'s ski season!',
       '🐻 Pro tip: bears don\'t yield to skiers!',
+      '🐻 Gnarly! Bear on the run!',
     ];
     milestoneText = bearAlerts[Math.floor(Math.random() * bearAlerts.length)];
     milestoneFlash = 120;
@@ -746,6 +760,7 @@ function spawnObstacle() {
       '🫎 MOOSE ON THE MOUNTAIN!',
       '🫎 That is an ACTUAL moose!',
       '🫎 1,500 lbs of don\'t-mess-with-me!',
+      '🫎 Sendy moose! Full send around it!',
     ];
     milestoneText = mooseAlerts[Math.floor(Math.random() * mooseAlerts.length)];
     milestoneFlash = 140;
@@ -868,15 +883,29 @@ function update() {
   const milestoneMessages = [
     { dist: 100,  text: '🪨 Watch for rocks!' },
     { dist: 200,  text: '🏂 Snowboarders ahead!' },
+    { dist: 300,  text: '🍪 Death cookies ahead!' },
     { dist: 400,  text: '⛷️ No friends on a powder day!' },
-    { dist: 600,  text: '🏔️ Getting steeper!' },
+    { dist: 500,  text: '❄️ Freshies top to bottom!' },
+    { dist: 600,  text: '🏔️ Getting gnarly!' },
+    { dist: 700,  text: '🌫️ Getting socked in up here!' },
     { dist: 800,  text: '🦌 Deer on the run!' },
-    { dist: 1000, text: '💯 Legit run!' },
+    { dist: 1000, text: '💯 Pure steeze!' },
+    { dist: 1100, text: '🌨️ Champagne powder!' },
     { dist: 1200, text: '🌫️ Steeps and deeps!' },
+    { dist: 1300, text: '🥾 Boot deep and loving it!' },
+    { dist: 1400, text: '❄️ Shredding the pow!' },
+    { dist: 1500, text: '🏔️ Shred the gnar!' },
     { dist: 1600, text: '🧇 Earn your turns!' },
+    { dist: 1700, text: '🌨️ Bottomless blower!' },
+    { dist: 1800, text: '☀️ Bluebird day!' },
+    { dist: 1900, text: '🌨️ Knee deep blower pow!' },
     { dist: 2000, text: '🔥 FULL SEND!', celebrate: true },
+    { dist: 2200, text: '🧈 Cream cheese turns!' },
+    { dist: 2400, text: '🌊 WHITE ROOM!', celebrate: true },
     { dist: 2500, text: '🏔️ Epic descent!' },
-    { dist: 3000, text: '⚡ LEGENDARY!', celebrate: true },
+    { dist: 2800, text: '🏔️ This line is sendy!' },
+    { dist: 3000, text: '⚡ LEGENDARY STEEZE!', celebrate: true },
+    { dist: 3200, text: '❄️ Dust on crust? Still sending!' },
     { dist: 3500, text: '👑 Sending it to the Village!', celebrate: true },
   ];
   for (const m of milestoneMessages) {
@@ -895,8 +924,21 @@ function update() {
   const km = Math.floor(distance / 1000) * 1000;
   if (km >= 2000 && km > lastMilestone) {
     lastMilestone = km;
+    const keepGoingMsgs = [
+      `${km}m — KEEP GOING!`,
+      `${km}m — FULL SEND!`,
+      `${km}m — SO STEEZY!`,
+      `${km}m — GNARLY RUN!`,
+      `${km}m — DEEP IN THE POW!`,
+      `${km}m — SHRED THE GNAR!`,
+      `${km}m — CHAM POW!`,
+      `${km}m — ONE MORE LAP!`,
+      `${km}m — FRESHIES ALL DAY!`,
+      `${km}m — KNEE DEEP!`,
+      `${km}m — WHITE ROOM!`,
+    ];
     milestoneFlash = 90;
-    milestoneText = `${km}m — KEEP GOING!`;
+    milestoneText = keepGoingMsgs[Math.floor(Math.random() * keepGoingMsgs.length)];
   }
   if (milestoneFlash > 0) milestoneFlash--;
 
@@ -1022,8 +1064,10 @@ function update() {
           const bonus = 25 * comboMultiplier;
           score += bonus;
           spawnParticles(skier.x, skier.y, '#ffd700', 5);
+          const nearMissWords = ['CLOSE!', 'STEEZY!', 'GNARLY!', 'SENDY!', 'SHREDDED!', 'CHAM!'];
+          const nearWord = nearMissWords[Math.floor(Math.random() * nearMissWords.length)];
           spawnFloatingText(skier.x, skier.y - 20,
-            combo >= 2 ? `${combo}x COMBO +${bonus}` : `CLOSE! +${bonus}`,
+            combo >= 2 ? `${combo}x COMBO +${bonus}` : `${nearWord} +${bonus}`,
             combo >= 2 ? '#ff6600' : '#ffd700');
         }
       }
@@ -1044,7 +1088,8 @@ function update() {
             const jumpPts = 50 + Math.floor(speed * 5);
             score += jumpPts;
             spawnParticles(skier.x, skier.y + 16, '#87ceeb', 12);
-            spawnFloatingText(skier.x, skier.y - 20, `JUMP! +${jumpPts}`, '#4db8e8');
+            const jumpWords = [`JUMP! +${jumpPts}`, `SENDY! +${jumpPts}`, `FULL SEND! +${jumpPts}`, `STEEZY! +${jumpPts}`, `SHRED THE GNAR! +${jumpPts}`, `HUCKED IT! +${jumpPts}`, `KICKER! +${jumpPts}`];
+            spawnFloatingText(skier.x, skier.y - 20, jumpWords[Math.floor(Math.random() * jumpWords.length)], '#4db8e8');
           }
         } else if (ob.isMogul) {
           if (!skier.jumping && skier.jumpCooldown <= 0) {
@@ -1061,7 +1106,8 @@ function update() {
           const pts = (ob.points || 10) * 3;
           score += pts;
           spawnParticles(ob.x, ob.y, '#ffd700', 8);
-          spawnFloatingText(ob.x, ob.y, `JUMPED! +${pts}`, '#00e5ff');
+          const overWords = [`JUMPED! +${pts}`, `STEEZY! +${pts}`, `BUTTERED IT! +${pts}`, `SHREDDED! +${pts}`];
+          spawnFloatingText(ob.x, ob.y, overWords[Math.floor(Math.random() * overWords.length)], '#00e5ff');
           ob.hit = true;
         } else if (!skier.invincible) {
           spawnParticles(skier.x, skier.y, '#ff4444', 15);
@@ -1669,7 +1715,8 @@ function draw() {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.font = `bold 13px ${hudFont}`;
-      ctx.fillText('🪂 AIRBORNE!', W / 2, 26);
+      const airWords = ['🪂 AIRBORNE!', '🪂 SENDY!', '🪂 FULL SEND!', '🪂 STEEZY AIR!', '🪂 SHREDDING!', '🪂 HUCKING IT!'];
+      ctx.fillText(airWords[jumpCount % airWords.length], W / 2, 26);
       ctx.restore();
     }
 
