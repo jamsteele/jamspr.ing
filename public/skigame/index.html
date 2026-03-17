@@ -1357,31 +1357,7 @@ function draw() {
   ctx.fillStyle = snowGrad;
   ctx.fillRect(-10, -10, W + 20, H + 20);
 
-  // Subtle snow terrain undulation bands
   const visualSpeed = Math.min(speed, 7); // Cap visual scroll to reduce blur at high speed
-  const bandOffset = (frameCount * visualSpeed * 0.5) % 120;
-  for (let y = H * 0.18 - 120 + bandOffset; y < H + 120; y += 120) {
-    const grad = ctx.createLinearGradient(0, y, 0, y + 60);
-    grad.addColorStop(0, 'rgba(180, 210, 240, 0.0)');
-    grad.addColorStop(0.3, 'rgba(180, 210, 240, 0.06)');
-    grad.addColorStop(0.5, 'rgba(190, 215, 240, 0.08)');
-    grad.addColorStop(0.7, 'rgba(180, 210, 240, 0.06)');
-    grad.addColorStop(1, 'rgba(180, 210, 240, 0.0)');
-    ctx.fillStyle = grad;
-    // Slight wave shape
-    ctx.beginPath();
-    ctx.moveTo(-10, y);
-    for (let x = 0; x <= W + 10; x += 40) {
-      const wave = Math.sin(x * 0.015 + frameCount * 0.01) * 8;
-      ctx.lineTo(x, y + wave);
-    }
-    for (let x = W + 10; x >= -10; x -= 40) {
-      const wave = Math.sin(x * 0.015 + frameCount * 0.01) * 8;
-      ctx.lineTo(x, y + 60 + wave);
-    }
-    ctx.closePath();
-    ctx.fill();
-  }
 
   // Mountains
   const mtColors = [
