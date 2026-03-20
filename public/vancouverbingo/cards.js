@@ -118,7 +118,7 @@ const BINGO_CARDS = [
       "☕ Coffee at 49th Parallel",
       "🧘 Yoga class (bonus if outdoor)",
       "🚴 Spin class",
-      "🚴 Spin class at a W 4th studio",
+      "☕ Breakfast at Provisions on W 4th",
       "🌳 Walk through Vanier Park",
       "⚓ Visit the Maritime Museum",
       "🚲 Bike the seaside path to Spanish Banks",
