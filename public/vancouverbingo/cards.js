@@ -144,7 +144,6 @@ const BINGO_CARDS = [
       "🎾 Tennis at Kits Beach courts",
       "📚 Find a gem at a bookstore",
 
-      "🎬 Catch a film at Park Theatre",
 
 
       "🌉 Walk across the Burrard Bridge",
@@ -158,17 +157,16 @@ const BINGO_CARDS = [
       "🍔 Burger at The Local",
       "🥞 Line up for brunch at Jam Cafe",
       "🥚 Breakfast sandwich at Their There",
-      "🍗 Biscuits and fried chicken at Chewie's",
+      "🦪 Oysters at Chewie's",
       "☕ Pastry and coffee at Lumine",
       "🏖️ Coffee at Kits Beach Coffee",
       "🥐 Beaucoup Bakery — French pastry with Asian flavours",
-      "🇫🇷 Brunch at Marché Mon Pitou",
       "🍓 Strawberry matcha at Cowdog",
       "🍨 Gelato at Tutto Belle on W 4th",
       "🎉 Khatsahlano Street Party on W 4th",
       "🍜 Dinner at Maenam on W 4th",
-      "🍶 Izakaya night at Suika",
       "🍣 Sushi at Octopus's Garden",
+      "🍺 Pint at the Kits Legion",
     ],
   },
   {
