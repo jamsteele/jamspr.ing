@@ -476,14 +476,14 @@
   </div>
   <div class="section-label">things i've made</div>
   <div class="links-grid">
-    <a href="/vancouverbingo" target="_blank" rel="noopener" class="link-button">
-      <span class="link-icon">🎯</span>
-      <span>Vancouver Bingo</span>
-      <span class="link-arrow">→</span>
-    </a>
     <a href="/skigame" target="_blank" rel="noopener" class="link-button">
       <span class="link-icon">🎿</span>
       <span>Whistler Descent <em style="font-style:italic;font-size:0.82em;opacity:0.6;font-weight:400"> — can you beat my score?</em></span>
+      <span class="link-arrow">→</span>
+    </a>
+    <a href="/vancouverbingo" target="_blank" rel="noopener" class="link-button">
+      <span class="link-icon">🎯</span>
+      <span>Vancouver Bingo</span>
       <span class="link-arrow">→</span>
     </a>
     <a href="https://chromewebstore.google.com/detail/stepwise-%E2%80%93-ai-prompt-work/jljbpnbmcehjnngdlieoleccnmgpjbno" target="_blank" rel="noopener" class="link-button">
@@ -631,6 +631,7 @@ let totalBloomed = 0, totalBranchZones = 0, isFullyBloomed = false;
 let windStrength = 0, windTarget = 0, windTimer = 0, gustCooldown = 0;
 let mouseVX = 0, mouseVY = 0, lastMouseX = 0, lastMouseY = 0, isMouseDown = false;
 let frameCount = 0;
+let _animId = null;
 let clouds = [], sparkles = [], flowers = [];
 
 const bird = {
@@ -1630,7 +1631,8 @@ function draw(){
     ctx.restore();
   }
   update();
-  if(!document.hidden) requestAnimationFrame(draw);
+  if(!document.hidden) _animId = requestAnimationFrame(draw);
+  else _animId = null;
 }
 
 // ---- Input ----
@@ -1928,7 +1930,10 @@ function initBgPetals(){
 }
 
 // ---- Init ----
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden) requestAnimationFrame(draw); });
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){ if(_animId){cancelAnimationFrame(_animId);_animId=null;} }
+  else if(!_animId){ _animId=requestAnimationFrame(draw); }
+});
 window.addEventListener('resize',()=>{clearTimeout(_resizeTimer);_resizeTimer=setTimeout(resizeCanvas,150);});
 initBgPetals();
 resizeCanvas();
