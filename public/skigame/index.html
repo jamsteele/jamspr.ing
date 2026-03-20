@@ -1919,19 +1919,23 @@ function draw() {
   }
 }
 
-let lastTime = 0;
+let lastTime = 0, _skiAnimId = null;
 function gameLoop(ts) {
-  requestAnimationFrame(gameLoop);
+  _skiAnimId = requestAnimationFrame(gameLoop);
   if (ts - lastTime < 16) return;
   lastTime = ts;
   update();
   draw();
 }
-requestAnimationFrame(gameLoop);
+_skiAnimId = requestAnimationFrame(gameLoop);
 
-setInterval(() => {
-  if (state === 'playing' && document.hidden) { update(); draw(); }
-}, 16);
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    if (_skiAnimId) { cancelAnimationFrame(_skiAnimId); _skiAnimId = null; }
+  } else if (!_skiAnimId) {
+    _skiAnimId = requestAnimationFrame(gameLoop);
+  }
+});
 
 // ── Leaderboard ──────────────────────────────────────────────────
 const _sb = window.supabase.createClient(
