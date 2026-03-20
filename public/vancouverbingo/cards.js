@@ -86,6 +86,7 @@ const BINGO_CARDS = [
 
       "🌮 Taco Tuesday at Tacofino",
       "🥗 Salad bowl at Field & Social",
+      "🫓 Cauliflower dish at Nuba",
 
       "🐟 Spot a seal in False Creek",
       "🚲 Bike the Seawall (rentals available in Yaletown)",
@@ -160,7 +161,6 @@ const BINGO_CARDS = [
       "🍗 Biscuits and fried chicken at Chewie's",
       "☕ Pastry and coffee at Lumine",
       "🏖️ Coffee at Kits Beach Coffee",
-      "🍵 Matcha at Oide in the Waterfall Building",
       "🥐 Beaucoup Bakery — French pastry with Asian flavours",
       "🇫🇷 Brunch at Marché Mon Pitou",
       "🍓 Strawberry matcha at Cowdog",
@@ -195,7 +195,7 @@ const BINGO_CARDS = [
       "🏭 Stop in at Main Street Brewing",
       "🍕 Beer and pizza at R&B Ale House",
       "📚 Taproom at Faculty Brewing",
-      "🚲 Try a ride at Electric Bicycle Brewing",
+      "🚲 Pint at Electric Bicycle Brewing",
       "🏟️ Big hall energy at BREWHALL",
       "🚂 Steamworks Mt Pleasant",
       "🌲 Portland Craft — order something Pacific Northwest",
