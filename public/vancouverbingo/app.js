@@ -304,6 +304,7 @@ function openBoard(card) {
   $("#board-title").textContent = card.title;
   $("#board-subtitle").textContent = card.subtitle;
 
+  setCardParam(card.id);
   renderBoard();
   updateProgress();
   switchScreen("board-screen");
@@ -708,6 +709,7 @@ function showBingoNudge() {
 // ---- Event listeners ----
 $("#back-btn").addEventListener("click", () => {
   if (isZoomed) toggleZoom();
+  setCardParam(null);
   renderHome();
   switchScreen("home-screen");
 });
@@ -866,6 +868,28 @@ if (window.visualViewport) {
   });
 }
 
+// ---- URL deep-linking ----
+function getCardParam() {
+  return new URLSearchParams(window.location.search).get("card");
+}
+
+function setCardParam(cardId) {
+  const url = new URL(window.location);
+  if (cardId) {
+    url.searchParams.set("card", cardId);
+  } else {
+    url.searchParams.delete("card");
+  }
+  history.replaceState(null, "", url);
+}
+
 // ---- Init ----
 loadState();
 renderHome();
+
+// Auto-open board from ?card= param
+const startCard = getCardParam();
+if (startCard) {
+  const match = BINGO_CARDS.find((c) => c.id === startCard);
+  if (match) openBoard(match);
+}
