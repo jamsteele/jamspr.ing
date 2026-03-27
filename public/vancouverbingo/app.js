@@ -556,104 +556,107 @@ function generateShareImage() {
   const bingos = isClean ? [] : detectBingos();
   const color = currentCard.color;
 
+  const displayFont = "'Space Grotesk', sans-serif";
+  const cleanFont = "'DM Sans', sans-serif";
+  const bg = "#FAF8F5";
+
   // Background
-  ctx.fillStyle = "#FAFAFA";
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, w, h);
 
-  // Header
-  ctx.fillStyle = "#1a1a1a";
-  ctx.font = "700 64px 'Caveat', cursive";
-  ctx.textAlign = "center";
-  ctx.fillText(`${currentCard.title}`, w / 2, 80);
-
+  // Header — bold color band
   ctx.fillStyle = color;
-  ctx.font = "500 48px 'Caveat', cursive";
-  ctx.fillText("Bingo", w / 2, 135);
+  ctx.fillRect(0, 0, w, 160);
 
+  ctx.fillStyle = "#fff";
+  ctx.font = `700 56px ${displayFont}`;
+  ctx.textAlign = "center";
+  ctx.letterSpacing = "-1px";
+  ctx.fillText(currentCard.title.toUpperCase(), w / 2, 72);
+
+  ctx.font = `700 36px ${displayFont}`;
+  ctx.fillText("BINGO", w / 2, 120);
+
+  // Subheader
   if (isClean) {
-    ctx.font = "500 30px 'Caveat', cursive";
-    ctx.fillStyle = "#888";
-    ctx.fillText(currentCard.description, w / 2, 180);
+    ctx.fillStyle = "#777";
+    ctx.font = `400 26px ${cleanFont}`;
+    ctx.fillText(currentCard.description, w / 2, 200);
   } else {
-    ctx.font = "600 30px 'Caveat', cursive";
-    ctx.fillStyle = "#888";
-    ctx.fillText(`${tier.label} — ${checked.size}/25`, w / 2, 180);
+    ctx.fillStyle = "#777";
+    ctx.font = `500 26px ${cleanFont}`;
+    ctx.fillText(`${tier.label} — ${checked.size}/25`, w / 2, 200);
 
     if (bingos.length > 0) {
       ctx.fillStyle = color;
-      ctx.font = "700 30px 'Caveat', cursive";
-      ctx.fillText(`${bingos.length} BINGO${bingos.length > 1 ? "S" : ""}!`, w / 2, 215);
+      ctx.font = `700 26px ${displayFont}`;
+      ctx.fillText(`${bingos.length} BINGO${bingos.length > 1 ? "S" : ""}!`, w / 2, 235);
     }
   }
 
   // Grid
   const gridX = 40;
   const hasExtra = !isClean && bingos.length > 0;
-  const gridY = hasExtra ? 240 : 210;
-  const cellW = (w - 80) / 5;
-  const cellH = (h - (hasExtra ? 380 : 350)) / 5;
-  const gap = 6;
+  const gridY = hasExtra ? 260 : 230;
+  const gridW = w - 80;
+  const gridH = h - (hasExtra ? 400 : 370);
+  const cellW = gridW / 5;
+  const cellH = gridH / 5;
+
+  // Grid outer border
+  ctx.strokeStyle = "#1a1a1a";
+  ctx.lineWidth = 4;
+  roundRect(ctx, gridX, gridY, gridW, gridH, 6);
+  ctx.stroke();
 
   dealt.forEach((item, i) => {
     const col = i % 5;
     const row = Math.floor(i / 5);
-    const x = gridX + col * cellW + gap / 2;
-    const y = gridY + row * cellH + gap / 2;
-    const cw = cellW - gap;
-    const ch = cellH - gap;
+    const x = gridX + col * cellW;
+    const y = gridY + row * cellH;
     const isFree = i === 12;
     const isChecked = checked.has(i);
 
     if (isFree) {
-      ctx.fillStyle = isClean ? "#FAFAFA" : color;
-      roundRect(ctx, x, y, cw, ch, 4);
-      ctx.fill();
-      ctx.strokeStyle = isClean ? color : "#1a1a1a";
-      ctx.lineWidth = isClean ? 3 : 2;
-      roundRect(ctx, x, y, cw, ch, 4);
-      ctx.stroke();
-      ctx.fillStyle = isClean ? "#1a1a1a" : "#fff";
-      ctx.font = "700 40px 'Caveat', cursive";
-      ctx.textAlign = "center";
-      ctx.fillText("FREE", x + cw / 2, y + ch / 2 + 14);
-    } else if (isChecked) {
       ctx.fillStyle = "#1a1a1a";
-      roundRect(ctx, x, y, cw, ch, 4);
-      ctx.fill();
-      ctx.strokeStyle = "#1a1a1a";
-      ctx.lineWidth = 2;
-      roundRect(ctx, x, y, cw, ch, 4);
-      ctx.stroke();
+      ctx.fillRect(x, y, cellW, cellH);
+      ctx.fillStyle = "#fff";
+      ctx.font = `700 34px ${displayFont}`;
+      ctx.textAlign = "center";
+      ctx.fillText("FREE", x + cellW / 2, y + cellH / 2 + 12);
+    } else if (isChecked) {
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, cellW, cellH);
 
       ctx.beginPath();
-      ctx.arc(x + cw / 2, y + ch / 2, Math.min(cw, ch) * 0.38, 0, Math.PI * 2);
-      ctx.strokeStyle = color;
+      ctx.arc(x + cellW / 2, y + cellH / 2, Math.min(cellW, cellH) * 0.36, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(255,255,255,0.4)";
       ctx.lineWidth = 3;
       ctx.stroke();
 
-      ctx.fillStyle = "#FAFAFA";
-      ctx.font = "500 28px 'Caveat', cursive";
+      ctx.fillStyle = "#fff";
+      ctx.font = `500 24px ${cleanFont}`;
       ctx.textAlign = "center";
-      wrapText(ctx, item, x + cw / 2, y + ch / 2 + 6, cw - 20, 30);
+      wrapText(ctx, item, x + cellW / 2, y + cellH / 2 + 6, cellW - 20, 28);
     } else {
-      ctx.fillStyle = "#FAFAFA";
-      roundRect(ctx, x, y, cw, ch, 4);
-      ctx.fill();
-      ctx.strokeStyle = "#1a1a1a";
-      ctx.lineWidth = 2;
-      roundRect(ctx, x, y, cw, ch, 4);
-      ctx.stroke();
+      ctx.fillStyle = bg;
+      ctx.fillRect(x, y, cellW, cellH);
 
       ctx.fillStyle = "#1a1a1a";
-      ctx.font = "500 28px 'Caveat', cursive";
+      ctx.font = `500 24px ${cleanFont}`;
       ctx.textAlign = "center";
-      wrapText(ctx, item, x + cw / 2, y + ch / 2 + 6, cw - 20, 30);
+      wrapText(ctx, item, x + cellW / 2, y + cellH / 2 + 6, cellW - 20, 28);
     }
+
+    // Cell borders
+    ctx.strokeStyle = "#1a1a1a";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, cellW, cellH);
   });
 
   // Footer
-  ctx.fillStyle = "#1a1a1a";
-  ctx.font = "600 32px 'Caveat', cursive";
+  ctx.fillStyle = "#777";
+  ctx.font = `500 26px ${cleanFont}`;
   ctx.textAlign = "center";
   ctx.fillText("jamspr.ing/vancouverbingo", w / 2, h - 35);
 
