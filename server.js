@@ -10,6 +10,11 @@ app.get('/insta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// The Library — a cozy room of public-domain short stories
+app.get('/library', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'library', 'index.html'));
+});
+
 // Redirect root to /insta for now
 app.get('/', (req, res) => {
   res.redirect(301, '/insta');

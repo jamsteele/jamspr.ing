@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Library — A room of short stories</title>
+  <meta name="description" content="A cozy illustrated room of public-domain short stories from around the world. They just stepped out — feel free to poke around.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main class="room" id="room" aria-label="An illustrated room with clickable objects">
+    <!-- The illustrated scene will eventually live as a background-image on .room.
+         For now, hotspots are auto-positioned in a grid by script.js so the
+         click-through experience works end-to-end before the art is in place. -->
+    <div class="room-placeholder">
+      <p class="placeholder-eyebrow">scaffold preview</p>
+      <p class="placeholder-text">the illustrated room will live here</p>
+      <p class="placeholder-hint">click any of the placeholder objects below</p>
+    </div>
+  </main>
+
+  <!-- Reader modal -->
+  <div class="modal" id="reader" hidden aria-hidden="true">
+    <div class="modal-backdrop" data-close></div>
+    <article class="modal-content" role="dialog" aria-modal="true" aria-labelledby="story-title">
+      <button class="modal-close" data-close aria-label="Close story">×</button>
+      <header class="story-header">
+        <p class="story-eyebrow"><span class="story-flag"></span> <span class="story-country"></span></p>
+        <h1 id="story-title"></h1>
+        <p class="story-meta">
+          <span class="story-author"></span>
+          <span class="story-sep">·</span>
+          <span class="story-mins"></span>
+        </p>
+        <p class="story-note" id="story-note" hidden></p>
+      </header>
+      <div class="story-content" id="story-content"></div>
+    </article>
+  </div>
+
+  <!-- Markdown parser (small, ~30KB) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
