@@ -133,20 +133,6 @@
       "position": { "top": "20%", "left": "65%" }
     },
     {
-      "id": "the-tell-tale-heart",
-      "title": "The Tell-Tale Heart",
-      "author": "Edgar Allan Poe",
-      "year": 1843,
-      "country": "USA",
-      "countryFlag": "🇺🇸",
-      "minutes": 8,
-      "mood": "Spooky",
-      "trinket": "Poe paperback from the Strand, NYC",
-      "trinketEmoji": "📕",
-      "source": "https://www.gutenberg.org/ebooks/2148",
-      "position": { "top": "32%", "left": "60%" }
-    },
-    {
       "id": "service-the-cremation-of-sam-mcgee",
       "title": "The Cremation of Sam McGee",
       "author": "Robert W. Service",

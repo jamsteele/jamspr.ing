@@ -32,7 +32,6 @@ The first paragraph gets a drop cap automatically — no special markup needed.
 | `the-boy-who-drew-cats` | Lafcadio Hearn | _Not on PG; try Standard Ebooks or Internet Archive_ |
 | `the-open-window` | Saki | https://www.gutenberg.org/ebooks/269 (Beasts and Super-Beasts) |
 | `the-nightingale-and-the-rose` | Oscar Wilde | https://www.gutenberg.org/ebooks/902 |
-| `the-tell-tale-heart` | Edgar Allan Poe | https://www.gutenberg.org/ebooks/2148 |
 | `the-postmaster` | Tagore | https://www.gutenberg.org/ebooks/34757 (Mashi, and Other Stories) |
 | `the-bet` | Chekhov | https://www.gutenberg.org/ebooks/55283 (The Bet, and other stories) |
 | `the-necklace` | Maupassant | https://www.gutenberg.org/ebooks/3090 (Complete Original Short Stories) |
@@ -67,7 +66,6 @@ Repeat for each story. Should take maybe 30 minutes total to populate all 17.
 - [x] the-two-sisters.md
 - [x] the-open-window.md
 - [x] the-nightingale-and-the-rose.md
-- [x] the-tell-tale-heart.md
 - [x] the-postmaster.md
 - [x] the-bet.md
 - [x] the-necklace.md
@@ -83,3 +81,4 @@ Repeat for each story. Should take maybe 30 minutes total to populate all 17.
 
 **Deferred (not in current MVP):**
 - _the-boy-who-drew-cats_ — original Hearn 1898 booklet not on PG, Wikisource, or any open-access full-text source we can scrape. To revive: paste manually from a Hearn collection, or substitute a Hearn tale that IS on PG (e.g. Yuki-Onna or Mujina from Kwaidan, PG #1210).
+- _the-tell-tale-heart_ — pulled because it's a first-person murder confession; too gruesome for the cozy room vibe. To swap a non-gruesome Poe back in: A Descent into the Maelström (PG #2148, same file) is a survival adventure with no violence.
