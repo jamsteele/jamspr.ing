@@ -405,6 +405,37 @@ body {
   100% { opacity: 0.4; transform: scale(1); }
 }
 
+/* ---------- Breathing cat ----------
+   A pixel-perfect cut-out of the cat (extracted from room2.png) overlaid on
+   top of the painted cat in the room. The painted cat sits underneath as the
+   "rest position"; the overlay scales gently from the bottom to simulate
+   chest rise/fall. Soft alpha edges hide any cut-out imperfections. */
+
+.cat-breath {
+  position: absolute;
+  top: 60.55%;
+  left: 65.76%;
+  width: 19.53%;
+  height: auto;
+  pointer-events: none;
+  z-index: 2;
+  /* Scale from the bottom (where the cat meets the blanket) so the breath
+     "rises" rather than expanding from the center. */
+  transform-origin: 50% 95%;
+  animation: cat-breathe 4.5s ease-in-out infinite;
+  /* Smooth out any sub-pixel edge shimmer */
+  will-change: transform;
+}
+
+@keyframes cat-breathe {
+  0%, 100% {
+    transform: scale(1, 1) translateY(0);
+  }
+  50% {
+    transform: scale(1.012, 1.018) translateY(-0.5px);
+  }
+}
+
 /* ---------- Easter egg: cherry blossom sprig ----------
    The painting's own fairy lights handle the "wave" visually via a brief
    golden bloom overlay (.room.bloom) below. Our cherry sprig is the only
@@ -513,6 +544,7 @@ body {
   .petal { display: none; }
   .cherry-sprig.shake { animation: none; }
   .room.bloom::after { animation: none; opacity: 0; }
+  .cat-breath { animation: none; }
 }
 
 /* ---------- Annotate mode (?annotate URL flag) ---------- */
