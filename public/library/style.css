@@ -556,9 +556,8 @@ body {
 }
 
 /* ---------- Easter egg: cherry blossom sprig ----------
-   The painting's own fairy lights handle the "wave" visually via a brief
-   golden bloom overlay (.room.bloom) below. Our cherry sprig is the only
-   added DOM element on top of the room — placed over the windowsill. */
+   Click the painted cherry-sprig art on the wall 3× → the painted-lights
+   layer pulses in a wave + petals drift from the painting. */
 
 .cherry-sprig {
   position: absolute;
@@ -575,26 +574,6 @@ body {
   z-index: 4;
   transition: transform 0.3s ease;
   transform-origin: 50% 50%;
-}
-
-/* When the easter egg fires, the entire painting briefly glows warmer —
-   a stand-in for "all the fairy lights pulsed." */
-.room.bloom::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 75% 35%, rgba(255, 200, 120, 0.45), transparent 60%),
-              radial-gradient(ellipse at 25% 25%, rgba(255, 220, 150, 0.3), transparent 50%);
-  pointer-events: none;
-  animation: bloom-flash 2.2s ease-out;
-  mix-blend-mode: screen;
-  z-index: 2;
-}
-
-@keyframes bloom-flash {
-  0% { opacity: 0; }
-  20% { opacity: 1; }
-  100% { opacity: 0; }
 }
 
 .cherry-sprig:focus-visible {
@@ -655,7 +634,6 @@ body {
   .painted-lights.wave .painted-light { animation: none; }
   .petal { display: none; }
   .cherry-sprig.shake { animation: none; }
-  .room.bloom::after { animation: none; opacity: 0; }
   .cat-body, .cat-headtail { animation: none; }
   .steam-wisp { animation: none; opacity: 0; }
 }

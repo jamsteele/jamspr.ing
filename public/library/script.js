@@ -290,14 +290,6 @@ function spawnPetal(petalLayer, options = {}) {
 }
 
 function triggerEasterEgg(room, petalLayer) {
-  // Bloom flash — the painting's own fairy lights "pulse"
-  if (room) {
-    room.classList.remove('bloom');
-    void room.offsetWidth;
-    room.classList.add('bloom');
-    setTimeout(() => room.classList.remove('bloom'), 2300);
-  }
-
   // Painted-lights wave — every twinkling light pulses bright in a cascade
   const lights = document.getElementById('painted-lights');
   if (lights) {
