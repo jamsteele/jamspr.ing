@@ -1,7 +1,7 @@
 {
-  "version": 3,
-  "lastUpdated": "2026-05-09",
-  "notes": "Each story has metadata + a position (% of room width/height) for its hotspot in the painted scene. Story text lives at stories/<id>.md and is lazy-loaded on click.",
+  "version": 4,
+  "lastUpdated": "2026-05-10",
+  "notes": "Each story has metadata + a position (% of room width/height) for its hotspot in the painted scene. Story text lives at stories/<id>.md and is lazy-loaded on click. Trinket descriptions are intentionally brief noun-phrases — the painting can't show every specific object, so we name a souvenir that suggests the trip without promising a visible prop.",
   "stories": [
     {
       "id": "the-open-window",
@@ -12,7 +12,7 @@
       "countryFlag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
       "minutes": 6,
       "mood": "Wicked-funny",
-      "trinket": "Small framed pencil sketch from a Cotswolds craft fair",
+      "trinket": "Pencil sketch from a Cotswolds craft fair",
       "trinketEmoji": "🖼️",
       "source": "https://www.gutenberg.org/ebooks/269",
       "position": { "top": "26%", "left": "2.5%" }
@@ -26,7 +26,7 @@
       "countryFlag": "🇨🇦",
       "minutes": 5,
       "mood": "Mythic",
-      "trinket": "Her own Instax polaroid of The Lions, taped to the photo string",
+      "trinket": "Polaroid of The Lions, from Stanley Park",
       "trinketEmoji": "📷",
       "source": "https://www.gutenberg.org/ebooks/3478",
       "contentNote": "A Squamish legend, told to Pauline Johnson by Chief Joe Capilano, 1911. The Squamish name for The Lions is Ch'ích'iyúy Elx̱wíḵn — Twin Sisters.",
@@ -42,7 +42,7 @@
       "countryFlag": "🇨🇦",
       "minutes": 18,
       "mood": "Warm-funny",
-      "trinket": "Tin of loose-leaf tea + a small ceramic dog figurine from a PEI craft market",
+      "trinket": "Tin of tea from a PEI farm shop",
       "trinketEmoji": "🐕",
       "source": "https://www.gutenberg.org/ebooks/1354",
       "position": { "top": "55%", "left": "30%" }
@@ -56,7 +56,7 @@
       "countryFlag": "🇮🇳",
       "minutes": 10,
       "mood": "Tender",
-      "trinket": "Handmade leather-bound notebook from a Jaipur market, with a folded unsent postcard tucked inside",
+      "trinket": "Leather notebook from a Jaipur market",
       "trinketEmoji": "📓",
       "source": "https://www.gutenberg.org/ebooks/34757",
       "position": { "top": "75%", "left": "37%", "width": "9%", "height": "8%" }
@@ -70,7 +70,7 @@
       "countryFlag": "🇮🇪",
       "minutes": 8,
       "mood": "Heartbreaking",
-      "trinket": "A single pressed rose tucked into a small leather notebook from Dublin",
+      "trinket": "Pressed rose in a Dublin paperback",
       "trinketEmoji": "🌹",
       "source": "https://www.gutenberg.org/ebooks/902",
       "position": { "top": "73%", "left": "8%" }
@@ -84,7 +84,7 @@
       "countryFlag": "🇫🇷",
       "minutes": 14,
       "mood": "Twist ending",
-      "trinket": "Single paste necklace draped over a small painted box from the Marché aux Puces, Paris",
+      "trinket": "Paris flea-market paperback",
       "trinketEmoji": "💎",
       "source": "https://www.gutenberg.org/ebooks/3090",
       "position": { "top": "55%", "left": "21%" }
@@ -98,7 +98,7 @@
       "countryFlag": "🇯🇵",
       "minutes": 14,
       "mood": "Creepy-cute",
-      "trinket": "Small hand-thrown ceramic dish from a Kyoto craft market, with a tiny folded paper crane resting on it",
+      "trinket": "Worn paperback picked up in Kyoto",
       "trinketEmoji": "🍵",
       "source": "https://en.wikisource.org/wiki/Translation:The_Restaurant_With_Many_Orders",
       "sourceNote": "Translation is licensed CC BY-SA 3.0 — attribution preserved at the bottom of the .md file.",
@@ -113,10 +113,9 @@
       "countryFlag": "🇷🇺",
       "minutes": 12,
       "mood": "Philosophical",
-      "trinket": "Matryoshka doll set, opened — the smallest doll standing alone next to the others",
+      "trinket": "Used Chekhov paperback from a Moscow bookstore",
       "trinketEmoji": "🪆",
       "source": "https://www.gutenberg.org/ebooks/55283",
-      "contentNote": "The nesting / peeling-back is the visual echo of fifteen years of selves the lawyer sheds in confinement.",
       "position": { "top": "20%", "left": "57%" }
     },
     {
@@ -128,7 +127,7 @@
       "countryFlag": "🇷🇺",
       "minutes": 25,
       "mood": "Tragic fable",
-      "trinket": "Small lacquered Khokhloma box (red, gold, and black) from a Moscow market",
+      "trinket": "Tolstoy paperback from St. Petersburg",
       "trinketEmoji": "🎁",
       "source": "https://www.gutenberg.org/ebooks/6157",
       "position": { "top": "20%", "left": "65%" }
@@ -142,7 +141,7 @@
       "countryFlag": "🇺🇸",
       "minutes": 8,
       "mood": "Spooky",
-      "trinket": "Worn used paperback of Poe's Tales — bookplate inside reads \"Strand, NYC, 2022\"",
+      "trinket": "Poe paperback from the Strand, NYC",
       "trinketEmoji": "📕",
       "source": "https://www.gutenberg.org/ebooks/2148",
       "position": { "top": "32%", "left": "60%" }
@@ -156,7 +155,7 @@
       "countryFlag": "🇨🇦",
       "minutes": 8,
       "mood": "Hilarious-then-haunting ballad",
-      "trinket": "Worn paperback of Service's verse on the bookshelf (shared with the other two Service poems)",
+      "trinket": "Service's Yukon ballads (same paperback as the other two)",
       "trinketEmoji": "📜",
       "source": "https://www.gutenberg.org/ebooks/207",
       "format": "poem",
@@ -171,7 +170,7 @@
       "countryFlag": "🇨🇦",
       "minutes": 6,
       "mood": "Restless wanderlust",
-      "trinket": "Worn paperback of Service's verse on the bookshelf (shared with the other two Service poems)",
+      "trinket": "Service's Yukon ballads (same paperback as the other two)",
       "trinketEmoji": "📜",
       "source": "https://www.gutenberg.org/ebooks/207",
       "format": "poem",
@@ -186,7 +185,7 @@
       "countryFlag": "🇨🇦",
       "minutes": 7,
       "mood": "Saloon ballad",
-      "trinket": "Worn paperback of Service's verse on the bookshelf (shared with the other two Service poems)",
+      "trinket": "Service's Yukon ballads (same paperback as the other two)",
       "trinketEmoji": "📜",
       "source": "https://www.gutenberg.org/ebooks/207",
       "format": "poem",
@@ -201,7 +200,7 @@
       "countryFlag": "🇨🇦",
       "minutes": 20,
       "mood": "Gentle absurd",
-      "trinket": "Vintage postcard of a steamboat propped against a small enamel travel mug",
+      "trinket": "Vintage steamboat postcard from Lake Couchiching",
       "trinketEmoji": "⛴️",
       "source": "https://www.gutenberg.org/ebooks/3533",
       "position": { "top": "33%", "left": "82%" }
@@ -215,7 +214,7 @@
       "countryFlag": "🇺🇸",
       "minutes": 30,
       "mood": "Survival",
-      "trinket": "Pressed birch leaf in a small thrifted frame, with a National Parks enamel pin beside it",
+      "trinket": "Yukon paperback, Parks pass tucked inside",
       "trinketEmoji": "🍂",
       "source": "https://www.gutenberg.org/ebooks/2429",
       "position": { "top": "47%", "left": "90%" }
@@ -229,10 +228,10 @@
       "countryFlag": "🇵🇭",
       "minutes": 12,
       "mood": "Witty / clever-peasant",
-      "trinket": "Hand-carved wooden hairpin from a Vigan market",
+      "trinket": "Folktale book from a Manila bookshop",
       "trinketEmoji": "📌",
       "source": "https://www.gutenberg.org/ebooks/8299",
-      "contentNote": "The hairpin echoes the story's signature riddle: a king sends Marcela one bird and demands twelve dishes from it; she sends back a single pin and demands twelve spoons made from it. Two versions of the tale (Pampangan + Tagalog) included in the .md file.",
+      "contentNote": "Two versions of a Filipino clever-girl tale (Pampangan + Tagalog) — both included in the file. The riddle the title comes from: the king sends Marcela one bird and demands twelve dishes from it; she sends back a single pin and demands twelve spoons made from it.",
       "position": { "top": "35%", "left": "85%" }
     }
   ]
