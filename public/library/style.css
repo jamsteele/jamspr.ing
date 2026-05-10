@@ -600,10 +600,11 @@ body {
   outline-offset: 2px;
 }
 
-/* When the cat is being pet, both layers breathe much faster. */
+/* When the cat is being pet, both layers breathe slightly faster — gentle
+   acknowledgement that she noticed you, not a panicked sprint. */
 .cat-body.purring,
 .cat-headtail.purring {
-  animation-duration: 1.4s !important;
+  animation-duration: 3s !important;
 }
 
 .purr-label {
