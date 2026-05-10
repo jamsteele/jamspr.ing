@@ -16,6 +16,14 @@ async function init() {
     const res = await fetch('stories/index.json');
     if (!res.ok) throw new Error(`index.json: ${res.status}`);
     const data = await res.json();
+
+    const annotateMode = new URLSearchParams(window.location.search).has('annotate');
+    if (annotateMode) {
+      // Skip everything else; the annotation UI takes over the page
+      setupAnnotateMode();
+      return;
+    }
+
     renderHotspots(data.stories || []);
     setupModalControls();
     setupPaintedLights();
@@ -26,6 +34,93 @@ async function init() {
     console.error('Failed to load story index:', err);
     showRoomError('Could not load the story index. See console for details.');
   }
+}
+
+/* ---------- Annotate mode ----------
+   Visit /library?annotate. Click each painted light in the room. Positions
+   are recorded as % of room dimensions. When done, hit "Copy" to get the
+   PAINTED_LIGHT_POSITIONS array on your clipboard, paste into script.js. */
+
+function setupAnnotateMode() {
+  const room = document.getElementById('room');
+  const wrapper = document.getElementById('room-wrapper');
+  if (!room) return;
+
+  const points = [];
+
+  // Floating panel UI
+  const panel = document.createElement('div');
+  panel.id = 'annotate-panel';
+  panel.innerHTML = `
+    <div class="annotate-title">🎯 Light Annotation Mode</div>
+    <div class="annotate-hint">Click each painted light. Scroll the room to find them all.</div>
+    <div class="annotate-stats"><span id="annotate-count">0</span> lights marked</div>
+    <div class="annotate-actions">
+      <button id="annotate-undo">Undo last</button>
+      <button id="annotate-clear">Clear all</button>
+      <button id="annotate-copy">Copy positions</button>
+    </div>
+    <textarea id="annotate-output" readonly></textarea>
+  `;
+  document.body.appendChild(panel);
+
+  // Crosshair on hover over the room
+  room.style.cursor = 'crosshair';
+
+  function refresh() {
+    document.getElementById('annotate-count').textContent = points.length;
+    document.getElementById('annotate-output').value = formatJS(points);
+    // Redraw markers
+    document.querySelectorAll('.annotate-marker').forEach((el) => el.remove());
+    points.forEach((p, i) => {
+      const marker = document.createElement('div');
+      marker.className = 'annotate-marker';
+      marker.style.left = `${p.x}%`;
+      marker.style.top = `${p.y}%`;
+      marker.textContent = i + 1;
+      room.appendChild(marker);
+    });
+  }
+
+  function formatJS(pts) {
+    if (!pts.length) return 'const PAINTED_LIGHT_POSITIONS = [];';
+    return 'const PAINTED_LIGHT_POSITIONS = [\n' +
+      pts.sort((a, b) => a.y - b.y || a.x - b.x)
+         .map((p) => `  { x: ${p.x.toFixed(2)}, y: ${p.y.toFixed(2)} },`)
+         .join('\n') +
+      '\n];';
+  }
+
+  room.addEventListener('click', (e) => {
+    if (e.target !== room && !e.target.classList.contains('annotate-marker')) return;
+    const rect = room.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    points.push({ x, y });
+    refresh();
+  });
+
+  document.getElementById('annotate-undo').addEventListener('click', () => {
+    points.pop();
+    refresh();
+  });
+  document.getElementById('annotate-clear').addEventListener('click', () => {
+    points.length = 0;
+    refresh();
+  });
+  document.getElementById('annotate-copy').addEventListener('click', async (e) => {
+    const ta = document.getElementById('annotate-output');
+    ta.select();
+    try {
+      await navigator.clipboard.writeText(ta.value);
+      e.target.textContent = 'Copied ✓';
+      setTimeout(() => { e.target.textContent = 'Copy positions'; }, 1500);
+    } catch {
+      e.target.textContent = 'Select & copy ↓';
+    }
+  });
+
+  refresh();
 }
 
 /* ---------- Painted-lights twinkle ----------
