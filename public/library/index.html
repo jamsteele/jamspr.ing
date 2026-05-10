@@ -72,6 +72,19 @@
     <div class="scroll-hint scroll-hint-left" aria-hidden="true"></div>
   </div>
 
+  <!-- First-visit hint overlay. Shown once per browser (localStorage flag).
+       Auto-dismisses after 5s, on click anywhere, or via the close button.
+       Re-openable via the "?" button in the top-right. -->
+  <div class="hint-overlay" id="hint-overlay" hidden>
+    <div class="hint-card">
+      <p class="hint-line-1"><em>she just stepped out.</em></p>
+      <p class="hint-line-2">stay as long as you'd like. tap any object.</p>
+    </div>
+  </div>
+
+  <!-- Re-summon button for the hint, lives in the top-right corner. -->
+  <button class="hint-toggle" id="hint-toggle" aria-label="What is this?">?</button>
+
   <!-- Reader modal -->
   <div class="modal" id="reader" hidden aria-hidden="true">
     <div class="modal-backdrop" data-close></div>

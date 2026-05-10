@@ -32,6 +32,7 @@ async function init() {
     setupScrollHints();
     setupParallax();
     setupDiscoveryPulse();
+    setupHintOverlay();
   } catch (err) {
     console.error('Failed to load story index:', err);
     showRoomError('Could not load the story index. See console for details.');
@@ -382,6 +383,48 @@ function setupParallax() {
     }
   }, { passive: true });
   update();
+}
+
+/* ---------- First-visit hint overlay ---------- */
+
+const HINT_SEEN_KEY = 'library:hintSeen';
+
+function setupHintOverlay() {
+  const overlay = document.getElementById('hint-overlay');
+  const toggle = document.getElementById('hint-toggle');
+  if (!overlay || !toggle) return;
+
+  let firstVisit = false;
+  try { firstVisit = !localStorage.getItem(HINT_SEEN_KEY); }
+  catch { firstVisit = true; }  // localStorage unavailable (private mode) → treat as first visit
+
+  let autoCloseTimer = null;
+
+  const open = () => {
+    overlay.hidden = false;
+    overlay.classList.remove('fading-out');
+    if (autoCloseTimer) clearTimeout(autoCloseTimer);
+    autoCloseTimer = setTimeout(close, 5000);
+  };
+
+  const close = () => {
+    if (overlay.hidden) return;
+    overlay.classList.add('fading-out');
+    setTimeout(() => {
+      overlay.hidden = true;
+      overlay.classList.remove('fading-out');
+    }, 500);
+    try { localStorage.setItem(HINT_SEEN_KEY, '1'); } catch {}
+    if (autoCloseTimer) { clearTimeout(autoCloseTimer); autoCloseTimer = null; }
+  };
+
+  overlay.addEventListener('click', close);
+  toggle.addEventListener('click', open);
+
+  if (firstVisit) {
+    // Slight delay so the room renders + discovery pulse starts before the hint appears
+    setTimeout(open, 600);
+  }
 }
 
 /* ---------- One-time discovery pulse ---------- */

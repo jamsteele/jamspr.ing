@@ -546,13 +546,13 @@ body {
 
 @keyframes cat-body-breathe {
   0%, 100% { transform: scaleY(1); }
-  50%      { transform: scaleY(1.03); }
+  50%      { transform: scaleY(1.05); }
 }
 
-/* Head & tail rise/fall ~1.5px in sympathy with the body's breath, no scale. */
+/* Head & tail rise/fall ~2.5px in sympathy with the body's breath, no scale. */
 @keyframes cat-headtail-bob {
   0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-1.5px); }
+  50%      { transform: translateY(-2.5px); }
 }
 
 /* ---------- Easter egg: cherry blossom sprig ----------
@@ -658,6 +658,104 @@ body {
   .room.bloom::after { animation: none; opacity: 0; }
   .cat-body, .cat-headtail { animation: none; }
   .steam-wisp { animation: none; opacity: 0; }
+}
+
+/* ---------- First-visit hint overlay ----------
+   Soft cream card centered on the room with the project's framing line.
+   Auto-fades after 5s; click anywhere to dismiss. Re-summon via "?" button. */
+
+.hint-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 15, 10, 0.35);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  pointer-events: auto;
+  cursor: pointer;
+  animation: hint-fade-in 0.6s ease-out;
+}
+
+.hint-overlay[hidden] { display: none; }
+
+.hint-overlay.fading-out {
+  animation: hint-fade-out 0.5s ease-in forwards;
+}
+
+.hint-card {
+  background: linear-gradient(180deg, var(--paper) 0%, #efe3cb 100%);
+  color: var(--ink);
+  padding: 2.25rem 2.5rem 2rem;
+  border-radius: 6px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  max-width: min(85vw, 380px);
+  text-align: center;
+  font-family: 'Iowan Old Style', 'Palatino Linotype', 'Palatino', 'Georgia', serif;
+}
+
+.hint-line-1 {
+  font-size: 1.4rem;
+  margin-bottom: 0.6rem;
+  color: var(--ink);
+  font-weight: 400;
+}
+
+.hint-line-1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.hint-line-2 {
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  letter-spacing: 0.01em;
+}
+
+@keyframes hint-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes hint-fade-out {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.hint-toggle {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 60;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 220, 150, 0.35);
+  background: rgba(20, 15, 10, 0.55);
+  color: rgba(255, 235, 200, 0.85);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  line-height: 1;
+  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.hint-toggle:hover {
+  background: rgba(40, 30, 20, 0.75);
+  border-color: rgba(255, 220, 150, 0.6);
+  transform: scale(1.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint-overlay { animation: none; }
+  .hint-overlay.fading-out { animation: none; opacity: 0; }
 }
 
 /* ---------- Annotate mode (?annotate URL flag) ---------- */
