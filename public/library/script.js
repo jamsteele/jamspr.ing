@@ -427,15 +427,37 @@ function setupHintOverlay() {
   }
 }
 
-/* ---------- One-time discovery pulse ---------- */
-/* On first load, the hotspot dots briefly pulse so users learn objects are clickable.
-   Fades out after a few seconds. */
+/* ---------- Discovery pulse + on-demand reveal ----------
+   On first load, the hotspot dots briefly pulse so users learn objects are
+   clickable. After that, tapping/clicking empty room space (anywhere that
+   isn't a hotspot or the cherry-sprig button) re-triggers the pulse —
+   primary discoverability mechanism on touch devices where hover is absent. */
 
 function setupDiscoveryPulse() {
   const room = document.getElementById('room');
   if (!room) return;
+
+  // First-load pulse
   room.classList.add('hotspots-discovery-pulse');
   setTimeout(() => room.classList.remove('hotspots-discovery-pulse'), 5000);
+
+  // Re-trigger pulse when user taps empty room space
+  let pulseTimer = null;
+  const triggerPulse = () => {
+    room.classList.remove('hotspots-discovery-pulse');
+    void room.offsetWidth;  // force reflow so the animation restarts cleanly
+    room.classList.add('hotspots-discovery-pulse');
+    if (pulseTimer) clearTimeout(pulseTimer);
+    pulseTimer = setTimeout(() => room.classList.remove('hotspots-discovery-pulse'), 4500);
+  };
+
+  const onRoomTap = (e) => {
+    // Skip if the tap was on something interactive — the existing handler
+    // (open story, easter egg, etc.) already gives feedback for those.
+    if (e.target.closest('.hotspot, .cherry-sprig, .modal, button, a')) return;
+    triggerPulse();
+  };
+  room.addEventListener('click', onRoomTap);
 }
 
 /* Render a hotspot for each story.
