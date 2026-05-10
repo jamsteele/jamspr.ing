@@ -56,6 +56,14 @@
       <img class="cat-body" src="assets/cat.png" alt="" aria-hidden="true">
       <img class="cat-headtail" src="assets/cat.png" alt="" aria-hidden="true">
 
+      <!-- Cat-shaped click area for petting. Polygon outline of the painted
+           cat from /library?annotate. Click → faster breathing + purr label. -->
+      <button class="cat-pet-area" id="cat-pet-area" aria-label="Pet the cat"></button>
+      <span class="purr-label" id="purr-label" aria-hidden="true">purrrr…</span>
+
+      <!-- Travel journal click area — over the painted open journal on the desk. -->
+      <button class="journal-area" id="journal-area" aria-label="Read her travel journal"></button>
+
       <!-- Easter egg trigger: invisible click target over the painted cherry
            blossom sprig framed on the wall (top-left of the room, beside
            the window). Click it 3× → petals drift down from it + fairy
@@ -84,6 +92,22 @@
 
   <!-- Re-summon button for the hint, lives in the top-right corner. -->
   <button class="hint-toggle" id="hint-toggle" aria-label="What is this?">?</button>
+
+  <!-- Travel journal modal — opens when the painted journal is clicked.
+       Entries are her own reflections about each trip and the books/items
+       she picked up. Loaded lazily from stories/journal.json. -->
+  <div class="modal journal-modal" id="journal-modal" hidden aria-hidden="true">
+    <div class="modal-backdrop" data-journal-close></div>
+    <article class="modal-content journal-content" role="dialog" aria-modal="true" aria-labelledby="journal-title">
+      <button class="modal-close" data-journal-close aria-label="Close journal">×</button>
+      <header class="story-header">
+        <p class="story-eyebrow">her travel journal</p>
+        <h1 id="journal-title">where everything came from</h1>
+        <p class="story-meta"><span class="story-author">an ongoing list</span></p>
+      </header>
+      <div class="journal-entries" id="journal-entries"></div>
+    </article>
+  </div>
 
   <!-- Reader modal -->
   <div class="modal" id="reader" hidden aria-hidden="true">

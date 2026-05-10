@@ -33,6 +33,8 @@ async function init() {
     setupParallax();
     setupDiscoveryPulse();
     setupHintOverlay();
+    setupCatPetting();
+    setupTravelJournal();
   } catch (err) {
     console.error('Failed to load story index:', err);
     showRoomError('Could not load the story index. See console for details.');
@@ -375,6 +377,96 @@ function setupParallax() {
     }
   }, { passive: true });
   update();
+}
+
+/* ---------- Cat petting ----------
+   Cat-shaped clickable area is in the DOM (clip-path polygon). Clicking it
+   speeds up both cat overlay animations for ~3s and shows a "purrrr…" label. */
+
+function setupCatPetting() {
+  const petArea = document.getElementById('cat-pet-area');
+  const catBody = document.querySelector('.cat-body');
+  const catHt = document.querySelector('.cat-headtail');
+  const purr = document.getElementById('purr-label');
+  if (!petArea) return;
+
+  let petTimer = null;
+  petArea.addEventListener('click', () => {
+    catBody?.classList.add('purring');
+    catHt?.classList.add('purring');
+    if (purr) {
+      purr.classList.remove('showing');
+      void purr.offsetWidth;
+      purr.classList.add('showing');
+    }
+    if (petTimer) clearTimeout(petTimer);
+    petTimer = setTimeout(() => {
+      catBody?.classList.remove('purring');
+      catHt?.classList.remove('purring');
+    }, 3000);
+  });
+}
+
+/* ---------- Travel journal ----------
+   Click the painted journal on the desk → modal opens with her travel
+   entries (loaded from stories/journal.json). */
+
+async function setupTravelJournal() {
+  const journalArea = document.getElementById('journal-area');
+  const journalModal = document.getElementById('journal-modal');
+  const entriesEl = document.getElementById('journal-entries');
+  if (!journalArea || !journalModal) return;
+
+  let entries = null;
+  const loadEntries = async () => {
+    if (entries) return entries;
+    try {
+      const res = await fetch('stories/journal.json');
+      if (!res.ok) throw new Error(`journal.json: ${res.status}`);
+      const data = await res.json();
+      entries = data.entries || [];
+    } catch (err) {
+      console.error('Failed to load journal:', err);
+      entries = [];
+    }
+    return entries;
+  };
+
+  const renderEntries = (data) => {
+    entriesEl.innerHTML = data.map((e) => {
+      const books = (e.books || []).map((b) => `<div>${escapeHtml(b)}</div>`).join('');
+      return `
+        <div class="journal-entry">
+          <div class="journal-entry-header">
+            <span class="entry-date">${escapeHtml(e.date)}</span>
+            <span class="entry-place">${escapeHtml(e.place)}</span>
+          </div>
+          <div class="journal-entry-body">${escapeHtml(e.body).replace(/\n\n/g, '</p><p>').replace(/^/, '<p>').replace(/$/, '</p>')}</div>
+          ${books ? `<div class="journal-entry-books"><strong>picked up</strong>${books}</div>` : ''}
+        </div>
+      `;
+    }).join('');
+  };
+
+  const open = async () => {
+    const data = await loadEntries();
+    renderEntries(data);
+    journalModal.hidden = false;
+    journalModal.scrollTop = 0;
+    document.body.style.overflow = 'hidden';
+    // Hide hotspot reveal so dots don't bleed through
+    document.getElementById('room')?.classList.remove('hotspots-revealed', 'hotspots-discovery-pulse');
+  };
+  const close = () => {
+    journalModal.hidden = true;
+    document.body.style.overflow = '';
+  };
+
+  journalArea.addEventListener('click', open);
+  journalModal.querySelectorAll('[data-journal-close]').forEach((el) => el.addEventListener('click', close));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !journalModal.hidden) close();
+  });
 }
 
 /* ---------- First-visit hint overlay ---------- */

@@ -1,0 +1,99 @@
+{
+  "lastUpdated": "2026-05-10",
+  "notes": "Her travel journal entries — short reflections on each trip and the books she picked up. Easy to edit/extend without touching code. Order is roughly chronological (oldest at bottom).",
+  "entries": [
+    {
+      "date": "September 2023",
+      "place": "Manila & Vigan",
+      "body": "Visited friends in Manila and rented a car up to Vigan for the weekend. Found the folktales paperback at a tiny bookshop near the cathedral — Sagacious Marcela was on the first page, the king sends her a bird and she sends back a pin. Read it on the bus back, laughed out loud twice.",
+      "books": ["Filipino folktales paperback from a Manila bookshop"]
+    },
+    {
+      "date": "June 2023",
+      "place": "Vancouver (home)",
+      "body": "Mom flew out for my birthday. We took the seabus to Lonsdale and drove up to Cypress to catch the sun on the Lions. I'd just finished re-reading Pauline Johnson's *Legends of Vancouver* — picked up the paperback at the Granville Island bookshop the week before. The Squamish name for the peaks is Ch'ích'iyúy Elx̱wíḵn — the Twin Sisters.",
+      "books": ["Pauline Johnson's Legends of Vancouver from a Granville Island bookshop"]
+    },
+    {
+      "date": "April 2023",
+      "place": "Whitehorse, Yukon",
+      "body": "Six days driving from Vancouver. The light up there does something to you — it stays soft for hours. I bought Service's Yukon ballads at a used bookshop on Main Street and read 'Sam McGee' out loud to the dog at our cabin. Picked up a Jack London paperback at the same shop. To Build a Fire is the most terrifying short story I've ever read about being cold.",
+      "books": [
+        "Service's Yukon ballads (same paperback as the other two)",
+        "Jack London paperback from a Whitehorse bookshop"
+      ]
+    },
+    {
+      "date": "October 2022",
+      "place": "Charlottetown, PEI",
+      "body": "Long weekend with C. The whole island smells like the sea. Found a copy of L.M. Montgomery's *Chronicles of Avonlea* at a bookshop downtown — read 'The Quarantine at Alexander Abraham's' on the porch. I have never laughed harder at a story about smallpox.",
+      "books": ["L.M. Montgomery paperback from a Charlottetown bookshop"]
+    },
+    {
+      "date": "August 2022",
+      "place": "Toronto",
+      "body": "Stopover on the way back east. Stayed in Cabbagetown, found Leacock's *Sunshine Sketches* in a used bookshop on Queen West. The Marine Excursion of the Knights of Pythias is the funniest thing he wrote, even funnier when you've actually been on a small-town Ontario lake at sunset.",
+      "books": ["Leacock paperback from a Toronto bookshop"]
+    },
+    {
+      "date": "July 2022",
+      "place": "Paris",
+      "body": "Marché aux Puces de Saint-Ouen with K — half the day haggling, half the day eating. Picked up a Maupassant paperback for €3. Read 'The Necklace' on the train back to the apartment. The twist ending hit harder when I was tired and a little drunk.",
+      "books": ["Maupassant paperback from a Paris flea market"]
+    },
+    {
+      "date": "June 2022",
+      "place": "Dublin",
+      "body": "A week in Dublin, mostly walking. Found Wilde at three different bookshops and bought two — the slim Dover edition with 'The Nightingale and the Rose,' and a beautiful hardback of his fairytales for the shelf. The Selfish Giant is the one that actually undoes me. Sat in St. Stephen's Green and read it twice.",
+      "books": [
+        "Wilde paperback from a Dublin bookshop",
+        "Wilde fairytales hardback from a Dublin bookshop"
+      ]
+    },
+    {
+      "date": "May 2022",
+      "place": "Cotswolds",
+      "body": "Bus from London. Stayed in a tiny B&B with sheep visible from the window. The Cotswolds bookshop in Stow had a Saki collection front-of-store — bought it for the train back. 'The Open Window' is the cleverest 6 pages in the language. The whole story is a teenager improvising a ghost story to mess with a houseguest.",
+      "books": ["Saki paperback from a Cotswolds bookshop"]
+    },
+    {
+      "date": "March 2022",
+      "place": "Calcutta",
+      "body": "Three weeks in India. The bookstalls on College Street go on forever. Picked up Tagore's *Mashi and Other Stories* from a man who had to climb a ladder to find a copy in English. Read 'The Postmaster' on a train going north — the lonely civil servant and the orphan girl who loved him in her quiet way. Cried a little.",
+      "books": ["Tagore paperback from a Calcutta bookstall"]
+    },
+    {
+      "date": "August 2021",
+      "place": "Moscow & St. Petersburg",
+      "body": "Two weeks across Russia by train. Bought a Chekhov paperback at a kiosk in Moscow — read 'The Bet' twice and still don't know if the lawyer was right. In St. Petersburg I found a thin Tolstoy edition with 'How Much Land Does a Man Need?' Pakhom dies of greed at the end and I haven't stopped thinking about it.",
+      "books": [
+        "Chekhov paperback from a Moscow bookstore",
+        "Tolstoy paperback from St. Petersburg"
+      ]
+    },
+    {
+      "date": "December 2021",
+      "place": "New York",
+      "body": "First Christmas after the lockdowns. The Strand was packed. I bought an O. Henry paperback with the crooked spine because I felt bad putting it back. 'The Gift of the Magi' on the subway home — the couple sells what they love most to buy each other useless presents. The Times Square Christmas tree was ugly and perfect.",
+      "books": ["O. Henry paperback from a New York used bookstore"]
+    },
+    {
+      "date": "October 2020",
+      "place": "Vermont",
+      "body": "Leaf-peeping with mom. We stayed at a cabin near Stowe. The bookshop in town had a slim Frost edition with the original woodcut illustrations — bought it without thinking. 'Stopping by Woods on a Snowy Evening' is the most cozy poem in English. I keep the book on the nightstand for nights I can't sleep.",
+      "books": ["Robert Frost paperback from a Vermont bookshop"]
+    },
+    {
+      "date": "May 2019",
+      "place": "Boston & Amherst",
+      "body": "Long bus ride out to Amherst to see Emily Dickinson's house. Tiny rooms. White dress in a glass case. Bought a slim collection of her poems at the Boston bookshop on the way home. *Hope is the thing with feathers* is the line everyone knows. Reading the others is what makes you understand why.",
+      "books": ["Dickinson poems paperback from a Boston bookshop"]
+    },
+    {
+      "date": "Spring 2019",
+      "place": "Sligo, Ireland",
+      "body": "Bus from Dublin out west. Yeats country. Found a slim collection of his poems at a bookshop in Sligo town. *The Lake Isle of Innisfree* — he wrote it homesick in London, dreaming of a cabin and bean-rows. I have wanted to live alone in a cabin for as long as I can remember.",
+      "books": ["Yeats poetry collection from a Dublin bookshop"]
+    }
+  ]
+}

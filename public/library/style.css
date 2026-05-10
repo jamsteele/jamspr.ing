@@ -566,6 +566,94 @@ body {
   50%      { transform: translateY(-2.5px); }
 }
 
+/* ---------- Cat petting ----------
+   Polygon-shaped clickable area traced over the painted cat. Clicking it
+   speeds up the cat's breathing for ~3s and fades in a "purrrr…" label.
+   Hand-traced 11-point outline from /library?annotate. */
+
+.cat-pet-area {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  /* Cat outline (11 points, sorted clockwise from far-left) */
+  clip-path: polygon(
+    74.14% 66.62%,
+    75.02% 63.19%,
+    77.48% 61.21%,
+    79.95% 60.95%,
+    82.94% 61.61%,
+    86.46% 64.38%,
+    87.86% 68.73%,
+    86.10% 73.09%,
+    83.38% 72.43%,
+    79.51% 71.64%,
+    75.46% 70.58%
+  );
+}
+
+.cat-pet-area:focus-visible {
+  outline: 1px dashed rgba(255, 220, 150, 0.7);
+  outline-offset: 2px;
+}
+
+/* When the cat is being pet, both layers breathe much faster. */
+.cat-body.purring,
+.cat-headtail.purring {
+  animation-duration: 1.4s !important;
+}
+
+.purr-label {
+  position: absolute;
+  top: 56%;
+  left: 80%;
+  pointer-events: none;
+  z-index: 5;
+  font-family: 'Iowan Old Style', 'Palatino', 'Georgia', serif;
+  font-style: italic;
+  font-size: clamp(11px, 1.1vw, 16px);
+  color: rgba(255, 235, 200, 0.92);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+}
+
+.purr-label.showing {
+  animation: purr-fade 3s ease-in-out;
+}
+
+@keyframes purr-fade {
+  0%   { opacity: 0; transform: translateY(0); }
+  20%  { opacity: 0.92; }
+  60%  { opacity: 0.85; }
+  100% { opacity: 0; transform: translateY(-14px); }
+}
+
+/* ---------- Travel journal click area ----------
+   Over the painted open journal on the desk. Click → travel-journal modal. */
+
+.journal-area {
+  position: absolute;
+  /* Estimated bounding box around the painted open book on the desk.
+     Tune via /library?annotate if needed. */
+  top: 70%;
+  left: 32%;
+  width: 13%;
+  height: 8%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  z-index: 4;
+}
+
+.journal-area:focus-visible {
+  outline: 1px dashed rgba(255, 220, 150, 0.7);
+  outline-offset: 2px;
+}
+
 /* ---------- Easter egg: cherry blossom sprig ----------
    Click the painted cherry-sprig art on the wall 3× → the painted-lights
    layer pulses in a wave + petals drift from the painting. */
@@ -647,6 +735,63 @@ body {
   .cherry-sprig.shake { animation: none; }
   .cat-body, .cat-headtail { animation: none; }
   .steam-wisp { animation: none; opacity: 0; }
+}
+
+/* ---------- Travel journal modal ----------
+   Reuses .modal infrastructure for backdrop + open/close, but the content
+   is a scroll of dated entries about the trips she's been on. */
+
+.journal-entries {
+  font-family: 'Iowan Old Style', 'Palatino', 'Georgia', serif;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.journal-entry + .journal-entry {
+  margin-top: 1.6rem;
+  padding-top: 1.6rem;
+  border-top: 1px dashed rgba(106, 90, 72, 0.25);
+}
+
+.journal-entry-header {
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.6rem;
+}
+
+.journal-entry-header .entry-date {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.journal-entry-header .entry-place {
+  margin-left: 0.6em;
+}
+
+.journal-entry-body {
+  font-style: italic;
+}
+
+.journal-entry-books {
+  margin-top: 0.7rem;
+  font-family: -apple-system, sans-serif;
+  font-size: 0.78rem;
+  font-style: normal;
+  color: var(--ink-soft);
+  letter-spacing: 0.02em;
+}
+
+.journal-entry-books strong {
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  margin-right: 0.5em;
 }
 
 /* ---------- First-visit hint overlay ----------
