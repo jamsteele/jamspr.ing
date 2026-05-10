@@ -405,6 +405,54 @@ body {
   100% { opacity: 0.4; transform: scale(1); }
 }
 
+/* ---------- Mug steam ----------
+   Three SVG wisp paths rising from the mug's rim. Each wisp animates with
+   its own delay so the steam appears continuous. Path strokes are white,
+   blurred via CSS filter for a soft "actual steam" feel. */
+
+.mug-steam {
+  position: absolute;
+  /* Hand-clicked mug rim center: (25.24%, 64.78%). Container's bottom edge
+     sits at the rim; height is the rise distance for the wisps. */
+  top: 56.8%;            /* 64.78% - 8% height */
+  left: 23.5%;           /* 25.24% - 1.75% half-width = center on rim */
+  width: 3.5%;
+  height: 8%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.steam-wisp {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  filter: blur(2.5px);
+  animation: steam-rise 5s ease-out infinite;
+}
+
+.wisp-1 { animation-delay: 0s;    margin-left: 0; }
+.wisp-2 { animation-delay: 1.7s;  margin-left: 4px; }
+.wisp-3 { animation-delay: 3.3s;  margin-left: -4px; }
+
+@keyframes steam-rise {
+  0% {
+    transform: translate(-50%, 0) scale(0.6, 0.8);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -80%) scale(1.4, 1.1);
+    opacity: 0;
+  }
+}
+
 /* ---------- Breathing cat ----------
    A pixel-perfect cut-out of the cat (extracted from room2.png) overlaid on
    top of the painted cat in the room. The painted cat sits underneath as the
@@ -590,6 +638,7 @@ body {
   .cherry-sprig.shake { animation: none; }
   .room.bloom::after { animation: none; opacity: 0; }
   .cat-body, .cat-headtail { animation: none; }
+  .steam-wisp { animation: none; opacity: 0; }
 }
 
 /* ---------- Annotate mode (?annotate URL flag) ---------- */

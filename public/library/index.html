@@ -21,6 +21,21 @@
            appear to pulse softly. Populated by setupPaintedLights() in script.js. -->
       <div class="painted-lights" id="painted-lights" aria-hidden="true"></div>
 
+      <!-- Mug steam: 3 SVG wisps rising from the orange mug's rim. Each rises
+           on its own delay so the steam appears continuous. The painted mug
+           reads as "still hot — she just stepped out." -->
+      <div class="mug-steam" aria-hidden="true">
+        <svg class="steam-wisp wisp-1" viewBox="0 0 20 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <path d="M10 100 Q4 80 12 60 Q16 40 8 22 Q10 8 10 0" stroke="white" stroke-width="6" fill="none" stroke-linecap="round"/>
+        </svg>
+        <svg class="steam-wisp wisp-2" viewBox="0 0 20 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <path d="M10 100 Q16 78 8 58 Q4 38 14 20 Q10 6 10 0" stroke="white" stroke-width="6" fill="none" stroke-linecap="round"/>
+        </svg>
+        <svg class="steam-wisp wisp-3" viewBox="0 0 20 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <path d="M10 100 Q12 82 6 62 Q14 42 9 22 Q11 8 10 0" stroke="white" stroke-width="6" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+
       <!-- Breathing cat: two overlays from the same cat.png cut-out.
            - .cat-body: shows only the middle (chest/back), scales with breath
            - .cat-headtail: shows only the left (head) + right (tail/paws),
