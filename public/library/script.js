@@ -35,20 +35,27 @@ async function init() {
      2. Along the right-hand shelf
    If the painting is replaced/edited, re-tune these positions. */
 
+// Auto-detected from assets/room.png (color + region analysis script).
+// If you swap room.png, re-run the detector — see PROJECT_PLAN.md.
 const PAINTED_LIGHT_POSITIONS = [
-  // Window frame: top edge (left → right)
-  { x: 12, y: 5 }, { x: 15, y: 4 }, { x: 18, y: 4 }, { x: 21, y: 4 },
-  { x: 24, y: 4 }, { x: 27, y: 4 }, { x: 30, y: 4 }, { x: 33, y: 4 },
-  { x: 36, y: 5 },
-  // Window frame: left side (top → down)
-  { x: 11, y: 9 }, { x: 11, y: 14 }, { x: 11, y: 19 }, { x: 11, y: 25 },
-  { x: 11, y: 31 }, { x: 11, y: 38 }, { x: 11, y: 45 }, { x: 12, y: 52 },
-  { x: 12, y: 57 },
-  // (Right side of window frame is mostly obscured by plants/books in the
-  // painting — skipped to avoid floating dots in dark wood.)
-  // Right-side shelf: horizontal string just under the shelf
-  { x: 60, y: 31 }, { x: 64, y: 30 }, { x: 68, y: 30 }, { x: 72, y: 31 },
-  { x: 76, y: 31 }, { x: 80, y: 31 }, { x: 84, y: 31 }, { x: 88, y: 31 },
+  // Window frame: top edge
+  { x: 13.74, y: 3.32 },
+  { x: 17.19, y: 4.20 },
+  { x: 21.16, y: 4.88 },
+  { x: 24.54, y: 5.27 },
+  // Window frame: right side (running down)
+  { x: 36.98, y: 7.23 },
+  { x: 39.58, y: 7.62 },
+  { x: 38.67, y: 11.43 },
+  { x: 35.94, y: 16.60 },
+  // Right wall shelf: horizontal string of bulbs
+  { x: 79.49, y: 21.19 },
+  { x: 81.77, y: 20.80 },
+  { x: 83.98, y: 20.41 },
+  { x: 86.56, y: 20.56 },
+  { x: 88.87, y: 20.31 },
+  { x: 91.93, y: 19.82 },
+  { x: 94.40, y: 19.24 },
 ];
 
 function setupPaintedLights() {
