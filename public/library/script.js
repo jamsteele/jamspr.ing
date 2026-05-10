@@ -130,27 +130,45 @@ function setupAnnotateMode() {
      2. Along the right-hand shelf
    If the painting is replaced/edited, re-tune these positions. */
 
-// Auto-detected from assets/room.png (color + region analysis script).
-// If you swap room.png, re-run the detector — see PROJECT_PLAN.md.
+// Hand-clicked via the annotate mode (visit /library?annotate to re-capture).
+// Order: top of window → window frame perimeter → right shelf string.
 const PAINTED_LIGHT_POSITIONS = [
-  // Window frame: top edge
-  { x: 13.74, y: 3.32 },
-  { x: 17.19, y: 4.20 },
-  { x: 21.16, y: 4.88 },
-  { x: 24.54, y: 5.27 },
-  // Window frame: right side (running down)
-  { x: 36.98, y: 7.23 },
-  { x: 39.58, y: 7.62 },
-  { x: 38.67, y: 11.43 },
-  { x: 35.94, y: 16.60 },
-  // Right wall shelf: horizontal string of bulbs
-  { x: 79.49, y: 21.19 },
-  { x: 81.77, y: 20.80 },
-  { x: 83.98, y: 20.41 },
-  { x: 86.56, y: 20.56 },
-  { x: 88.87, y: 20.31 },
-  { x: 91.93, y: 19.82 },
-  { x: 94.40, y: 19.24 },
+  { x: 13.88, y: 3.33 },
+  { x: 17.32, y: 4.43 },
+  { x: 21.02, y: 4.93 },
+  { x: 10.59, y: 5.30 },
+  { x: 24.47, y: 5.54 },
+  { x: 27.75, y: 6.03 },
+  { x: 30.79, y: 6.03 },
+  { x: 34.15, y: 6.65 },
+  { x: 36.95, y: 7.27 },
+  { x: 39.82, y: 7.76 },
+  { x: 42.78, y: 8.00 },
+  { x: 45.73, y: 8.25 },
+  { x: 48.77, y: 8.87 },
+  { x: 51.15, y: 9.61 },
+  { x: 10.51, y: 10.84 },
+  { x: 51.72, y: 12.93 },
+  { x: 10.59, y: 16.13 },
+  { x: 51.81, y: 17.61 },
+  { x: 99.51, y: 17.86 },
+  { x: 97.13, y: 18.60 },
+  { x: 94.58, y: 18.72 },
+  { x: 92.12, y: 19.46 },
+  { x: 89.00, y: 20.07 },
+  { x: 84.15, y: 20.32 },
+  { x: 86.54, y: 20.32 },
+  { x: 79.64, y: 20.81 },
+  { x: 81.94, y: 20.81 },
+  { x: 51.89, y: 21.55 },
+  { x: 10.43, y: 21.92 },
+  { x: 51.81, y: 25.74 },
+  { x: 10.26, y: 27.34 },
+  { x: 51.89, y: 29.80 },
+  { x: 10.26, y: 32.88 },
+  { x: 51.97, y: 34.36 },
+  { x: 51.97, y: 38.55 },
+  { x: 10.26, y: 54.19 },
 ];
 
 function setupPaintedLights() {
