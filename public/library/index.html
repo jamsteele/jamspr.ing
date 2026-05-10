@@ -45,32 +45,21 @@
       <img class="cat-body" src="assets/cat.png" alt="" aria-hidden="true">
       <img class="cat-headtail" src="assets/cat.png" alt="" aria-hidden="true">
 
-      <!-- Easter egg: cherry-blossom sprig overlaid on the windowsill.
-           Click it 3× → drift petals across the room + fairy lights wave.
-           (The painting's own fairy lights also pulse in the wave.) -->
-      <button class="cherry-sprig" id="cherry-sprig" aria-label="A small cherry blossom sprig in a glass jar">
-        <svg viewBox="0 0 60 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M18 60 L18 78 Q18 80 20 80 L40 80 Q42 80 42 78 L42 60 Z" fill="rgba(180,210,220,0.45)" stroke="rgba(180,210,220,0.7)" stroke-width="0.8"/>
-          <ellipse cx="30" cy="60" rx="12" ry="2" fill="rgba(180,210,220,0.6)"/>
-          <path d="M30 58 Q28 45 24 35 Q21 28 18 22" stroke="#5a3a28" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-          <path d="M28 50 Q33 42 38 36" stroke="#5a3a28" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-          <circle cx="18" cy="22" r="3.5" fill="#f8c8d4"/>
-          <circle cx="22" cy="28" r="2.5" fill="#fadbe2"/>
-          <circle cx="38" cy="35" r="3" fill="#f8c8d4"/>
-          <circle cx="33" cy="42" r="2.5" fill="#fadbe2"/>
-          <circle cx="26" cy="38" r="2.2" fill="#f8c8d4"/>
-          <circle cx="18" cy="22" r="0.8" fill="#d97a8c"/>
-          <circle cx="38" cy="35" r="0.7" fill="#d97a8c"/>
-        </svg>
-      </button>
+      <!-- Easter egg trigger: invisible click target over the painted cherry
+           blossom sprig framed on the wall (top-left of the room, beside
+           the window). Click it 3× → petals drift down from it + fairy
+           lights pulse in a wave. Coordinates from /library?annotate. -->
+      <button class="cherry-sprig" id="cherry-sprig" aria-label="A small framed painting of a cherry blossom sprig"></button>
+
+      <!-- Petal layer — petals spawn from the painted cherry sprig and
+           drift down + outward into the room. Lives inside .room so it
+           scrolls horizontally with the painting. -->
+      <div class="petal-layer" id="petal-layer" aria-hidden="true"></div>
     </main>
     <!-- Scroll affordance: subtle gradient fades at the edges suggest "more room over there" -->
     <div class="scroll-hint scroll-hint-right" aria-hidden="true"></div>
     <div class="scroll-hint scroll-hint-left" aria-hidden="true"></div>
   </div>
-
-  <!-- Petal layer — fixed-position, sits over everything when easter egg fires -->
-  <div class="petal-layer" id="petal-layer" aria-hidden="true"></div>
 
   <!-- Reader modal -->
   <div class="modal" id="reader" hidden aria-hidden="true">

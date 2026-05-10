@@ -536,26 +536,19 @@ body {
 
 .cherry-sprig {
   position: absolute;
-  /* Position over the windowsill in the painting (right side of windowsill).
-     Coords are % of room width/height — adjust if you reposition trinkets. */
-  top: 56%;
-  left: 31%;
-  width: 6%;
-  min-width: 38px;
-  max-width: 60px;
-  height: auto;
-  aspect-ratio: 60 / 80;
+  /* Hand-clicked corners of the painted cherry-sprig frame on the wall:
+       top-left (0.88%, 7.65%) → bottom-right (7.04%, 21.77%) */
+  top: 7.65%;
+  left: 0.88%;
+  width: 6.16%;
+  height: 14.12%;
   background: transparent;
   border: none;
   cursor: pointer;
   padding: 0;
   z-index: 4;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
   transition: transform 0.3s ease;
-}
-
-.cherry-sprig:hover {
-  transform: translateY(-3px) rotate(-2deg);
+  transform-origin: 50% 50%;
 }
 
 /* When the easter egg fires, the entire painting briefly glows warmer —
@@ -589,44 +582,44 @@ body {
 
 @keyframes shake {
   0%, 100% { transform: rotate(0); }
-  25% { transform: rotate(-4deg); }
-  75% { transform: rotate(4deg); }
+  25% { transform: rotate(-2deg); }
+  75% { transform: rotate(2deg); }
 }
 
 /* ---------- Petal layer ---------- */
 
 .petal-layer {
-  position: fixed;
+  position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 7;
+  z-index: 5;
   overflow: hidden;
 }
 
 .petal {
   position: absolute;
-  top: -20px;
-  width: 12px;
-  height: 12px;
+  /* Top/left set inline by JS — petals spawn at the painted sprig's
+     position with a small random offset, then drift down + outward. */
+  width: 9px;
+  height: 9px;
   background: radial-gradient(circle at 30% 30%, #fadbe2, #f8c8d4 60%, #f4a8bd 100%);
   border-radius: 60% 40% 60% 40%;
   opacity: 0;
-  transform: rotate(var(--rot, 0deg));
-  animation: drift var(--duration, 6s) linear forwards;
+  animation: drift var(--duration, 8s) linear forwards;
   animation-delay: var(--delay, 0s);
 }
 
 @keyframes drift {
   0% {
     opacity: 0;
-    transform: translate(0, -20px) rotate(0deg);
+    transform: translate(0, 0) rotate(var(--rot, 0deg));
   }
   10% {
-    opacity: 0.9;
+    opacity: 0.85;
   }
   100% {
     opacity: 0;
-    transform: translate(var(--drift-x, 80px), 110vh) rotate(var(--rot-end, 720deg));
+    transform: translate(var(--drift-x, 80px), var(--drift-y, 600px)) rotate(var(--rot-end, 720deg));
   }
 }
 
@@ -719,6 +712,4 @@ body {
   .story-header h1 { font-size: 1.4rem; }
   .story-content { font-size: 1rem; line-height: 1.7; }
   .hotspot { font-size: 22px; }
-  .fairy-lights { height: 60px; padding: 0 6%; }
-  .cherry-sprig { width: 44px; height: 60px; bottom: 8%; right: 4%; }
 }

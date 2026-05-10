@@ -28,6 +28,7 @@ async function init() {
     setupModalControls();
     setupPaintedLights();
     setupCherrySprigEasterEgg();
+    setupAmbientPetals();
     setupScrollHints();
     setupDiscoveryPulse();
   } catch (err) {
@@ -215,6 +216,43 @@ function setupCherrySprigEasterEgg() {
   });
 }
 
+/* Painted cherry-sprig location (corners hand-clicked via /library?annotate).
+   Used as the spawn origin for both easter-egg petals and ambient petal drift. */
+const SPRIG_REGION = {
+  left:  0.88,
+  top:   7.65,
+  right: 7.04,
+  bottom: 21.77,
+};
+
+function spawnPetal(petalLayer, options = {}) {
+  if (!petalLayer) return;
+  const petal = document.createElement('span');
+  petal.className = 'petal';
+  // Origin: somewhere within the painted sprig (weighted toward the blossoms
+  // at the top of the frame).
+  const startX = SPRIG_REGION.left + Math.random() * (SPRIG_REGION.right - SPRIG_REGION.left);
+  const startY = SPRIG_REGION.top + Math.random() * (SPRIG_REGION.bottom - SPRIG_REGION.top) * 0.6;
+  // Drift down + slightly into the room (positive X). Distance scales with viewport
+  // height so it always reaches a "natural" landing distance.
+  const driftX = 30 + Math.random() * 120;
+  const driftY = (50 + Math.random() * 35) * window.innerHeight / 100; // 50-85vh
+  const rot = Math.random() * 360;
+  const rotEnd = rot + (Math.random() * 720 - 360);
+  const duration = options.duration ?? (7 + Math.random() * 4);
+  const delay = options.delay ?? (Math.random() * 0.5);
+  petal.style.left = `${startX}%`;
+  petal.style.top = `${startY}%`;
+  petal.style.setProperty('--drift-x', `${driftX}px`);
+  petal.style.setProperty('--drift-y', `${driftY}px`);
+  petal.style.setProperty('--rot', `${rot}deg`);
+  petal.style.setProperty('--rot-end', `${rotEnd}deg`);
+  petal.style.setProperty('--duration', `${duration.toFixed(2)}s`);
+  petal.style.setProperty('--delay', `${delay.toFixed(2)}s`);
+  petalLayer.appendChild(petal);
+  setTimeout(() => petal.remove(), (duration + delay + 0.5) * 1000);
+}
+
 function triggerEasterEgg(room, petalLayer) {
   // Bloom flash — the painting's own fairy lights "pulse"
   if (room) {
@@ -233,28 +271,34 @@ function triggerEasterEgg(room, petalLayer) {
     setTimeout(() => lights.classList.remove('wave'), 2400);
   }
 
-  // Drift petals
-  if (petalLayer) {
-    const PETAL_COUNT = 40;
-    for (let i = 0; i < PETAL_COUNT; i++) {
-      const petal = document.createElement('span');
-      petal.className = 'petal';
-      const startX = Math.random() * 100;
-      const driftX = (Math.random() - 0.5) * 200;
-      const rot = Math.random() * 360;
-      const rotEnd = rot + (Math.random() * 720 - 360);
-      const duration = 5 + Math.random() * 4;
-      const delay = Math.random() * 1.5;
-      petal.style.left = `${startX}%`;
-      petal.style.setProperty('--drift-x', `${driftX}px`);
-      petal.style.setProperty('--rot', `${rot}deg`);
-      petal.style.setProperty('--rot-end', `${rotEnd}deg`);
-      petal.style.setProperty('--duration', `${duration.toFixed(2)}s`);
-      petal.style.setProperty('--delay', `${delay.toFixed(2)}s`);
-      petalLayer.appendChild(petal);
-      setTimeout(() => petal.remove(), (duration + delay + 0.5) * 1000);
-    }
+  // Burst of petals from the sprig — ~40 over 1.5s
+  const PETAL_COUNT = 40;
+  for (let i = 0; i < PETAL_COUNT; i++) {
+    spawnPetal(petalLayer, {
+      duration: 5 + Math.random() * 4,
+      delay: Math.random() * 1.5,
+    });
   }
+}
+
+/* Ambient occasional petal drift — every 25-50s, one petal idly falls from
+   the sprig. Hints that the easter egg exists without giving it away. */
+function setupAmbientPetals() {
+  const petalLayer = document.getElementById('petal-layer');
+  if (!petalLayer) return;
+  const scheduleNext = () => {
+    const delay = 25000 + Math.random() * 25000;
+    setTimeout(() => {
+      // Skip if the page is hidden (browser tab in background)
+      if (!document.hidden) spawnPetal(petalLayer);
+      scheduleNext();
+    }, delay);
+  };
+  // First petal after a shorter delay so the user gets a hint within ~10s
+  setTimeout(() => {
+    if (!document.hidden) spawnPetal(petalLayer);
+    scheduleNext();
+  }, 8000 + Math.random() * 5000);
 }
 
 /* ---------- Scroll hints ---------- */
