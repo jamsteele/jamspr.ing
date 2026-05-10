@@ -262,6 +262,60 @@
         "top": "9.96%",
         "left": "82.72%"
       }
+    },
+    {
+      "id": "frost-stopping-by-woods",
+      "title": "Stopping by Woods on a Snowy Evening",
+      "author": "Robert Frost",
+      "year": 1923,
+      "country": "USA",
+      "countryFlag": "🇺🇸",
+      "minutes": 1,
+      "mood": "Snowy stillness",
+      "trinket": "Robert Frost paperback from a Vermont bookshop",
+      "trinketEmoji": "📖",
+      "source": "https://en.wikisource.org/wiki/Stopping_by_Woods_on_a_Snowy_Evening",
+      "format": "poem",
+      "position": {
+        "top": "16.68%",
+        "left": "69.18%"
+      }
+    },
+    {
+      "id": "yeats-lake-isle-of-innisfree",
+      "title": "The Lake Isle of Innisfree",
+      "author": "W. B. Yeats",
+      "year": 1890,
+      "country": "Ireland",
+      "countryFlag": "🇮🇪",
+      "minutes": 1,
+      "mood": "Yearning for solitude",
+      "trinket": "Yeats poetry collection from a Dublin bookshop",
+      "trinketEmoji": "📖",
+      "source": "https://en.wikisource.org/wiki/The_Lake_Isle_of_Innisfree",
+      "format": "poem",
+      "position": {
+        "top": "26.58%",
+        "left": "65.93%"
+      }
+    },
+    {
+      "id": "dickinson-hope-is-the-thing-with-feathers",
+      "title": "Hope is the thing with feathers",
+      "author": "Emily Dickinson",
+      "year": 1891,
+      "country": "USA",
+      "countryFlag": "🇺🇸",
+      "minutes": 1,
+      "mood": "Gentle / observational",
+      "trinket": "Dickinson poems paperback from a Boston bookshop",
+      "trinketEmoji": "📖",
+      "source": "https://en.wikisource.org/wiki/Hope_is_the_thing_with_feathers",
+      "format": "poem",
+      "position": {
+        "top": "39.24%",
+        "left": "68.21%"
+      }
     }
   ]
 }
