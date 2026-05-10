@@ -426,11 +426,15 @@ body {
   transform-origin: 50% 100%;
   animation: cat-breathe 4.5s ease-in-out infinite;
   will-change: transform;
+  /* Mask: fade out the head (left ~35% of overlay) so only the body breathes.
+     The painted head from room2.png shows through underneath, static. */
+  mask-image: linear-gradient(to right, transparent 0%, transparent 30%, black 50%, black 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 30%, black 50%, black 100%);
 }
 
 @keyframes cat-breathe {
   0%, 100% { transform: scaleY(1); }
-  50%      { transform: scaleY(1.04); }
+  50%      { transform: scaleY(1.03); }
 }
 
 /* ---------- Easter egg: cherry blossom sprig ----------
