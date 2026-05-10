@@ -49,13 +49,13 @@ function setupAnnotateMode() {
 
   const points = [];
 
-  // Floating panel UI
+  // Floating panel UI (draggable by header — drag if it covers what you need to click)
   const panel = document.createElement('div');
   panel.id = 'annotate-panel';
   panel.innerHTML = `
-    <div class="annotate-title">🎯 Light Annotation Mode</div>
-    <div class="annotate-hint">Click each painted light. Scroll the room to find them all.</div>
-    <div class="annotate-stats"><span id="annotate-count">0</span> lights marked</div>
+    <div class="annotate-title" id="annotate-drag-handle">🎯 Annotation Mode <span style="opacity:.5;font-weight:400">— drag to move</span></div>
+    <div class="annotate-hint">Click anywhere on the room. Scroll horizontally to find more.</div>
+    <div class="annotate-stats"><span id="annotate-count">0</span> points marked</div>
     <div class="annotate-actions">
       <button id="annotate-undo">Undo last</button>
       <button id="annotate-clear">Clear all</button>
@@ -64,6 +64,40 @@ function setupAnnotateMode() {
     <textarea id="annotate-output" readonly></textarea>
   `;
   document.body.appendChild(panel);
+
+  // Drag-to-reposition by header
+  (function makeDraggable() {
+    const handle = document.getElementById('annotate-drag-handle');
+    let dragging = false, startX = 0, startY = 0, panelStartX = 0, panelStartY = 0;
+    const onDown = (e) => {
+      dragging = true;
+      const point = e.touches ? e.touches[0] : e;
+      startX = point.clientX;
+      startY = point.clientY;
+      const rect = panel.getBoundingClientRect();
+      panelStartX = rect.left;
+      panelStartY = rect.top;
+      panel.style.right = 'auto';
+      panel.style.bottom = 'auto';
+      panel.style.left = `${panelStartX}px`;
+      panel.style.top = `${panelStartY}px`;
+      e.preventDefault();
+    };
+    const onMove = (e) => {
+      if (!dragging) return;
+      const point = e.touches ? e.touches[0] : e;
+      panel.style.left = `${panelStartX + (point.clientX - startX)}px`;
+      panel.style.top = `${panelStartY + (point.clientY - startY)}px`;
+      e.preventDefault();
+    };
+    const onUp = () => { dragging = false; };
+    handle.addEventListener('mousedown', onDown);
+    handle.addEventListener('touchstart', onDown, { passive: false });
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchend', onUp);
+  })();
 
   // Crosshair on hover over the room
   room.style.cursor = 'crosshair';

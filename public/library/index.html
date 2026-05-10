@@ -15,6 +15,12 @@
        explore. On desktop the room usually fits without scrolling. -->
   <div class="room-wrapper" id="room-wrapper">
     <main class="room" id="room" aria-label="An illustrated room with clickable objects. Scroll horizontally to explore.">
+      <!-- Parallax was attempted but the painted wood window divider in
+           the mountains crop conflicts with the same divider in the room
+           foreground when shifted — produces visible double-mullion. To
+           re-enable, extract a clean mountain texture (no wood frame)
+           per window pane, OR have the artist deliver a layered PSD. -->
+
       <!-- Painted-lights overlay: invisible glow-dots positioned over each
            painted fairy light in the room, animated with mix-blend-mode: screen.
            Each twinkles on its own delay, making the painted lights themselves
