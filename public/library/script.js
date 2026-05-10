@@ -30,6 +30,7 @@ async function init() {
     setupCherrySprigEasterEgg();
     setupAmbientPetals();
     setupScrollHints();
+    setupParallax();
     setupDiscoveryPulse();
   } catch (err) {
     console.error('Failed to load story index:', err);
@@ -355,6 +356,32 @@ function setupScrollHints() {
   updateHints();
   wrapper.addEventListener('scroll', updateHints, { passive: true });
   window.addEventListener('resize', updateHints, { passive: true });
+}
+
+/* ---------- Parallax: window mountains scroll slower than the room ----------
+   Mountains image is wider than the windows. JS shifts it RIGHT (counter to
+   the natural left drift in the viewport) at 0.15× the scroll rate, so the
+   net visible motion is 0.85× — appears far away. */
+
+const PARALLAX_FACTOR = 0.15;
+
+function setupParallax() {
+  const wrapper = document.getElementById('room-wrapper');
+  const mountains = document.getElementById('parallax-mountains');
+  if (!wrapper || !mountains) return;
+
+  let pending = false;
+  const update = () => {
+    pending = false;
+    mountains.style.transform = `translateX(${wrapper.scrollLeft * PARALLAX_FACTOR}px)`;
+  };
+  wrapper.addEventListener('scroll', () => {
+    if (!pending) {
+      pending = true;
+      requestAnimationFrame(update);
+    }
+  }, { passive: true });
+  update();
 }
 
 /* ---------- One-time discovery pulse ---------- */

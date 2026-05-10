@@ -61,13 +61,42 @@ body {
      On desktop (e.g. 1280x800): room = 1200px wide → fits without scroll.
      No max-width clamp — we WANT the room as wide as it naturally is. */
   width: 150vh;
-  background-image: url('assets/room2.png');
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
+  /* No background-image — the room is composed of layered <img> elements
+     (.parallax-mountains behind, .room-fg on top with transparent windows). */
   flex-shrink: 0;
   box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.25);
   overflow: hidden;
+}
+
+/* Room foreground: the painted scene with the inside of both window panes
+   cleared to transparent. Sits above the parallax mountains layer. */
+.room-fg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  display: block;
+}
+
+/* Parallax mountains: clean wide mountain texture (no window frame), sits
+   BEHIND .room-fg. Shifts horizontally on scroll at 0.15× the room rate so
+   the view through the windows appears far away. Sized wider than the window
+   region so the edges never become visible during shift. */
+.parallax-mountains {
+  position: absolute;
+  /* Cover from left edge of room to past the right window pane.
+     Mountain image aspect 1.78; at width 60% of room it'll be ~50% tall — fits the
+     full vertical span of both window panes (top ~7%, bottom ~51%). */
+  top: 5%;
+  left: 0%;
+  width: 60%;
+  height: auto;
+  pointer-events: none;
+  z-index: 0;
+  display: block;
+  will-change: transform;
 }
 
 /* Edge-fade scroll affordance: subtle gradient hints "more room that way".
