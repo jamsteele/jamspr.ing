@@ -61,7 +61,7 @@ body {
      On desktop (e.g. 1280x800): room = 1200px wide → fits without scroll.
      No max-width clamp — we WANT the room as wide as it naturally is. */
   width: 150vh;
-  background-image: url('assets/room.png');
+  background-image: url('assets/room2.png');
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
