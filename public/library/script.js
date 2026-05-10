@@ -421,33 +421,25 @@ function setupHintOverlay() {
 
 /* ---------- Discovery pulse + on-demand reveal ----------
    On first load, the hotspot dots briefly pulse so users learn objects are
-   clickable. After that, tapping/clicking empty room space (anywhere that
-   isn't a hotspot or the cherry-sprig button) re-triggers the pulse —
-   primary discoverability mechanism on touch devices where hover is absent. */
+   clickable. After that, tapping empty room space TOGGLES a persistent
+   reveal — dots stay visible until the user taps empty space again or
+   opens a hotspot. Primary discoverability mechanism on touch devices
+   where hover is absent. */
 
 function setupDiscoveryPulse() {
   const room = document.getElementById('room');
   if (!room) return;
 
-  // First-load pulse
+  // First-load attention-getter (pulses 2× then auto-fades)
   room.classList.add('hotspots-discovery-pulse');
   setTimeout(() => room.classList.remove('hotspots-discovery-pulse'), 5000);
 
-  // Re-trigger pulse when user taps empty room space
-  let pulseTimer = null;
-  const triggerPulse = () => {
-    room.classList.remove('hotspots-discovery-pulse');
-    void room.offsetWidth;  // force reflow so the animation restarts cleanly
-    room.classList.add('hotspots-discovery-pulse');
-    if (pulseTimer) clearTimeout(pulseTimer);
-    pulseTimer = setTimeout(() => room.classList.remove('hotspots-discovery-pulse'), 4500);
-  };
-
+  // Toggle persistent reveal on empty-room tap
   const onRoomTap = (e) => {
-    // Skip if the tap was on something interactive — the existing handler
-    // (open story, easter egg, etc.) already gives feedback for those.
     if (e.target.closest('.hotspot, .cherry-sprig, .modal, button, a')) return;
-    triggerPulse();
+    // Stop the first-load pulse if it's still running so the toggle doesn't fight it
+    room.classList.remove('hotspots-discovery-pulse');
+    room.classList.toggle('hotspots-revealed');
   };
   room.addEventListener('click', onRoomTap);
 }
@@ -496,6 +488,9 @@ function renderHotspots(stories) {
 }
 
 async function openStory(story) {
+  // Hide any persistent dots so the room is clean when the modal closes
+  document.getElementById('room')?.classList.remove('hotspots-revealed', 'hotspots-discovery-pulse');
+
   // Header
   STORY_TITLE.textContent = story.title;
   document.querySelector('.story-author').textContent = story.author;

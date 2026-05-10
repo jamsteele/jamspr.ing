@@ -208,7 +208,7 @@ body {
   transform: translateX(-50%) translateY(-2px);
 }
 
-/* Once-per-page pulse to teach users hotspots exist (fades after a few seconds) */
+/* First-load attention-getter — pulses a couple of times, then fades. */
 .hotspots-discovery-pulse .hotspot::before {
   animation: discovery-pulse 2s ease-out 2;
 }
@@ -216,6 +216,17 @@ body {
 @keyframes discovery-pulse {
   0%, 100% { background: rgba(255, 220, 150, 0); box-shadow: 0 0 0 0 rgba(255, 220, 150, 0); }
   50% { background: rgba(255, 220, 150, 0.6); box-shadow: 0 0 0 4px rgba(255, 220, 150, 0.15); }
+}
+
+/* Persistent reveal — toggled by tapping empty room space. Dots stay
+   visible until tapped again (or until a hotspot is opened). */
+.hotspots-revealed .hotspot::before {
+  background: rgba(255, 220, 150, 0.85);
+  width: 14px;
+  height: 14px;
+  box-shadow:
+    0 0 0 6px rgba(255, 220, 150, 0.18),
+    0 0 14px 4px rgba(255, 200, 120, 0.5);
 }
 
 /* ---------- Modal / reader ---------- */
