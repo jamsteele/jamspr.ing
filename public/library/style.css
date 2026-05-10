@@ -356,6 +356,55 @@ body {
   color: var(--ink-soft);
 }
 
+/* ---------- Painted-lights twinkle overlay ----------
+   Tiny glow dots positioned over each painted fairy light in the room art.
+   With mix-blend-mode: screen they only brighten what's already bright,
+   so the painted lights themselves appear to pulse without washing out the
+   rest of the room. Each light twinkles on its own randomized delay. */
+
+.painted-lights {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  mix-blend-mode: screen;
+}
+
+.painted-light {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  margin-top: -7px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255, 235, 175, 0.95) 0%,
+    rgba(255, 210, 130, 0.6) 35%,
+    rgba(255, 180, 90, 0.2) 65%,
+    transparent 100%);
+  animation: painted-twinkle var(--dur, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  opacity: 0;
+}
+
+@keyframes painted-twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.7); }
+  50% { opacity: 0.85; transform: scale(1.3); }
+}
+
+/* Wave: when the easter egg fires, every light blooms briefly then
+   returns to its idle twinkle. */
+.painted-lights.wave .painted-light {
+  animation: painted-wave-pulse 1.6s ease-out;
+  animation-delay: calc(var(--idx, 0) * 0.025s);
+}
+
+@keyframes painted-wave-pulse {
+  0% { opacity: 0.3; transform: scale(0.7); }
+  35% { opacity: 1; transform: scale(2.2); }
+  100% { opacity: 0.4; transform: scale(1); }
+}
+
 /* ---------- Easter egg: cherry blossom sprig ----------
    The painting's own fairy lights handle the "wave" visually via a brief
    golden bloom overlay (.room.bloom) below. Our cherry sprig is the only
@@ -459,10 +508,11 @@ body {
 
 /* Reduced-motion respect: flatten everything that animates */
 @media (prefers-reduced-motion: reduce) {
-  .fairy-light { animation: none; opacity: 0.85; }
+  .painted-light { animation: none; opacity: 0.4; }
+  .painted-lights.wave .painted-light { animation: none; }
   .petal { display: none; }
   .cherry-sprig.shake { animation: none; }
-  .fairy-lights.wave .fairy-light { animation: none; }
+  .room.bloom::after { animation: none; opacity: 0; }
 }
 
 /* ---------- Mobile ---------- */

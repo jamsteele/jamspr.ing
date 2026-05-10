@@ -15,6 +15,12 @@
        explore. On desktop the room usually fits without scrolling. -->
   <div class="room-wrapper" id="room-wrapper">
     <main class="room" id="room" aria-label="An illustrated room with clickable objects. Scroll horizontally to explore.">
+      <!-- Painted-lights overlay: invisible glow-dots positioned over each
+           painted fairy light in the room, animated with mix-blend-mode: screen.
+           Each twinkles on its own delay, making the painted lights themselves
+           appear to pulse softly. Populated by setupPaintedLights() in script.js. -->
+      <div class="painted-lights" id="painted-lights" aria-hidden="true"></div>
+
       <!-- Easter egg: cherry-blossom sprig overlaid on the windowsill.
            Click it 3× → drift petals across the room + fairy lights wave.
            (The painting's own fairy lights also pulse in the wave.) -->

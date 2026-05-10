@@ -18,6 +18,7 @@ async function init() {
     const data = await res.json();
     renderHotspots(data.stories || []);
     setupModalControls();
+    setupPaintedLights();
     setupCherrySprigEasterEgg();
     setupScrollHints();
     setupDiscoveryPulse();
@@ -25,6 +26,45 @@ async function init() {
     console.error('Failed to load story index:', err);
     showRoomError('Could not load the story index. See console for details.');
   }
+}
+
+/* ---------- Painted-lights twinkle ----------
+   Positions are % of room width/height, hand-tuned to sit over each painted
+   light in assets/room.png. Two strings:
+     1. Around the window frame on the left (top edge + left side + partial right side)
+     2. Along the right-hand shelf
+   If the painting is replaced/edited, re-tune these positions. */
+
+const PAINTED_LIGHT_POSITIONS = [
+  // Window frame: top edge (left → right)
+  { x: 12, y: 5 }, { x: 15, y: 4 }, { x: 18, y: 4 }, { x: 21, y: 4 },
+  { x: 24, y: 4 }, { x: 27, y: 4 }, { x: 30, y: 4 }, { x: 33, y: 4 },
+  { x: 36, y: 5 },
+  // Window frame: left side (top → down)
+  { x: 11, y: 9 }, { x: 11, y: 14 }, { x: 11, y: 19 }, { x: 11, y: 25 },
+  { x: 11, y: 31 }, { x: 11, y: 38 }, { x: 11, y: 45 }, { x: 12, y: 52 },
+  { x: 12, y: 57 },
+  // (Right side of window frame is mostly obscured by plants/books in the
+  // painting — skipped to avoid floating dots in dark wood.)
+  // Right-side shelf: horizontal string just under the shelf
+  { x: 60, y: 31 }, { x: 64, y: 30 }, { x: 68, y: 30 }, { x: 72, y: 31 },
+  { x: 76, y: 31 }, { x: 80, y: 31 }, { x: 84, y: 31 }, { x: 88, y: 31 },
+];
+
+function setupPaintedLights() {
+  const container = document.getElementById('painted-lights');
+  if (!container) return;
+  PAINTED_LIGHT_POSITIONS.forEach((pos, i) => {
+    const el = document.createElement('span');
+    el.className = 'painted-light';
+    el.style.left = `${pos.x}%`;
+    el.style.top = `${pos.y}%`;
+    // Each light twinkles on its own duration + delay so the string feels alive
+    el.style.setProperty('--dur', `${(2.4 + Math.random() * 2.4).toFixed(2)}s`);
+    el.style.setProperty('--delay', `${(Math.random() * 3).toFixed(2)}s`);
+    el.style.setProperty('--idx', i);
+    container.appendChild(el);
+  });
 }
 
 /* ---------- Easter egg: cherry sprig ---------- */
@@ -62,6 +102,15 @@ function triggerEasterEgg(room, petalLayer) {
     void room.offsetWidth;
     room.classList.add('bloom');
     setTimeout(() => room.classList.remove('bloom'), 2300);
+  }
+
+  // Painted-lights wave — every twinkling light pulses bright in a cascade
+  const lights = document.getElementById('painted-lights');
+  if (lights) {
+    lights.classList.remove('wave');
+    void lights.offsetWidth;
+    lights.classList.add('wave');
+    setTimeout(() => lights.classList.remove('wave'), 2400);
   }
 
   // Drift petals
