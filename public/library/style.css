@@ -411,30 +411,74 @@ body {
    "rest position"; the overlay scales gently from the bottom to simulate
    chest rise/fall. Soft alpha edges hide any cut-out imperfections. */
 
-.cat-breath {
+/* Both layers share position/size so they register on the painted cat. */
+.cat-body,
+.cat-headtail {
   position: absolute;
-  /* Crop bounds from the latest extraction. Bottom edge sits exactly on the
-     bed surface; breath rises upward only — bed never moves. */
   top: 57.62%;
   left: 70.31%;
   width: 16.93%;
   height: auto;
   pointer-events: none;
-  z-index: 2;
-  /* Origin at the bottom edge — bed pixels (which aren't in the overlay) stay
-     pinned where they are; only the cat above scales. */
-  transform-origin: 50% 100%;
-  animation: cat-breathe 4.5s ease-in-out infinite;
   will-change: transform;
-  /* Mask: fade out the head (left ~35% of overlay) so only the body breathes.
-     The painted head from room2.png shows through underneath, static. */
-  mask-image: linear-gradient(to right, transparent 0%, transparent 30%, black 50%, black 100%);
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 30%, black 50%, black 100%);
 }
 
-@keyframes cat-breathe {
+/* BODY layer: shows only the middle of the cat (the chest/back bulge).
+   Scales vertically from the bottom — chest rises with breath. */
+.cat-body {
+  z-index: 2;
+  transform-origin: 50% 100%;
+  animation: cat-body-breathe 4.5s ease-in-out infinite;
+  /* Mask: middle 35-75% opaque, sides transparent (head + tail handled by
+     the other layer). */
+  mask-image: linear-gradient(to right,
+    transparent 0%,
+    transparent 30%,
+    black 40%,
+    black 75%,
+    transparent 85%,
+    transparent 100%);
+  -webkit-mask-image: linear-gradient(to right,
+    transparent 0%,
+    transparent 30%,
+    black 40%,
+    black 75%,
+    transparent 85%,
+    transparent 100%);
+}
+
+/* HEAD + TAIL layer: shows the left (head/face) and right (tail/paws) of
+   the cat. Translates slightly with breath so they bob naturally with the
+   body, but does NOT scale — face and tail stay the same size. */
+.cat-headtail {
+  z-index: 3;
+  animation: cat-headtail-bob 4.5s ease-in-out infinite;
+  /* Inverse mask: opaque on the sides, transparent in the middle. */
+  mask-image: linear-gradient(to right,
+    black 0%,
+    black 25%,
+    transparent 40%,
+    transparent 75%,
+    black 90%,
+    black 100%);
+  -webkit-mask-image: linear-gradient(to right,
+    black 0%,
+    black 25%,
+    transparent 40%,
+    transparent 75%,
+    black 90%,
+    black 100%);
+}
+
+@keyframes cat-body-breathe {
   0%, 100% { transform: scaleY(1); }
   50%      { transform: scaleY(1.03); }
+}
+
+/* Head & tail rise/fall ~1.5px in sympathy with the body's breath, no scale. */
+@keyframes cat-headtail-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-1.5px); }
 }
 
 /* ---------- Easter egg: cherry blossom sprig ----------
@@ -545,7 +589,7 @@ body {
   .petal { display: none; }
   .cherry-sprig.shake { animation: none; }
   .room.bloom::after { animation: none; opacity: 0; }
-  .cat-breath { animation: none; }
+  .cat-body, .cat-headtail { animation: none; }
 }
 
 /* ---------- Annotate mode (?annotate URL flag) ---------- */

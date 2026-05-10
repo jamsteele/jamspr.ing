@@ -21,11 +21,14 @@
            appear to pulse softly. Populated by setupPaintedLights() in script.js. -->
       <div class="painted-lights" id="painted-lights" aria-hidden="true"></div>
 
-      <!-- Breathing cat overlay: a cut-out of the cat from room2.png, registered
-           pixel-perfect on top of the painted cat, with a subtle slow scale
-           animation that reads as breathing. The painted cat underneath shows
-           through if the cut-out has soft edges, so it never looks "off." -->
-      <img class="cat-breath" src="assets/cat.png" alt="" aria-hidden="true">
+      <!-- Breathing cat: two overlays from the same cat.png cut-out.
+           - .cat-body: shows only the middle (chest/back), scales with breath
+           - .cat-headtail: shows only the left (head) + right (tail/paws),
+             translates slightly so they bob with the body but don't change size
+           Complementary CSS masks so the two layers cover the painted cat
+           between them with no overlap. -->
+      <img class="cat-body" src="assets/cat.png" alt="" aria-hidden="true">
+      <img class="cat-headtail" src="assets/cat.png" alt="" aria-hidden="true">
 
       <!-- Easter egg: cherry-blossom sprig overlaid on the windowsill.
            Click it 3× → drift petals across the room + fairy lights wave.
