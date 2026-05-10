@@ -413,27 +413,24 @@ body {
 
 .cat-breath {
   position: absolute;
-  top: 60.55%;
-  left: 65.76%;
-  width: 19.53%;
+  /* Crop bounds from the latest extraction. Bottom edge sits exactly on the
+     bed surface; breath rises upward only — bed never moves. */
+  top: 57.62%;
+  left: 70.31%;
+  width: 16.93%;
   height: auto;
   pointer-events: none;
   z-index: 2;
-  /* Scale from the bottom (where the cat meets the blanket) so the breath
-     "rises" rather than expanding from the center. */
-  transform-origin: 50% 95%;
+  /* Origin at the bottom edge — bed pixels (which aren't in the overlay) stay
+     pinned where they are; only the cat above scales. */
+  transform-origin: 50% 100%;
   animation: cat-breathe 4.5s ease-in-out infinite;
-  /* Smooth out any sub-pixel edge shimmer */
   will-change: transform;
 }
 
 @keyframes cat-breathe {
-  0%, 100% {
-    transform: scale(1, 1) translateY(0);
-  }
-  50% {
-    transform: scale(1.012, 1.018) translateY(-0.5px);
-  }
+  0%, 100% { transform: scaleY(1); }
+  50%      { transform: scaleY(1.015); }
 }
 
 /* ---------- Easter egg: cherry blossom sprig ----------
