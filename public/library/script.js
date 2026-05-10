@@ -18,47 +18,148 @@ async function init() {
     const data = await res.json();
     renderHotspots(data.stories || []);
     setupModalControls();
+    setupCherrySprigEasterEgg();
+    setupScrollHints();
+    setupDiscoveryPulse();
   } catch (err) {
     console.error('Failed to load story index:', err);
     showRoomError('Could not load the story index. See console for details.');
   }
 }
 
-/* Render a hotspot for each story.
-   - If a story has explicit `position` coords, use them (for the real room layout).
-   - Otherwise, lay them out in an auto-grid for placeholder mode. */
-function renderHotspots(stories) {
-  const useGrid = stories.every((s) => !s.position);
+/* ---------- Easter egg: cherry sprig ---------- */
 
+let sprigClicks = 0;
+let sprigTimer = null;
+
+function setupCherrySprigEasterEgg() {
+  const sprig = document.getElementById('cherry-sprig');
+  const room = document.getElementById('room');
+  const petalLayer = document.getElementById('petal-layer');
+  if (!sprig) return;
+
+  sprig.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sprigClicks++;
+    sprig.classList.remove('shake');
+    void sprig.offsetWidth;
+    sprig.classList.add('shake');
+
+    if (sprigTimer) clearTimeout(sprigTimer);
+    sprigTimer = setTimeout(() => { sprigClicks = 0; }, 1200);
+
+    if (sprigClicks >= 3) {
+      sprigClicks = 0;
+      triggerEasterEgg(room, petalLayer);
+    }
+  });
+}
+
+function triggerEasterEgg(room, petalLayer) {
+  // Bloom flash — the painting's own fairy lights "pulse"
+  if (room) {
+    room.classList.remove('bloom');
+    void room.offsetWidth;
+    room.classList.add('bloom');
+    setTimeout(() => room.classList.remove('bloom'), 2300);
+  }
+
+  // Drift petals
+  if (petalLayer) {
+    const PETAL_COUNT = 40;
+    for (let i = 0; i < PETAL_COUNT; i++) {
+      const petal = document.createElement('span');
+      petal.className = 'petal';
+      const startX = Math.random() * 100;
+      const driftX = (Math.random() - 0.5) * 200;
+      const rot = Math.random() * 360;
+      const rotEnd = rot + (Math.random() * 720 - 360);
+      const duration = 5 + Math.random() * 4;
+      const delay = Math.random() * 1.5;
+      petal.style.left = `${startX}%`;
+      petal.style.setProperty('--drift-x', `${driftX}px`);
+      petal.style.setProperty('--rot', `${rot}deg`);
+      petal.style.setProperty('--rot-end', `${rotEnd}deg`);
+      petal.style.setProperty('--duration', `${duration.toFixed(2)}s`);
+      petal.style.setProperty('--delay', `${delay.toFixed(2)}s`);
+      petalLayer.appendChild(petal);
+      setTimeout(() => petal.remove(), (duration + delay + 0.5) * 1000);
+    }
+  }
+}
+
+/* ---------- Scroll hints ---------- */
+
+function setupScrollHints() {
+  const wrapper = document.getElementById('room-wrapper');
+  if (!wrapper) return;
+
+  const updateHints = () => {
+    const max = wrapper.scrollWidth - wrapper.clientWidth;
+    if (max <= 2) {
+      // Room fits, no scroll affordance needed
+      wrapper.classList.remove('has-scroll-left', 'has-scroll-right');
+      return;
+    }
+    wrapper.classList.toggle('has-scroll-left', wrapper.scrollLeft > 8);
+    wrapper.classList.toggle('has-scroll-right', wrapper.scrollLeft < max - 8);
+  };
+
+  updateHints();
+  wrapper.addEventListener('scroll', updateHints, { passive: true });
+  window.addEventListener('resize', updateHints, { passive: true });
+}
+
+/* ---------- One-time discovery pulse ---------- */
+/* On first load, the hotspot dots briefly pulse so users learn objects are clickable.
+   Fades out after a few seconds. */
+
+function setupDiscoveryPulse() {
+  const room = document.getElementById('room');
+  if (!room) return;
+  room.classList.add('hotspots-discovery-pulse');
+  setTimeout(() => room.classList.remove('hotspots-discovery-pulse'), 5000);
+}
+
+/* Render a hotspot for each story.
+   Positions come from index.json as % of room width/height — they overlay
+   real objects in the painting. Falls back to a grid only if no positions
+   are defined (debug/placeholder mode). */
+function renderHotspots(stories) {
   stories.forEach((story, idx) => {
     const btn = document.createElement('button');
     btn.className = 'hotspot';
     btn.dataset.storyId = story.id;
-    btn.dataset.label = `${story.trinket || story.title} — ${story.title}`;
+    btn.dataset.label = `${story.title} — ${story.trinket || ''}`.replace(/ — $/, '');
     btn.setAttribute('aria-label', `Open “${story.title}” by ${story.author}`);
-    btn.textContent = story.trinketEmoji || '📖';
 
-    if (story.position) {
+    const pos = story.position;
+    if (pos) {
       Object.assign(btn.style, {
-        top: story.position.top,
-        left: story.position.left,
-        width: story.position.width || '60px',
-        height: story.position.height || '60px',
+        top: pos.top,
+        left: pos.left,
+        width: pos.width || '5%',
+        height: pos.height || '7%',
       });
     } else {
-      // Auto-grid: 5 columns, rows as needed
+      // Fallback grid (only when no positions defined)
       const COLS = 5;
       const col = idx % COLS;
       const row = Math.floor(idx / COLS);
       Object.assign(btn.style, {
         top: `${22 + row * 18}%`,
         left: `${10 + col * 18}%`,
-        width: '64px',
-        height: '64px',
+        width: '5%',
+        height: '7%',
       });
     }
 
     btn.addEventListener('click', () => openStory(story));
+    // Add a touched class on tap (mobile) so the dot stays briefly visible
+    btn.addEventListener('touchstart', () => {
+      btn.classList.add('touched');
+      setTimeout(() => btn.classList.remove('touched'), 1200);
+    }, { passive: true });
     ROOM.appendChild(btn);
   });
 }

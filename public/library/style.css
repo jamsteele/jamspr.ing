@@ -32,96 +32,164 @@ body {
 
 /* ---------- The room ---------- */
 
+/* The wrapper handles horizontal scroll — phone swipes through the wide room,
+   desktop usually sees the whole room without scrolling.
+   Image natural ratio is 1.5 (3:2), so room width = 100vh * 1.5 = 150vh.
+   On a 375x812 phone: room is 1218px wide vs 375px viewport → 3.25x scroll.
+   On a 1280x800 desktop: room is 1200px wide vs 1280px viewport → fits. */
+
+.room-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  background: var(--bg-deep);
+}
+
+/* Hide scrollbar but keep scroll functionality */
+.room-wrapper::-webkit-scrollbar { display: none; }
+.room-wrapper { scrollbar-width: none; -ms-overflow-style: none; }
+
 .room {
   position: relative;
-  width: 100%;
   height: 100vh;
-  background: radial-gradient(ellipse at center, var(--bg-room-hi) 0%, var(--bg-room) 60%, var(--bg-deep) 100%);
-  /* When the room art is ready, replace the gradient above with:
-     background-image: url('assets/room.png');
-     background-size: cover;
-     background-position: center;
-  */
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* Width = height * image-aspect (1.5). 150vh keeps the painting at native ratio.
+     On phone (e.g. 375x812): room = 1218px wide, viewport = 375px → 3.25x scroll.
+     On desktop (e.g. 1280x800): room = 1200px wide → fits without scroll.
+     No max-width clamp — we WANT the room as wide as it naturally is. */
+  width: 150vh;
+  background-image: url('assets/room.png');
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+  /* Slight darkening for ambience + readable hover labels */
+  box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.25);
+  /* Clip absolutely-positioned children (esp. hotspot tooltips) so they
+     don't extend the wrapper's scrollWidth past the room's natural width. */
   overflow: hidden;
 }
 
-.room-placeholder {
-  text-align: center;
-  opacity: 0.55;
-  font-style: italic;
+/* Edge-fade scroll affordance: subtle gradient hints "more room that way".
+   Fixed-positioned so they don't extend the wrapper's scrollWidth. */
+.scroll-hint {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 60px;
   pointer-events: none;
-  max-width: 80%;
+  z-index: 4;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.placeholder-eyebrow {
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  margin-bottom: 0.75rem;
-  opacity: 0.7;
+.scroll-hint-right {
+  right: 0;
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.35));
 }
 
-.placeholder-text {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
+.scroll-hint-left {
+  left: 0;
+  background: linear-gradient(to left, transparent, rgba(0, 0, 0, 0.35));
 }
 
-.placeholder-hint {
-  font-size: 0.85rem;
-  opacity: 0.7;
-}
+/* Hint visible when there's more room to scroll in that direction (toggled by JS) */
+.room-wrapper.has-scroll-right .scroll-hint-right { opacity: 1; }
+.room-wrapper.has-scroll-left .scroll-hint-left { opacity: 1; }
 
-/* ---------- Hotspots ---------- */
+/* ---------- Hotspots ----------
+   Subtle "you can click this" affordance over a painted scene.
+   Default: invisible (transparent button covering the object).
+   Hover/focus: a soft golden ring + glow appears, signaling interactivity.
+   Tap on mobile: same ring shows briefly. */
 
 .hotspot {
   position: absolute;
-  border: 1px dashed rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  color: var(--paper);
-  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-  font-family: inherit;
   padding: 0;
+  font-family: inherit;
+  font-size: 0; /* No emoji visible; the painted object IS the visual */
+  z-index: 3;
+  /* Center marker: tiny gold dot, very subtle */
 }
 
-.hotspot:hover,
+/* The subtle dot at the center of every hotspot — barely visible until hover */
+.hotspot::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 220, 150, 0.0);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 0 rgba(255, 220, 150, 0);
+  transition: background 0.3s ease, box-shadow 0.3s ease, width 0.3s ease, height 0.3s ease;
+}
+
+.hotspot:hover::before,
+.hotspot:focus-visible::before,
+.hotspot.touched::before {
+  background: rgba(255, 220, 150, 0.85);
+  width: 14px;
+  height: 14px;
+  box-shadow:
+    0 0 0 6px rgba(255, 220, 150, 0.18),
+    0 0 14px 4px rgba(255, 200, 120, 0.5);
+}
+
 .hotspot:focus-visible {
-  transform: scale(1.08);
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.5);
   outline: none;
 }
 
+/* Hover label */
 .hotspot::after {
   content: attr(data-label);
   position: absolute;
-  top: calc(100% + 8px);
+  bottom: calc(100% + 12px);
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(20, 15, 10, 0.92);
   color: var(--paper);
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 11px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.35;
   letter-spacing: 0.02em;
-  white-space: nowrap;
+  white-space: normal;
+  width: max-content;
+  max-width: 200px;
+  text-align: center;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
   z-index: 10;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .hotspot:hover::after,
 .hotspot:focus-visible::after {
   opacity: 1;
+  transform: translateX(-50%) translateY(-2px);
+}
+
+/* Once-per-page pulse to teach users hotspots exist (fades after a few seconds) */
+.hotspots-discovery-pulse .hotspot::before {
+  animation: discovery-pulse 2s ease-out 2;
+}
+
+@keyframes discovery-pulse {
+  0%, 100% { background: rgba(255, 220, 150, 0); box-shadow: 0 0 0 0 rgba(255, 220, 150, 0); }
+  50% { background: rgba(255, 220, 150, 0.6); box-shadow: 0 0 0 4px rgba(255, 220, 150, 0.15); }
 }
 
 /* ---------- Modal / reader ---------- */
@@ -149,13 +217,18 @@ body {
   position: relative;
   background: var(--paper);
   color: var(--ink);
-  width: min(92vw, 680px);
+  width: min(92vw, 640px);
   max-height: 88vh;
   overflow-y: auto;
-  padding: 3rem 2.75rem 3.5rem;
+  padding: 3.25rem 3rem 4rem;
   border-radius: 4px;
   box-shadow: var(--shadow);
-  font-family: 'Iowan Old Style', 'Palatino', 'Georgia', serif;
+  font-family: 'Iowan Old Style', 'Palatino Linotype', 'Palatino', 'Georgia', 'Times New Roman', serif;
+  /* Subtle paper warmth — barely-there cream gradient instead of flat */
+  background-image: radial-gradient(ellipse at 20% 0%, rgba(255, 248, 230, 0.9) 0%, transparent 50%),
+                    linear-gradient(180deg, var(--paper) 0%, #efe3cb 100%);
+  /* Smooth scroll on programmatic jumps */
+  scroll-behavior: smooth;
 }
 
 .modal-close {
@@ -222,12 +295,22 @@ body {
 }
 
 .story-content {
-  font-size: 1.05rem;
-  line-height: 1.75;
+  font-size: 1.08rem;
+  line-height: 1.78;
+  letter-spacing: 0.005em;
 }
 
 .story-content p {
-  margin-bottom: 1rem;
+  margin-bottom: 1.1rem;
+  text-align: left;
+  hanging-punctuation: first last;
+}
+
+/* For poems / verse — preserve line breaks (Service ballads use 2-space line breaks) */
+.story-content br {
+  content: '';
+  display: block;
+  margin-top: 0.1rem;
 }
 
 .story-content p:first-of-type::first-letter {
@@ -241,7 +324,28 @@ body {
 }
 
 .story-content em {
-  color: var(--bg-room-hi);
+  color: inherit;
+  font-style: italic;
+}
+
+.story-content h1,
+.story-content h2,
+.story-content h3 {
+  display: none; /* Suppress the in-file H1; the modal header already shows the title */
+}
+
+.story-content hr {
+  border: none;
+  border-top: 1px solid var(--paper-soft);
+  margin: 1.5rem auto;
+  width: 40%;
+}
+
+.story-content a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 0.5px;
+  text-underline-offset: 2px;
 }
 
 .story-content blockquote {
@@ -252,14 +356,125 @@ body {
   color: var(--ink-soft);
 }
 
+/* ---------- Easter egg: cherry blossom sprig ----------
+   The painting's own fairy lights handle the "wave" visually via a brief
+   golden bloom overlay (.room.bloom) below. Our cherry sprig is the only
+   added DOM element on top of the room — placed over the windowsill. */
+
+.cherry-sprig {
+  position: absolute;
+  /* Position over the windowsill in the painting (right side of windowsill).
+     Coords are % of room width/height — adjust if you reposition trinkets. */
+  top: 56%;
+  left: 31%;
+  width: 6%;
+  min-width: 38px;
+  max-width: 60px;
+  height: auto;
+  aspect-ratio: 60 / 80;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 4;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+  transition: transform 0.3s ease;
+}
+
+.cherry-sprig:hover {
+  transform: translateY(-3px) rotate(-2deg);
+}
+
+/* When the easter egg fires, the entire painting briefly glows warmer —
+   a stand-in for "all the fairy lights pulsed." */
+.room.bloom::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 75% 35%, rgba(255, 200, 120, 0.45), transparent 60%),
+              radial-gradient(ellipse at 25% 25%, rgba(255, 220, 150, 0.3), transparent 50%);
+  pointer-events: none;
+  animation: bloom-flash 2.2s ease-out;
+  mix-blend-mode: screen;
+  z-index: 2;
+}
+
+@keyframes bloom-flash {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.cherry-sprig:focus-visible {
+  outline: 1px dashed rgba(248, 200, 212, 0.8);
+  outline-offset: 4px;
+}
+
+.cherry-sprig.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-4deg); }
+  75% { transform: rotate(4deg); }
+}
+
+/* ---------- Petal layer ---------- */
+
+.petal-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 7;
+  overflow: hidden;
+}
+
+.petal {
+  position: absolute;
+  top: -20px;
+  width: 12px;
+  height: 12px;
+  background: radial-gradient(circle at 30% 30%, #fadbe2, #f8c8d4 60%, #f4a8bd 100%);
+  border-radius: 60% 40% 60% 40%;
+  opacity: 0;
+  transform: rotate(var(--rot, 0deg));
+  animation: drift var(--duration, 6s) linear forwards;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes drift {
+  0% {
+    opacity: 0;
+    transform: translate(0, -20px) rotate(0deg);
+  }
+  10% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--drift-x, 80px), 110vh) rotate(var(--rot-end, 720deg));
+  }
+}
+
+/* Reduced-motion respect: flatten everything that animates */
+@media (prefers-reduced-motion: reduce) {
+  .fairy-light { animation: none; opacity: 0.85; }
+  .petal { display: none; }
+  .cherry-sprig.shake { animation: none; }
+  .fairy-lights.wave .fairy-light { animation: none; }
+}
+
 /* ---------- Mobile ---------- */
 
 @media (max-width: 600px) {
   .modal-content {
     width: 95vw;
-    padding: 2rem 1.25rem 2.5rem;
+    padding: 2.25rem 1.5rem 2.75rem;
   }
   .story-header h1 { font-size: 1.4rem; }
-  .story-content { font-size: 1rem; }
+  .story-content { font-size: 1rem; line-height: 1.7; }
   .hotspot { font-size: 22px; }
+  .fairy-lights { height: 60px; padding: 0 6%; }
+  .cherry-sprig { width: 44px; height: 60px; bottom: 8%; right: 4%; }
 }
