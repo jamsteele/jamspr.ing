@@ -35,7 +35,8 @@ The first paragraph gets a drop cap automatically — no special markup needed.
 | `the-postmaster` | Tagore | https://www.gutenberg.org/ebooks/34757 (Mashi, and Other Stories) |
 | `the-bet` | Chekhov | https://www.gutenberg.org/ebooks/55283 (The Bet, and other stories) |
 | `the-necklace` | Maupassant | https://www.gutenberg.org/ebooks/3090 (Complete Original Short Stories) |
-| `the-restaurant-of-many-orders` | Miyazawa | https://en.wikisource.org/wiki/Translation:The_Restaurant_With_Many_Orders (CC BY-SA 3.0) |
+| `the-gift-of-the-magi` | O. Henry | https://www.gutenberg.org/ebooks/2776 (The Four Million) |
+| `the-selfish-giant` | Oscar Wilde | https://www.gutenberg.org/ebooks/902 (The Happy Prince and Other Tales) |
 | `the-quarantine-at-alexander-abrahams` | L.M. Montgomery | https://www.gutenberg.org/ebooks/1354 (Chronicles of Avonlea) |
 | `the-marine-excursion` | Leacock | https://www.gutenberg.org/ebooks/3533 (Sunshine Sketches of a Little Town) |
 | `dead-stars` | Benitez | https://en.wikisource.org/wiki/Dead_Stars |
@@ -43,7 +44,6 @@ The first paragraph gets a drop cap automatically — no special markup needed.
 | `to-build-a-fire` | Jack London | https://www.gutenberg.org/ebooks/2429 (Lost Face) |
 | `service-the-cremation-of-sam-mcgee` | Robert Service | https://www.gutenberg.org/ebooks/207 (Spell of the Yukon and Other Verses) |
 | `service-the-spell-of-the-yukon` | Robert Service | https://www.gutenberg.org/ebooks/207 (Spell of the Yukon and Other Verses) |
-| `service-the-shooting-of-dan-mcgrew` | Robert Service | https://www.gutenberg.org/ebooks/207 (Spell of the Yukon and Other Verses) |
 
 ## Cleaning the text after fetching
 
@@ -69,7 +69,8 @@ Repeat for each story. Should take maybe 30 minutes total to populate all 17.
 - [x] the-postmaster.md
 - [x] the-bet.md
 - [x] the-necklace.md
-- [x] the-restaurant-of-many-orders.md _(CC BY-SA 3.0 translation from Wikisource — see attribution at bottom of file)_
+- [x] the-gift-of-the-magi.md
+- [x] the-selfish-giant.md
 - [x] the-quarantine-at-alexander-abrahams.md
 - [x] the-marine-excursion.md
 - [x] sagacious-marcela.md _(replaced "Dead Stars" — Filipino folktale, fully PD globally; Dead Stars couldn't be sourced cleanly outside US PD)_
@@ -77,8 +78,9 @@ Repeat for each story. Should take maybe 30 minutes total to populate all 17.
 - [x] to-build-a-fire.md
 - [x] service-the-cremation-of-sam-mcgee.md
 - [x] service-the-spell-of-the-yukon.md
-- [x] service-the-shooting-of-dan-mcgrew.md
 
 **Deferred (not in current MVP):**
 - _the-boy-who-drew-cats_ — original Hearn 1898 booklet not on PG, Wikisource, or any open-access full-text source we can scrape. To revive: paste manually from a Hearn collection, or substitute a Hearn tale that IS on PG (e.g. Yuki-Onna or Mujina from Kwaidan, PG #1210).
 - _the-tell-tale-heart_ — pulled because it's a first-person murder confession; too gruesome for the cozy room vibe. To swap a non-gruesome Poe back in: A Descent into the Maelström (PG #2148, same file) is a survival adventure with no violence.
+- _the-restaurant-of-many-orders_ — pulled because the body-horror twist (hunters being prepared as food) was creepier than the room's vibe wants.
+- _service-the-shooting-of-dan-mcgrew_ — pulled because the saloon-shootout climax is more violent than the rest of the collection. The other two Service ballads (Cremation, Spell of the Yukon) carry the Yukon mood without it.
