@@ -363,7 +363,7 @@ function setupScrollHints() {
    the natural left drift in the viewport) at 0.15× the scroll rate, so the
    net visible motion is 0.85× — appears far away. */
 
-const PARALLAX_FACTOR = 0.15;
+const PARALLAX_FACTOR = 0.25;
 
 function setupParallax() {
   const wrapper = document.getElementById('room-wrapper');
