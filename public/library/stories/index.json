@@ -1,7 +1,7 @@
 {
   "version": 4,
   "lastUpdated": "2026-05-10",
-  "notes": "Each story has metadata + a position (% of room width/height) for its hotspot in the painted scene. Story text lives at stories/<id>.md and is lazy-loaded on click. Trinket descriptions are intentionally brief noun-phrases — the painting can't show every specific object, so we name a souvenir that suggests the trip without promising a visible prop.",
+  "notes": "Each story has metadata + a position (% of room width/height) for its hotspot in the painted scene. Story text lives at stories/<id>.md and is lazy-loaded on click. Every trinket is a book — each hotspot points to a specific painted book in the room (bookshelf, windowsill, or floor stack). Plants/photos/etc. are reserved for future stories.",
   "stories": [
     {
       "id": "the-open-window",
@@ -12,12 +12,12 @@
       "countryFlag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
       "minutes": 6,
       "mood": "Wicked-funny",
-      "trinket": "Pencil sketch from a Cotswolds craft fair",
-      "trinketEmoji": "🖼️",
+      "trinket": "Saki paperback from a Cotswolds bookshop",
+      "trinketEmoji": "📖",
       "source": "https://www.gutenberg.org/ebooks/269",
       "position": {
-        "top": "25.52%",
-        "left": "4.71%"
+        "top": "26.05%",
+        "left": "57.75%"
       }
     },
     {
@@ -29,14 +29,14 @@
       "countryFlag": "🇨🇦",
       "minutes": 5,
       "mood": "Mythic",
-      "trinket": "Polaroid of The Lions, from Stanley Park",
-      "trinketEmoji": "📷",
+      "trinket": "Pauline Johnson's Legends of Vancouver from a Granville Island bookshop",
+      "trinketEmoji": "📖",
       "source": "https://www.gutenberg.org/ebooks/3478",
       "contentNote": "A Squamish legend, told to Pauline Johnson by Chief Joe Capilano, 1911. The Squamish name for The Lions is Ch'ích'iyúy Elx̱wíḵn — Twin Sisters.",
       "summary": "The Squamish legend of how the twin peaks visible from Vancouver came to be.",
       "position": {
-        "top": "50.85%",
-        "left": "34.62%"
+        "top": "44.65%",
+        "left": "49.65%"
       }
     },
     {
@@ -48,12 +48,12 @@
       "countryFlag": "🇨🇦",
       "minutes": 18,
       "mood": "Warm-funny",
-      "trinket": "Tin of tea from a PEI farm shop",
-      "trinketEmoji": "🐕",
+      "trinket": "L.M. Montgomery paperback from a Charlottetown bookshop",
+      "trinketEmoji": "📖",
       "source": "https://www.gutenberg.org/ebooks/1354",
       "position": {
-        "top": "49.53%",
-        "left": "28.63%"
+        "top": "44.92%",
+        "left": "17.90%"
       }
     },
     {
@@ -65,14 +65,12 @@
       "countryFlag": "🇮🇳",
       "minutes": 10,
       "mood": "Tender",
-      "trinket": "Leather notebook from a Jaipur market",
-      "trinketEmoji": "📓",
+      "trinket": "Tagore paperback from a Calcutta bookstall",
+      "trinketEmoji": "📖",
       "source": "https://www.gutenberg.org/ebooks/34757",
       "position": {
-        "top": "60.12%",
-        "left": "32.88%",
-        "width": "9%",
-        "height": "8%"
+        "top": "45.97%",
+        "left": "13.07%"
       }
     },
     {
@@ -84,12 +82,12 @@
       "countryFlag": "🇮🇪",
       "minutes": 8,
       "mood": "Heartbreaking",
-      "trinket": "Pressed rose in a Dublin paperback",
-      "trinketEmoji": "🌹",
+      "trinket": "Wilde paperback from a Dublin bookshop",
+      "trinketEmoji": "📖",
       "source": "https://www.gutenberg.org/ebooks/902",
       "position": {
-        "top": "65.23%",
-        "left": "23.18%"
+        "top": "59.03%",
+        "left": "5.24%"
       }
     },
     {
@@ -101,12 +99,12 @@
       "countryFlag": "🇫🇷",
       "minutes": 14,
       "mood": "Twist ending",
-      "trinket": "Paris flea-market paperback",
-      "trinketEmoji": "💎",
+      "trinket": "Maupassant paperback from a Paris flea market",
+      "trinketEmoji": "📖",
       "source": "https://www.gutenberg.org/ebooks/3090",
       "position": {
-        "top": "53.62%",
-        "left": "14.03%"
+        "top": "65.37%",
+        "left": "5.50%"
       }
     },
     {
@@ -118,12 +116,12 @@
       "countryFlag": "🇺🇸",
       "minutes": 10,
       "mood": "Tender / twist ending",
-      "trinket": "Worn O. Henry paperback from a New York used bookstore",
-      "trinketEmoji": "🎁",
+      "trinket": "O. Henry paperback from a New York used bookstore",
+      "trinketEmoji": "📖",
       "source": "https://www.gutenberg.org/ebooks/2776",
       "position": {
-        "top": "47.16%",
-        "left": "18.34%"
+        "top": "52.96%",
+        "left": "49.04%"
       }
     },
     {
@@ -135,12 +133,12 @@
       "countryFlag": "🇷🇺",
       "minutes": 12,
       "mood": "Philosophical",
-      "trinket": "Used Chekhov paperback from a Moscow bookstore",
-      "trinketEmoji": "🪆",
+      "trinket": "Chekhov paperback from a Moscow bookstore",
+      "trinketEmoji": "📖",
       "source": "https://www.gutenberg.org/ebooks/55283",
       "position": {
-        "top": "14.84%",
-        "left": "64.25%"
+        "top": "25.13%",
+        "left": "61.97%"
       }
     },
     {
@@ -153,11 +151,11 @@
       "minutes": 25,
       "mood": "Tragic fable",
       "trinket": "Tolstoy paperback from St. Petersburg",
-      "trinketEmoji": "🎁",
+      "trinketEmoji": "📖",
       "source": "https://www.gutenberg.org/ebooks/6157",
       "position": {
         "top": "26.32%",
-        "left": "66.01%"
+        "left": "72.26%"
       }
     },
     {
@@ -170,12 +168,12 @@
       "minutes": 8,
       "mood": "Hilarious-then-haunting ballad",
       "trinket": "Service's Yukon ballads (same paperback as the other two)",
-      "trinketEmoji": "📜",
+      "trinketEmoji": "📖",
       "source": "https://www.gutenberg.org/ebooks/207",
       "format": "poem",
       "position": {
-        "top": "37.79%",
-        "left": "61.53%"
+        "top": "37.27%",
+        "left": "61.79%"
       }
     },
     {
@@ -188,12 +186,12 @@
       "minutes": 6,
       "mood": "Restless wanderlust",
       "trinket": "Service's Yukon ballads (same paperback as the other two)",
-      "trinketEmoji": "📜",
+      "trinketEmoji": "📖",
       "source": "https://www.gutenberg.org/ebooks/207",
       "format": "poem",
       "position": {
-        "top": "61.80%",
-        "left": "52.91%"
+        "top": "39.11%",
+        "left": "64.69%"
       }
     },
     {
@@ -205,12 +203,12 @@
       "countryFlag": "🇮🇪",
       "minutes": 8,
       "mood": "Sweet / redemptive",
-      "trinket": "Hardback fairytale from a Dublin bookshop",
-      "trinketEmoji": "🌳",
+      "trinket": "Wilde fairytales hardback from a Dublin bookshop",
+      "trinketEmoji": "📖",
       "source": "https://www.gutenberg.org/ebooks/902",
       "position": {
-        "top": "52.30%",
-        "left": "49.39%"
+        "top": "37.66%",
+        "left": "58.89%"
       }
     },
     {
@@ -222,12 +220,12 @@
       "countryFlag": "🇨🇦",
       "minutes": 20,
       "mood": "Gentle absurd",
-      "trinket": "Vintage steamboat postcard from Lake Couchiching",
-      "trinketEmoji": "⛴️",
+      "trinket": "Leacock paperback from a Toronto bookshop",
+      "trinketEmoji": "📖",
       "source": "https://www.gutenberg.org/ebooks/3533",
       "position": {
-        "top": "26.97%",
-        "left": "83.43%"
+        "top": "37.79%",
+        "left": "71.29%"
       }
     },
     {
@@ -239,12 +237,12 @@
       "countryFlag": "🇺🇸",
       "minutes": 30,
       "mood": "Survival",
-      "trinket": "Yukon paperback, Parks pass tucked inside",
-      "trinketEmoji": "🍂",
+      "trinket": "Jack London paperback from a Whitehorse bookshop",
+      "trinketEmoji": "📖",
       "source": "https://www.gutenberg.org/ebooks/2429",
       "position": {
-        "top": "41.49%",
-        "left": "86.42%"
+        "top": "57.05%",
+        "left": "48.95%"
       }
     },
     {
@@ -256,13 +254,13 @@
       "countryFlag": "🇵🇭",
       "minutes": 12,
       "mood": "Witty / clever-peasant",
-      "trinket": "Folktale book from a Manila bookshop",
-      "trinketEmoji": "📌",
+      "trinket": "Filipino folktales paperback from a Manila bookshop",
+      "trinketEmoji": "📖",
       "source": "https://www.gutenberg.org/ebooks/8299",
       "contentNote": "Two versions of a Filipino clever-girl tale (Pampangan + Tagalog) — both included in the file. The riddle the title comes from: the king sends Marcela one bird and demands twelve dishes from it; she sends back a single pin and demands twelve spoons made from it.",
       "position": {
-        "top": "38.32%",
-        "left": "83.43%"
+        "top": "9.96%",
+        "left": "82.72%"
       }
     }
   ]
