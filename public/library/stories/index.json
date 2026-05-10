@@ -15,7 +15,10 @@
       "trinket": "Pencil sketch from a Cotswolds craft fair",
       "trinketEmoji": "🖼️",
       "source": "https://www.gutenberg.org/ebooks/269",
-      "position": { "top": "26%", "left": "2.5%" }
+      "position": {
+        "top": "26%",
+        "left": "2.5%"
+      }
     },
     {
       "id": "the-two-sisters",
@@ -31,7 +34,10 @@
       "source": "https://www.gutenberg.org/ebooks/3478",
       "contentNote": "A Squamish legend, told to Pauline Johnson by Chief Joe Capilano, 1911. The Squamish name for The Lions is Ch'ích'iyúy Elx̱wíḵn — Twin Sisters.",
       "summary": "The Squamish legend of how the twin peaks visible from Vancouver came to be.",
-      "position": { "top": "57%", "left": "37%" }
+      "position": {
+        "top": "57%",
+        "left": "37%"
+      }
     },
     {
       "id": "the-quarantine-at-alexander-abrahams",
@@ -45,7 +51,10 @@
       "trinket": "Tin of tea from a PEI farm shop",
       "trinketEmoji": "🐕",
       "source": "https://www.gutenberg.org/ebooks/1354",
-      "position": { "top": "55%", "left": "30%" }
+      "position": {
+        "top": "55%",
+        "left": "30%"
+      }
     },
     {
       "id": "the-postmaster",
@@ -59,7 +68,12 @@
       "trinket": "Leather notebook from a Jaipur market",
       "trinketEmoji": "📓",
       "source": "https://www.gutenberg.org/ebooks/34757",
-      "position": { "top": "75%", "left": "37%", "width": "9%", "height": "8%" }
+      "position": {
+        "top": "75%",
+        "left": "37%",
+        "width": "9%",
+        "height": "8%"
+      }
     },
     {
       "id": "the-nightingale-and-the-rose",
@@ -73,7 +87,10 @@
       "trinket": "Pressed rose in a Dublin paperback",
       "trinketEmoji": "🌹",
       "source": "https://www.gutenberg.org/ebooks/902",
-      "position": { "top": "73%", "left": "8%" }
+      "position": {
+        "top": "65.23%",
+        "left": "23.18%"
+      }
     },
     {
       "id": "the-necklace",
@@ -87,7 +104,10 @@
       "trinket": "Paris flea-market paperback",
       "trinketEmoji": "💎",
       "source": "https://www.gutenberg.org/ebooks/3090",
-      "position": { "top": "55%", "left": "21%" }
+      "position": {
+        "top": "53.62%",
+        "left": "14.03%"
+      }
     },
     {
       "id": "the-gift-of-the-magi",
@@ -101,7 +121,10 @@
       "trinket": "Worn O. Henry paperback from a New York used bookstore",
       "trinketEmoji": "🎁",
       "source": "https://www.gutenberg.org/ebooks/2776",
-      "position": { "top": "55%", "left": "44%" }
+      "position": {
+        "top": "60.62%",
+        "left": "34.88%"
+      }
     },
     {
       "id": "the-bet",
@@ -115,7 +138,10 @@
       "trinket": "Used Chekhov paperback from a Moscow bookstore",
       "trinketEmoji": "🪆",
       "source": "https://www.gutenberg.org/ebooks/55283",
-      "position": { "top": "20%", "left": "57%" }
+      "position": {
+        "top": "14.84%",
+        "left": "64.25%"
+      }
     },
     {
       "id": "how-much-land-does-a-man-need",
@@ -129,7 +155,10 @@
       "trinket": "Tolstoy paperback from St. Petersburg",
       "trinketEmoji": "🎁",
       "source": "https://www.gutenberg.org/ebooks/6157",
-      "position": { "top": "20%", "left": "65%" }
+      "position": {
+        "top": "26.32%",
+        "left": "66.01%"
+      }
     },
     {
       "id": "service-the-cremation-of-sam-mcgee",
@@ -144,7 +173,10 @@
       "trinketEmoji": "📜",
       "source": "https://www.gutenberg.org/ebooks/207",
       "format": "poem",
-      "position": { "top": "40%", "left": "60%" }
+      "position": {
+        "top": "37.79%",
+        "left": "61.53%"
+      }
     },
     {
       "id": "service-the-spell-of-the-yukon",
@@ -159,7 +191,10 @@
       "trinketEmoji": "📜",
       "source": "https://www.gutenberg.org/ebooks/207",
       "format": "poem",
-      "position": { "top": "40%", "left": "65%" }
+      "position": {
+        "top": "61.80%",
+        "left": "52.91%"
+      }
     },
     {
       "id": "the-selfish-giant",
@@ -173,7 +208,10 @@
       "trinket": "Hardback fairytale from a Dublin bookshop",
       "trinketEmoji": "🌳",
       "source": "https://www.gutenberg.org/ebooks/902",
-      "position": { "top": "48%", "left": "62%" }
+      "position": {
+        "top": "52.30%",
+        "left": "49.39%"
+      }
     },
     {
       "id": "the-marine-excursion",
@@ -187,7 +225,10 @@
       "trinket": "Vintage steamboat postcard from Lake Couchiching",
       "trinketEmoji": "⛴️",
       "source": "https://www.gutenberg.org/ebooks/3533",
-      "position": { "top": "33%", "left": "82%" }
+      "position": {
+        "top": "26.97%",
+        "left": "83.43%"
+      }
     },
     {
       "id": "to-build-a-fire",
@@ -201,7 +242,10 @@
       "trinket": "Yukon paperback, Parks pass tucked inside",
       "trinketEmoji": "🍂",
       "source": "https://www.gutenberg.org/ebooks/2429",
-      "position": { "top": "47%", "left": "90%" }
+      "position": {
+        "top": "41.49%",
+        "left": "86.42%"
+      }
     },
     {
       "id": "sagacious-marcela",
@@ -216,7 +260,10 @@
       "trinketEmoji": "📌",
       "source": "https://www.gutenberg.org/ebooks/8299",
       "contentNote": "Two versions of a Filipino clever-girl tale (Pampangan + Tagalog) — both included in the file. The riddle the title comes from: the king sends Marcela one bird and demands twelve dishes from it; she sends back a single pin and demands twelve spoons made from it.",
-      "position": { "top": "35%", "left": "85%" }
+      "position": {
+        "top": "38.32%",
+        "left": "83.43%"
+      }
     }
   ]
 }
