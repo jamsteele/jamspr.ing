@@ -636,10 +636,10 @@ body {
 
 .journal-area {
   position: absolute;
-  /* Estimated bounding box around the painted open book on the desk.
-     Tune via /library?annotate if needed. */
-  top: 70%;
-  left: 32%;
+  /* Hand-clicked center of the painted open journal: (37.47%, 63.98%).
+     13%×8% box centered on that point covers the full open spread. */
+  top: 59.98%;
+  left: 30.97%;
   width: 13%;
   height: 8%;
   background: transparent;
