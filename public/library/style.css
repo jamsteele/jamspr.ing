@@ -47,6 +47,12 @@ body {
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   background: var(--bg-deep);
+  /* Center the room when narrower than the viewport (desktop). On phone
+     where the room is wider, `safe center` falls back to start-aligned
+     so the user can scroll through the entire room. */
+  display: flex;
+  justify-content: safe center;
+  align-items: safe center;
 }
 
 /* Hide scrollbar but keep scroll functionality */
@@ -863,7 +869,11 @@ body {
 .hint-toggle {
   position: fixed;
   top: 14px;
-  right: 14px;
+  /* Anchored to the right edge of the room (which is centered horizontally
+     when narrower than the viewport). On phone the room fills the viewport
+     so the max(0, …) clamps to viewport-right. On desktop with extra space,
+     this offsets the button to sit at the visible room's right edge. */
+  right: max(14px, calc(50vw - 75vh + 14px));
   z-index: 60;
   width: 32px;
   height: 32px;

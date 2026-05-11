@@ -1,6 +1,6 @@
 {
   "version": 4,
-  "lastUpdated": "2026-05-10",
+  "lastUpdated": "2026-05-11",
   "notes": "Each story has metadata + a position (% of room width/height) for its hotspot in the painted scene. Story text lives at stories/<id>.md and is lazy-loaded on click. Every trinket is a book — each hotspot points to a specific painted book in the room (bookshelf, windowsill, or floor stack). Plants/photos/etc. are reserved for future stories.",
   "stories": [
     {
@@ -315,6 +315,58 @@
       "position": {
         "top": "39.24%",
         "left": "68.21%"
+      }
+    },
+    {
+      "id": "carroll-mad-tea-party",
+      "title": "A Mad Tea-Party",
+      "author": "Lewis Carroll",
+      "year": 1865,
+      "country": "England",
+      "countryFlag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+      "minutes": 10,
+      "mood": "Whimsical / nonsense",
+      "trinket": "Carroll's Alice in Wonderland from a London bookshop",
+      "trinketEmoji": "📖",
+      "source": "https://www.gutenberg.org/ebooks/11",
+      "position": {
+        "top": "16.68%",
+        "left": "69.18%"
+      }
+    },
+    {
+      "id": "kipling-elephants-child",
+      "title": "The Elephant's Child",
+      "author": "Rudyard Kipling",
+      "year": 1902,
+      "country": "England",
+      "countryFlag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+      "minutes": 12,
+      "mood": "Whimsical animal fable",
+      "trinket": "Kipling's Just So Stories from a London bookshop",
+      "trinketEmoji": "📖",
+      "source": "https://www.gutenberg.org/ebooks/2781",
+      "position": {
+        "top": "26.71%",
+        "left": "69.62%"
+      }
+    },
+    {
+      "id": "lear-owl-and-the-pussycat",
+      "title": "The Owl and the Pussycat",
+      "author": "Edward Lear",
+      "year": 1871,
+      "country": "England",
+      "countryFlag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+      "minutes": 2,
+      "mood": "Whimsical nonsense verse",
+      "trinket": "Edward Lear's nonsense verse from a London bookshop",
+      "trinketEmoji": "📖",
+      "source": "https://www.gutenberg.org/ebooks/13650",
+      "format": "poem",
+      "position": {
+        "top": "19.50%",
+        "left": "59.50%"
       }
     }
   ]
