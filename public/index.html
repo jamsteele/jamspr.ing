@@ -426,6 +426,160 @@
     100% { height: 14px; opacity: 0.8; }
   }
   .equalizer { display: flex; gap: 2px; align-items: center; flex-shrink: 0; }
+
+  /* ---- Autumn refresh additions ---- */
+  .season-badge {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 6px 11px;
+    border: 1px solid rgba(154, 104, 66, 0.22);
+    border-radius: 999px;
+    background: rgba(255, 248, 238, 0.68);
+    color: #96613f;
+    font-size: 10.5px;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+  }
+  .seasonal-decor {
+    position: absolute;
+    z-index: 3;
+    pointer-events: none;
+    filter: drop-shadow(0 3px 5px rgba(46, 24, 54, 0.22));
+  }
+  .decor-moon { top: 13px; right: 16px; font-size: 27px; }
+  .decor-web { top: 8px; left: 10px; font-size: 25px; opacity: 0.88; }
+  .decor-bat-one { top: 48px; right: 58px; font-size: 16px; transform: rotate(-8deg); }
+  .decor-bat-two { top: 72px; left: 48px; font-size: 12px; transform: rotate(10deg); opacity: 0.78; }
+  .decor-pumpkin { bottom: 10px; left: 13px; font-size: 25px; }
+  .mini-note {
+    font-size: 11.5px;
+    line-height: 1.55;
+    color: #9a7b90;
+    font-style: italic;
+  }
+  .trophy-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 8px 0;
+  }
+  .trophy-item + .trophy-item { border-top: 1px solid rgba(200, 170, 185, 0.16); }
+  .trophy-medal { font-size: 23px; line-height: 1.15; }
+  .trophy-copy h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #5c3d52;
+    margin-bottom: 2px;
+  }
+  .trophy-copy p, .orbit-item p {
+    font-size: 12px;
+    line-height: 1.55;
+    color: #9a7b90;
+  }
+  .orbit-item {
+    display: flex;
+    gap: 11px;
+    align-items: flex-start;
+    padding: 7px 0;
+    font-size: 13px;
+    color: #6a4d62;
+  }
+  .orbit-icon { font-size: 18px; width: 23px; text-align: center; flex-shrink: 0; }
+  .orbit-item strong { color: #5c3d52; font-weight: 600; }
+  .shelf-note {
+    margin-top: 5px;
+    font-size: 11.5px !important;
+    line-height: 1.55;
+    color: #aa8b9e !important;
+    font-style: italic;
+  }
+  .playlist-note { margin: -3px 0 11px; }
+  .tarot-card { text-align: center; overflow: hidden; }
+  .tarot-face {
+    width: 100%;
+    border: 1px solid rgba(115, 78, 128, 0.22);
+    border-radius: 16px;
+    padding: 20px 18px 17px;
+    background: linear-gradient(155deg, rgba(63, 41, 84, 0.97), rgba(116, 67, 105, 0.94));
+    color: #fff7ed;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 4px rgba(255, 231, 190, 0.08), 0 10px 26px rgba(82, 46, 91, 0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .tarot-face:hover { transform: translateY(-1px); box-shadow: inset 0 0 0 4px rgba(255, 231, 190, 0.11), 0 13px 30px rgba(82, 46, 91, 0.22); }
+  .tarot-face:focus-visible, .truth-btn:focus-visible, .sock-btn:focus-visible { outline: 2px solid #9a6aa8; outline-offset: 3px; }
+  .tarot-kicker {
+    display: block;
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #e9c7dd;
+    margin-bottom: 12px;
+  }
+  .tarot-symbol { display: block; font-size: 37px; line-height: 1; margin-bottom: 8px; }
+  .tarot-title {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 7px;
+  }
+  .tarot-message { display: block; font-size: 12.5px; line-height: 1.6; color: #f4e2ec; min-height: 40px; }
+  .tarot-cta {
+    display: inline-block;
+    margin-top: 13px;
+    padding: 6px 10px;
+    border: 1px solid rgba(255, 231, 190, 0.38);
+    border-radius: 999px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: #ffe7be;
+  }
+  .truth-prompt { font-size: 13px; color: #6a4d62; margin-bottom: 11px; }
+  .truth-options { display: flex; flex-direction: column; gap: 8px; }
+  .truth-btn {
+    width: 100%;
+    text-align: left;
+    border: 1px solid rgba(200, 170, 185, 0.25);
+    border-radius: 11px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.48);
+    color: #65465e;
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  }
+  .truth-btn:hover { background: rgba(255,255,255,0.78); transform: translateY(-1px); }
+  .truth-btn.is-correct { border-color: rgba(88, 145, 102, 0.55); background: rgba(225, 246, 230, 0.82); }
+  .truth-btn.is-true { border-color: rgba(200, 145, 95, 0.5); background: rgba(255, 241, 222, 0.82); }
+  .truth-result { min-height: 20px; margin-top: 10px; font-size: 12px; line-height: 1.5; color: #8c687f; font-style: italic; }
+  .sock-btn {
+    display: inline-block;
+    margin-top: 9px;
+    border: none;
+    background: none;
+    color: #b18ca4;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    cursor: pointer;
+    letter-spacing: 0.2px;
+  }
+  .sock-btn:hover { color: #7d5573; text-decoration: underline; }
+  .sock-drawer {
+    max-width: 330px;
+    margin: 10px auto 0;
+    padding: 12px 14px;
+    border: 1px dashed rgba(168, 116, 148, 0.38);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.42);
+    color: #876276;
+    font-size: 11.5px;
+    line-height: 1.6;
+  }
+  .sock-drawer strong { color: #5c3d52; }
   .footer { text-align: center; margin-top: 40px; font-size: 11px; color: #c8b0be; }
   @media (max-width: 480px) {
     .container { padding: 30px 16px 50px; }
@@ -445,11 +599,17 @@
   <div class="header">
     <h1>jill</h1>
     <p>sorry i'm not home right now, i'm walking into <span style="white-space:nowrap">spiderwebs 🕸️</span></p>
+    <div class="season-badge">🍂 autumn edition · the spiderwebs are intentional</div>
   </div>
   <div class="game-section">
-    <div class="game-label">bloom the branches</div>
+    <div class="game-label">bloom the branches · halloween interlude</div>
     <div class="game-container" id="gameContainer">
       <canvas class="game-canvas" id="gameCanvas"></canvas>
+      <span class="seasonal-decor decor-web" aria-hidden="true">🕸️</span>
+      <span class="seasonal-decor decor-moon" aria-hidden="true">🌕</span>
+      <span class="seasonal-decor decor-bat-one" aria-hidden="true">🦇</span>
+      <span class="seasonal-decor decor-bat-two" aria-hidden="true">🦇</span>
+      <span class="seasonal-decor decor-pumpkin" aria-hidden="true">🎃</span>
     </div>
     <div class="game-hint" id="gameHint">tap the bare branches to make them bloom</div>
     <div class="bloom-counter" id="bloomCounter"></div>
@@ -505,20 +665,53 @@
     </div>
     <div class="working-on-item">
       <div class="working-on-dot"></div>
-      <span>🏃🏻‍♀️ BMO Half Marathon</span>
+      <span>🇫🇷 Learning French, one small conversation at a time</span>
     </div>
     <div class="working-on-item">
       <div class="working-on-dot"></div>
-      <span>🏃🏻‍♀️ Seawheeze Half Marathon</span>
+      <span>✨ Building a life with more making and less merely consuming</span>
     </div>
   </div>
-  <div class="section-label">what i'm reading</div>
+  <div class="section-label">finish lines i'm proud of</div>
+  <div class="card">
+    <div class="trophy-item">
+      <div class="trophy-medal">🏅</div>
+      <div class="trophy-copy">
+        <h3>BMO Half Marathon</h3>
+        <p>21.1 km, countless encouraging strangers, and the deeply satisfying moment it was finally over.</p>
+      </div>
+    </div>
+    <div class="trophy-item">
+      <div class="trophy-medal">🏅</div>
+      <div class="trophy-copy">
+        <h3>Seawheeze Half Marathon</h3>
+        <p>Early miles, big energy, and a finish line that made every alarm feel briefly justified.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section-label">in my orbit this season</div>
+  <div class="card">
+    <div class="orbit-item">
+      <div class="orbit-icon">🎷</div>
+      <p><strong>Live jazz.</strong> Especially in a room small enough to hear every note.</p>
+    </div>
+    <div class="orbit-item">
+      <div class="orbit-icon">🚴‍♀️</div>
+      <p><strong>Autumn rides.</strong> Squeezing in the last golden kilometres before ski season starts whispering.</p>
+    </div>
+    <div class="orbit-item">
+      <div class="orbit-icon">☕</div>
+      <p><strong>Serious café research.</strong> Coffee quality is assessed first. The pastry case is judged separately.</p>
+    </div>
+  </div>
+  <div class="section-label">from the bookshelf</div>
   <div class="card">
     <div class="book-card">
       <div class="book-emoji">📖</div>
       <div class="book-info">
         <h3>Lessons in Chemistry</h3>
         <p>by Bonnie Garmus</p>
+        <p class="shelf-note">One I still think about: sharp, funny, and quietly furious in the best way.</p>
       </div>
     </div>
   </div>
@@ -528,8 +721,9 @@
       <div class="equalizer">
         <div class="track-bar"></div><div class="track-bar" style="animation-delay:0.2s"></div><div class="track-bar" style="animation-delay:0.4s"></div>
       </div>
-      <h3>on repeat</h3>
+      <h3>evergreen on repeat</h3>
     </div>
+    <p class="mini-note playlist-note">Not a live feed, just songs that have earned permanent residency in my head.</p>
     <div class="playlist-tracks">
       <div class="playlist-track">
         <span class="track-title">DREAMS COME TRUE — excape.</span>
@@ -569,6 +763,26 @@
       </div>
     </div>
   </div>
+  <div class="section-label">a tiny tarot pause</div>
+  <div class="card tarot-card">
+    <button class="tarot-face" id="tarotDraw" type="button" aria-live="polite">
+      <span class="tarot-kicker">from the world of Opal Tarot</span>
+      <span class="tarot-symbol" id="tarotSymbol">🌙</span>
+      <span class="tarot-title" id="tarotTitle">The Moon</span>
+      <span class="tarot-message" id="tarotMessage">Tap to draw a tiny fortune. No doom, only vibes.</span>
+      <span class="tarot-cta">draw a card</span>
+    </button>
+  </div>
+  <div class="section-label">two truths &amp; a lie</div>
+  <div class="card">
+    <p class="truth-prompt">A tiny getting-to-know-me quiz. Can you spot the fib?</p>
+    <div class="truth-options">
+      <button class="truth-btn" type="button" data-answer="truth">I have completed two half marathons.</button>
+      <button class="truth-btn" type="button" data-answer="truth">My dream business sells only socks.</button>
+      <button class="truth-btn" type="button" data-answer="lie">I am fluent in French.</button>
+    </div>
+    <p class="truth-result" id="truthResult" aria-live="polite"></p>
+  </div>
   <div class="section-label">find me in the wild</div>
   <div class="links-grid">
     <a href="https://www.instagram.com/jamspring/" target="_blank" rel="noopener" class="link-button">
@@ -602,7 +816,13 @@
     </a>
   </div>
   END FAVOURITE THINGS SECTION -->
-  <div class="footer">made with 🌸 and late nights</div>
+  <div class="footer">
+    <div>made with 🌸 and late nights</div>
+    <button class="sock-btn" id="sockBtn" type="button" aria-expanded="false" aria-controls="sockDrawer">🧦 psst… open the sock drawer</button>
+    <div class="sock-drawer" id="sockDrawer" hidden>
+      <strong>The long-term plan?</strong> A tiny shop that sells only socks. Beautiful socks. Unexpected socks. Socks with a point of view. Every empire starts somewhere.
+    </div>
+  </div>
 </div>
 
 <!-- Wishing Tree Modal -->
@@ -1969,6 +2189,58 @@ initOrca();
 initDog();
 initFlowers();
 draw();
+</script>
+
+<script>
+(() => {
+  const fortunes = [
+    { symbol: '✨', title: 'The Star', message: 'A small hope is still a serious plan. Give it one concrete next step.' },
+    { symbol: '☀️', title: 'The Sun', message: 'Choose the bright, uncomplicated option today.' },
+    { symbol: '🌙', title: 'The Moon', message: 'Not everything needs solving tonight. Let one mystery stay mysterious.' },
+    { symbol: '🌿', title: 'The Empress', message: 'Make something cosy on purpose.' },
+    { symbol: '🪄', title: 'The Magician', message: 'You already have most of the tools. Start with the one in your hand.' },
+    { symbol: '🎡', title: 'Wheel of Fortune', message: 'A change in route is not a change in destination.' }
+  ];
+  let lastFortune = -1;
+  const drawButton = document.getElementById('tarotDraw');
+  if (drawButton) {
+    drawButton.addEventListener('click', () => {
+      let next = Math.floor(Math.random() * fortunes.length);
+      if (next === lastFortune) next = (next + 1) % fortunes.length;
+      lastFortune = next;
+      const fortune = fortunes[next];
+      document.getElementById('tarotSymbol').textContent = fortune.symbol;
+      document.getElementById('tarotTitle').textContent = fortune.title;
+      document.getElementById('tarotMessage').textContent = fortune.message;
+      drawButton.querySelector('.tarot-cta').textContent = 'draw another';
+    });
+  }
+
+  const truthResult = document.getElementById('truthResult');
+  document.querySelectorAll('.truth-btn').forEach((button) => {
+    button.addEventListener('click', () => {
+      document.querySelectorAll('.truth-btn').forEach((item) => item.classList.remove('is-correct', 'is-true'));
+      if (button.dataset.answer === 'lie') {
+        button.classList.add('is-correct');
+        truthResult.textContent = 'Correct. French is very much a joyful work in progress.';
+      } else {
+        button.classList.add('is-true');
+        truthResult.textContent = 'Nope, that one is true. The fib is sneakier than that.';
+      }
+    });
+  });
+
+  const sockButton = document.getElementById('sockBtn');
+  const sockDrawer = document.getElementById('sockDrawer');
+  if (sockButton && sockDrawer) {
+    sockButton.addEventListener('click', () => {
+      const opening = sockDrawer.hidden;
+      sockDrawer.hidden = !opening;
+      sockButton.setAttribute('aria-expanded', String(opening));
+      sockButton.textContent = opening ? '🧦 close the sock drawer' : '🧦 psst… open the sock drawer';
+    });
+  }
+})();
 </script>
 </body>
 </html>
