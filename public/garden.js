@@ -6,6 +6,36 @@ const ctx = canvas.getContext('2d');
 const gameContainer = document.getElementById('gameContainer');
 let W, H;
 let branches = [], leaves = [], blossoms = [], petals = [], wishes = [];
+// Season state. 'spring' = original cherry-blossom mechanic (bare → bloom pink).
+// 'autumn' = green-leafed tree that visitors tap to color-shift leaves until
+// they fall. autumn.js flips this through window.__setGardenSeason().
+let season = window.__initialSeason === 'autumn' ? 'autumn' : 'spring';
+// Each autumn leaf picks its own final colour [hue, sat, light]; taps blend it
+// from green toward that colour over AUTUMN_TURN_STEPS. Hue blends 120→10 pass
+// through yellow and orange, so even mid-turn leaves look natural.
+// Brown appears once in the list so it stays an accent, not the whole tree.
+const AUTUMN_FINALS = [
+  [4, 78, 42],   // deep red
+  [12, 85, 48],  // red
+  [24, 90, 50],  // orange
+  [32, 92, 52],  // pumpkin orange
+  [44, 92, 52],  // gold
+  [20, 55, 34],  // rust brown
+];
+const AUTUMN_TURN_STEPS = 3;
+// Autumn canopy density: a base count per branch plus leaves per canvas px of
+// branch length (canvas is 2x CSS px). Raise these for a fuller tree.
+const AUTUMN_LEAVES_PER_BRANCH = 6;
+const AUTUMN_LEAVES_PER_PX = 0.35;
+// Per-leaf odds of falling on one tap / one drag movement once fully turned.
+const KNOCK_CHANCE_TAP = 0.2;
+const KNOCK_CHANCE_DRAG = 0.02;
+function pickAutumnFinal() {
+  return AUTUMN_FINALS[Math.floor(Math.random() * AUTUMN_FINALS.length)];
+}
+// Autumn progress: counted off every time a leaf hits the final tint stage.
+// Fully turned triggers phase 2 (knock the leaves loose).
+let totalLeavesInit = 0, totalColorShifted = 0, isFullyAutumn = false;
 let selectedWishIdx = -1, draggingWishIdx = -1, dragMoved = false;
 let dragDownX = 0, dragDownY = 0;
 let totalBloomed = 0, totalBranchZones = 0, isFullyBloomed = false;
@@ -13,6 +43,13 @@ let windStrength = 0, windTarget = 0, windTimer = 0, gustCooldown = 0;
 let mouseVX = 0, mouseVY = 0, lastMouseX = 0, lastMouseY = 0, isMouseDown = false;
 let frameCount = 0;
 let _animId = null, _lastFrame = 0;
+// Paused while the game is scrolled out of view (IntersectionObserver below).
+let _gameVisible = true;
+// Autumn tree cache: ~2,000 leaves cost several ms per frame to redraw, so in
+// autumn the branches + leaves are rendered once into this offscreen layer and
+// re-rendered only when a leaf changes (_treeDirty). Wind sways the whole layer
+// from the trunk base instead of rotating every leaf. Spring draws live.
+let _treeLayer = null, _treeDirty = true;
 let _bgBack = null, _bgFront = null;
 let clouds = [], sparkles = [], flowers = [];
 
@@ -36,6 +73,8 @@ const MAX_WISHES = 8;
 function generateTree() {
   branches=[]; leaves=[]; blossoms=[]; petals=[]; wishes=[];
   totalBloomed=0; isFullyBloomed=false;
+  totalLeavesInit=0; totalColorShifted=0; isFullyAutumn=false;
+  _treeDirty=true;
   const trunkBaseX=W*0.48, trunkBaseY=H*0.92;
   const trunkTopX=W*0.46,  trunkTopY=H*0.50;
   function addBranch(x1,y1,angle,length,depth,maxDepth) {
@@ -45,19 +84,33 @@ function generateTree() {
     const isTip=depth>=maxDepth-1, canBloom=depth>=2;
     const branchIdx=branches.length;
     branches.push({x1,y1,x2,y2,thickness,depth,isTip,canBloom,bloomed:false,bloomProgress:0,bloomZoneRadius:length*0.6+15});
-    if (canBloom) {
-      const numLeaves=isTip?4+Math.floor(Math.random()*5):2+Math.floor(Math.random()*3);
+    // Autumn leafs every branch including the main limbs (depth 1), and spreads
+    // leaves by branch LENGTH so they run all the way down each branch instead
+    // of bunching at the many short tips — aiming for full-bloom blossom
+    // coverage. Spring keeps its original sparse leaves on bloomable branches;
+    // its random-call order must not change (trees are seeded).
+    const autumn = season === 'autumn';
+    if (canBloom || (autumn && depth >= 1)) {
+      const numLeaves = autumn
+        ? AUTUMN_LEAVES_PER_BRANCH + Math.round(length * AUTUMN_LEAVES_PER_PX)
+        : (isTip ? 4 : 2) + Math.floor(Math.random() * (isTip ? 5 : 3));
+      const tStart = autumn ? 0.04 : 0.15; // 0 = branch base, 1 = tip
+      const jitter = autumn ? 22 : 12;
       for (let j=0;j<numLeaves;j++) {
-        const t=0.15+Math.random()*0.85;
+        const t=tStart+Math.random()*(1-tStart);
         leaves.push({
-          x:x1+(x2-x1)*t+(Math.random()-0.5)*12,
-          y:y1+(y2-y1)*t+(Math.random()-0.5)*12,
-          size:isTip?3.5+Math.random()*4.5:2.5+Math.random()*3.5,
+          x:x1+(x2-x1)*t+(Math.random()-0.5)*jitter,
+          y:y1+(y2-y1)*t+(Math.random()-0.5)*jitter,
+          size: autumn
+            ? (isTip?4.5+Math.random()*5:4+Math.random()*4.5)
+            : (isTip?3.5+Math.random()*4.5:2.5+Math.random()*3.5),
           angle:angle+(Math.random()-0.5)*1.8,
           hue:100+Math.random()*35,
           lightness:36+Math.random()*18,
           opacity:0.6+Math.random()*0.35,
           branchIdx,
+          tintStage:0,
+          autumnFinal:autumn ? pickAutumnFinal() : null,
         });
       }
     }
@@ -75,6 +128,7 @@ function generateTree() {
     addBranch(trunkTopX,trunkTopY,spreadAngle,H*(0.10+Math.random()*0.06),1,5);
   }
   totalBranchZones=branches.filter(b=>b.canBloom).length;
+  totalLeavesInit=leaves.length;
   updateUI();
   initBird();
 }
@@ -243,6 +297,7 @@ function updateClouds() {
   });
 }
 function drawClouds() {
+  if (season === 'autumn') return; // Clear night sky in autumn.
   clouds.forEach(c=>{
     ctx.save(); ctx.globalAlpha=c.opacity; ctx.translate(c.x,c.y); ctx.scale(c.scale,c.scale);
     c.puffs.forEach(p=>{ctx.beginPath();ctx.arc(p.dx,p.dy,p.r,0,Math.PI*2);ctx.fillStyle='rgba(255,250,255,1)';ctx.fill();});
@@ -701,6 +756,7 @@ function updateFlowers(){
   });
 }
 function drawFlowers(){
+  if (season === 'autumn') return; // No wildflowers in autumn.
   flowers.forEach(f=>{
     const bp=f.bloomProgress,s=f.size;
     const sway=Math.sin(frameCount*0.022+f.swayOffset)*windStrength*0.06;
@@ -807,13 +863,15 @@ function triggerFerryElectric(){
 
 function checkCharacterClick(pos){
   const x=pos.x,y=pos.y;
+  // Autumn hides the bird, dog and wildflowers, so they must not catch taps either.
+  const autumn = season === 'autumn';
   // Bird
-  if(bird.visible){
+  if(!autumn&&bird.visible){
     const by=bird.y+(bird.jumpY||0);
     if((x-bird.x)**2+(y-by)**2<40*40){triggerBirdTweet();return true;}
   }
   // Dog
-  if((x-dog.x)**2+(y-dog.y)**2<58*58){triggerDogSpin();return true;}
+  if(!autumn&&(x-dog.x)**2+(y-dog.y)**2<58*58){triggerDogSpin();return true;}
   // Orca (only when surfaced)
   if(orca.phase!=='hidden'&&orca.rise>0.1){
     const oy=orca.y+(1-orca.rise)*30;
@@ -833,7 +891,7 @@ function checkCharacterClick(pos){
   }
   // Flowers — find the CLOSEST flower to click (handles dense clusters correctly)
   let bestF=null,bestHeadX=0,bestHeadY=0,bestDist=Infinity;
-  for(let i=0;i<flowers.length;i++){
+  for(let i=0;!autumn&&i<flowers.length;i++){
     const f=flowers[i];
     const sway=Math.sin(frameCount*0.022+f.swayOffset)*windStrength*0.06;
     const stemH=f.size*3.2;
@@ -865,23 +923,48 @@ function updateWind(){
 }
 
 // ---- Draw helpers ----
-function drawBranch(b){
-  ctx.beginPath();ctx.moveTo(b.x1,b.y1);ctx.lineTo(b.x2,b.y2);
+function drawBranch(b, c=ctx){
+  c.beginPath();c.moveTo(b.x1,b.y1);c.lineTo(b.x2,b.y2);
   const d=Math.max(0.25,1-b.depth*0.12);
-  ctx.strokeStyle=`rgb(${Math.floor(80*d)},${Math.floor(55*d)},${Math.floor(45*d)})`;
-  ctx.lineWidth=b.thickness;ctx.lineCap='round';ctx.stroke();
+  c.strokeStyle=`rgb(${Math.floor(80*d)},${Math.floor(55*d)},${Math.floor(45*d)})`;
+  c.lineWidth=b.thickness;c.lineCap='round';c.stroke();
   // Subtle pulse on unbloomed tips when >85% in bloom — helps find the last few
   if(b.canBloom&&!b.bloomed&&totalBranchZones>0&&totalBloomed/totalBranchZones>=0.85){
     const pulse=(Math.sin(Date.now()*0.004)+1)/2;
-    ctx.beginPath();ctx.arc(b.x2,b.y2,10+pulse*8,0,Math.PI*2);
-    ctx.fillStyle=`rgba(255,175,200,${0.12+pulse*0.22})`;ctx.fill();
+    c.beginPath();c.arc(b.x2,b.y2,10+pulse*8,0,Math.PI*2);
+    c.fillStyle=`rgba(255,175,200,${0.12+pulse*0.22})`;c.fill();
   }
 }
-function drawLeaf(l){
-  ctx.save();ctx.translate(l.x,l.y);ctx.rotate(l.angle);ctx.globalAlpha=l.opacity;
-  ctx.beginPath();ctx.moveTo(0,0);ctx.bezierCurveTo(l.size*0.5,-l.size*0.6,l.size*1.2,-l.size*0.3,l.size*1.4,0);ctx.bezierCurveTo(l.size*1.2,l.size*0.3,l.size*0.5,l.size*0.6,0,0);
-  ctx.fillStyle=`hsla(${l.hue},55%,${l.lightness}%,0.8)`;ctx.fill();
-  ctx.restore();ctx.globalAlpha=1;
+function drawLeaf(l, c=ctx){
+  c.save();c.translate(l.x,l.y);c.rotate(l.angle);c.globalAlpha=l.opacity;
+  c.beginPath();c.moveTo(0,0);c.bezierCurveTo(l.size*0.5,-l.size*0.6,l.size*1.2,-l.size*0.3,l.size*1.4,0);c.bezierCurveTo(l.size*1.2,l.size*0.3,l.size*0.5,l.size*0.6,0,0);
+  let hue=l.hue, sat=55, light=l.lightness;
+  if (season==='autumn' && l.tintStage) {
+    const t=Math.min(l.tintStage/AUTUMN_TURN_STEPS, 1);
+    const f=l.autumnFinal;
+    hue=l.hue+(f[0]-l.hue)*t; sat=55+(f[1]-55)*t; light=l.lightness+(f[2]-l.lightness)*t;
+  }
+  c.fillStyle=`hsla(${hue},${sat}%,${light}%,0.8)`;c.fill();
+  c.restore();c.globalAlpha=1;
+}
+// Autumn: draw the cached tree layer, re-rendering it first if a leaf changed.
+function drawAutumnTree(){
+  if(!_treeLayer||_treeLayer.width!==W||_treeLayer.height!==H){
+    _treeLayer=document.createElement('canvas');_treeLayer.width=W;_treeLayer.height=H;_treeDirty=true;
+  }
+  if(_treeDirty){
+    const c=_treeLayer.getContext('2d');
+    c.clearRect(0,0,W,H);
+    [...branches].sort((a,b)=>a.depth-b.depth).forEach(b=>drawBranch(b,c));
+    leaves.forEach(l=>drawLeaf(l,c));
+    _treeDirty=false;
+  }
+  // Skew around the trunk base: the canopy leans with the wind, the base stays put.
+  const baseX=W*0.48, baseY=H*0.92;
+  const lean=-windStrength*0.012*(0.8+0.2*Math.sin(frameCount*0.05));
+  ctx.save();ctx.translate(baseX,baseY);ctx.transform(1,0,lean,1,0,0);ctx.translate(-baseX,-baseY);
+  ctx.drawImage(_treeLayer,0,0);
+  ctx.restore();
 }
 function drawBlossom(b){
   if(b.opacity<=0)return;
@@ -960,7 +1043,7 @@ function update(){
     b.x=b.baseX+sway;b.y=b.baseY+Math.sin(frameCount*0.025+b.swayOffset)*Math.abs(windStrength)*0.4;
     b.rotation=b.baseRotation+Math.sin(frameCount*0.022+b.swayOffset)*windStrength*0.06;
   });
-  leaves.forEach(l=>{if(l.baseAngle===undefined)l.baseAngle=l.angle;l.angle=l.baseAngle+Math.sin(frameCount*0.02+l.x*0.01)*windStrength*0.08;});
+  if(season!=='autumn') leaves.forEach(l=>{if(l.baseAngle===undefined)l.baseAngle=l.angle;l.angle=l.baseAngle+Math.sin(frameCount*0.02+l.x*0.01)*windStrength*0.08;});
   for(let i=wishes.length-1;i>=0;i--){
     const w=wishes[i];
     if(w.dying){w.deathTimer-=0.04;w.opacity=Math.max(0,w.deathTimer);if(w.opacity<=0){wishes.splice(i,1);if(selectedWishIdx===i)selectedWishIdx=-1;else if(selectedWishIdx>i)selectedWishIdx--;updateWishCount();}continue;}
@@ -995,33 +1078,31 @@ function draw(ts){
   if(ts-_lastFrame<33){_animId=requestAnimationFrame(draw);return;}
   _lastFrame=ts;
   if(_isRecording){
-    const bg=ctx.createLinearGradient(0,0,0,H);
-    bg.addColorStop(0.00,'#c8ddf5');bg.addColorStop(0.20,'#d8e8f8');bg.addColorStop(0.35,'#b8d4ef');
-    bg.addColorStop(0.50,'#8ab8c8');bg.addColorStop(0.60,'#6da8b8');bg.addColorStop(0.72,'#88b888');
-    bg.addColorStop(0.82,'#6aad6a');bg.addColorStop(1.00,'#5a9050');
-    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+    paintShareBackground(ctx,W,H);
   } else {
     ctx.clearRect(0,0,W,H);
   }
   if(_bgBack)ctx.drawImage(_bgBack,0,0);else drawMountains();
   drawClouds();drawGeese();drawWater();drawWaterItems();
   if(_bgFront)ctx.drawImage(_bgFront,0,0);else{drawSeawall();drawGround();}
-  drawDog();drawFlowers();
-  const sorted=[...branches].sort((a,b)=>a.depth-b.depth);sorted.forEach(drawBranch);
-  leaves.forEach(drawLeaf);
+  if(season!=='autumn')drawDog();
+  drawFlowers();
+  if(season==='autumn') drawAutumnTree();
+  else { const sorted=[...branches].sort((a,b)=>a.depth-b.depth);sorted.forEach(b=>drawBranch(b));leaves.forEach(l=>drawLeaf(l)); }
   petals.filter(p=>p.grounded).forEach(drawPetal);
   blossoms.forEach(drawBlossom);
-  drawBird();
+  if(season!=='autumn')drawBird();
   wishes.forEach((w,i)=>drawWish(w,i));
   drawSparkles();
   petals.filter(p=>!p.grounded).forEach(drawPetal);
+  if(_isRecording)paintShareOverlay(ctx);
   if(Math.abs(windStrength)>0.8){
     ctx.save();ctx.globalAlpha=Math.min(Math.abs(windStrength)*0.08,0.15);
     for(let i=0;i<3;i++){const y=H*(0.2+i*0.25)+Math.sin(frameCount*0.02+i)*20;const sx=windStrength>0?W*0.1+i*40:W*0.9-i*40;ctx.beginPath();ctx.moveTo(sx,y);ctx.lineTo(sx+windStrength*15,y);ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=1;ctx.stroke();}
     ctx.restore();
   }
   update();update();
-  if(!document.hidden) _animId = requestAnimationFrame(draw);
+  if(!document.hidden && (_gameVisible || _isRecording)) _animId = requestAnimationFrame(draw);
   else _animId = null;
 }
 
@@ -1032,8 +1113,81 @@ function getCanvasPos(e){
   if(e.touches){cx=e.touches[0].clientX;cy=e.touches[0].clientY;}else{cx=e.clientX;cy=e.clientY;}
   return{x:(cx-rect.left)*scaleX,y:(cy-rect.top)*scaleY};
 }
+// Autumn mechanic — two phases that parallel spring's bloom → petals:
+//   phase 1  "turning":  tap blends a leaf from green toward its own final
+//                        colour (see AUTUMN_FINALS). Leaves STAY ON THE TREE.
+//   phase 2  "falling":  once ≥95% are fully turned, every remaining leaf
+//                        snaps to its final colour and the hint flips. Taps
+//                        now knock leaves off — they fall as petal-shaped
+//                        flakes using the same physics as the spring petals.
+function spawnFallenLeaf(l) {
+  const p = l.autumnFinal || AUTUMN_FINALS[0];
+  petals.push({
+    x:l.x, y:l.y,
+    vx:(Math.random()-0.5)*0.5,
+    vy:0.2+Math.random()*0.3,
+    size:l.size*1.1,
+    hue:p[0], lightness:p[2],
+    rotation:l.angle,
+    rotSpeed:(Math.random()-0.5)*0.04,
+    opacity:0.9+Math.random()*0.1,
+    life:1,
+    flutter:Math.random()*Math.PI*2,
+    flutterSpeed:0.008+Math.random()*0.012,
+    grounded:false,
+    groundY:H*(0.86+Math.random()*0.12),
+  });
+}
+function completeAutumnTurn() {
+  // Snap any still-green/half-turned leaves to their final colour so the whole
+  // tree reads as one full autumn canopy before anything falls.
+  leaves.forEach(l => {
+    if (l.tintStage < AUTUMN_TURN_STEPS) {
+      l.tintStage = AUTUMN_TURN_STEPS;
+      totalColorShifted++;
+    }
+  });
+  isFullyAutumn = true;
+  _treeDirty = true;
+}
+// knockChance: odds that a leaf in range comes loose (phase 2 only). Kept low
+// so the tree empties gradually instead of in a couple of taps.
+function pokeAutumnLeaves(pos, radius, knockChance) {
+  let touched = false;
+  if (!isFullyAutumn) {
+    // Phase 1 — colour shift, leaves stay on the tree.
+    for (const l of leaves) {
+      if (l.tintStage >= AUTUMN_TURN_STEPS) continue;
+      const dist = Math.sqrt((pos.x-l.x)**2 + (pos.y-l.y)**2);
+      if (dist < radius) {
+        l.tintStage++;
+        if (l.tintStage === AUTUMN_TURN_STEPS) totalColorShifted++;
+        touched = true;
+      }
+    }
+    if (!isFullyAutumn && totalLeavesInit > 0 &&
+        totalColorShifted / totalLeavesInit >= 0.95) {
+      completeAutumnTurn();
+    }
+    if (touched) { _treeDirty = true; updateUI(); }
+  } else {
+    // Phase 2 — knock the leaves loose.
+    for (let i = leaves.length - 1; i >= 0; i--) {
+      const l = leaves[i];
+      const dist = Math.sqrt((pos.x-l.x)**2 + (pos.y-l.y)**2);
+      if (dist < radius && Math.random() < knockChance) {
+        spawnFallenLeaf(l);
+        leaves.splice(i, 1);
+        touched = true;
+      }
+    }
+    if (touched) { _treeDirty = true; updateUI(); }
+  }
+}
+
 function handleTap(e){
   const pos=getCanvasPos(e);
+  if (season === 'autumn') { pokeAutumnLeaves(pos, 42, KNOCK_CHANCE_TAP); return; }
   if(isFullyBloomed&&selectedWishIdx!==-1){selectedWishIdx=-1;document.getElementById('gameHint').textContent='swirl the petals... or make a wish 🎋';}
   let bloomedSomething=false;
   const alreadyBloomed=new Set();
@@ -1055,6 +1209,11 @@ function handleMove(e){
   if(!isMouseDown)return;
   const pos=getCanvasPos(e);
   mouseVX=pos.x-lastMouseX;mouseVY=pos.y-lastMouseY;lastMouseX=pos.x;lastMouseY=pos.y;
+  if (season === 'autumn') {
+    pokeAutumnLeaves(pos, 24, KNOCK_CHANCE_DRAG);
+    petals.forEach(p=>{const dist=Math.sqrt((pos.x-p.x)**2+(pos.y-p.y)**2);if(dist<70){const force=(70-dist)/70;p.vx+=mouseVX*force*0.3;p.vy+=mouseVY*force*0.3-force*0.5;if(p.grounded){p.grounded=false;p.vy=-2-Math.random()*2;}}});
+    return;
+  }
   if(draggingWishIdx!==-1){
     const dx=pos.x-dragDownX,dy=pos.y-dragDownY;
     if(!dragMoved&&Math.sqrt(dx*dx+dy*dy)>12)dragMoved=true;
@@ -1128,6 +1287,21 @@ function updateUI(){
   const counter=document.getElementById('bloomCounter');
   const hint=document.getElementById('gameHint');
   const wishBtn=document.getElementById('wishBtn');
+  if (season === 'autumn') {
+    if (!isFullyAutumn) {
+      const pct = totalLeavesInit > 0
+        ? Math.round((totalColorShifted / totalLeavesInit) * 100)
+        : 0;
+      counter.textContent = pct > 0 ? `${pct}% turning` : '';
+      hint.textContent = 'tap the leaves — watch them turn';
+    } else {
+      counter.textContent = leaves.length > 0 ? 'the tree is full of autumn' : 'bare branches 🍂';
+      hint.textContent = leaves.length > 0
+        ? 'tap the branches — knock the leaves loose'
+        : 'swirl the fallen leaves';
+    }
+    return;
+  }
   if(totalBloomed===0){counter.textContent='';hint.textContent='touch the branches to make them bloom';}
   else if(totalBloomed<totalBranchZones){const pct=Math.round((totalBloomed/totalBranchZones)*100);counter.textContent=`${pct}% in bloom`;hint.textContent='keep going to bloom more branches';}
   else{counter.textContent='full bloom 🌸';hint.textContent='swirl the petals... or make a wish 🎋';wishBtn.classList.add('visible');updateWishCount();}
@@ -1154,36 +1328,79 @@ document.getElementById('resetBtn').addEventListener('click',resetTree);
 // ---- Share / Camera button ----
 // ---- Share as 7-second video ----
 let _isRecording = false;
+// Autumn overlay layers (moon, owl, pumpkins…) painted into shared frames;
+// filled from autumn.js __autumnShareLayers() when a share starts.
+let _shareOverlay = null;
+
+// The live sky is the CSS background behind a transparent canvas, so shared
+// frames must paint it in. Autumn stops mirror .game-container in autumn.css.
+function paintShareBackground(c,w,h){
+  const bg=c.createLinearGradient(0,0,0,h);
+  if(season==='autumn'){
+    [[0,'#0b1733'],[0.10,'#1d2a4f'],[0.22,'#3a2a56'],[0.34,'#6b3f5c'],[0.50,'#a85a44'],
+     [0.62,'#c47a4a'],[0.76,'#8a5230'],[0.92,'#5a3a24'],[1,'#3d2615']].forEach(([o,col])=>bg.addColorStop(o,col));
+  } else {
+    bg.addColorStop(0.00,'#c8ddf5');bg.addColorStop(0.20,'#d8e8f8');bg.addColorStop(0.35,'#b8d4ef');
+    bg.addColorStop(0.50,'#8ab8c8');bg.addColorStop(0.60,'#6da8b8');bg.addColorStop(0.72,'#88b888');
+    bg.addColorStop(0.82,'#6aad6a');bg.addColorStop(1.00,'#5a9050');
+  }
+  c.fillStyle=bg;c.fillRect(0,0,w,h);
+}
+function paintShareOverlay(c){
+  if(!_shareOverlay)return;
+  _shareOverlay.forEach(l=>{
+    if(l.dot){c.beginPath();c.arc(l.x,l.y,l.r,0,Math.PI*2);c.fillStyle=l.color;c.fill();return;}
+    if(l.flip){c.save();c.translate(l.x+l.w,l.y);c.scale(-1,1);c.drawImage(l.img,0,0,l.w,l.h);c.restore();}
+    else c.drawImage(l.img,l.x,l.y,l.w,l.h);
+  });
+}
 document.getElementById('shareBtn').addEventListener('click', async () => {
   const btn = document.getElementById('shareBtn');
   if (_isRecording) return;
 
   const label = btn.querySelector('span:last-child');
   const DURATION = 7000;
+  const autumn = season === 'autumn';
+  const fileBase = autumn ? 'autumn-tree' : 'cherry-blossom-tree';
+  const shareTitle = autumn ? 'My Autumn Tree 🍁' : 'My Cherry Blossom Tree 🌸';
+  const shareText = autumn ? 'turned the leaves on an autumn tree 🍂' : 'made a wish on a cherry blossom tree ✨';
+  _shareOverlay = null;
+  if (autumn && typeof window.__autumnShareLayers === 'function') {
+    try { _shareOverlay = await window.__autumnShareLayers(canvas); }
+    catch (err) { _shareOverlay = null; } // share without the overlay rather than fail
+    if (_isRecording) return; // a second tap arrived while layers were loading
+  }
 
   // Fall back to photo share if captureStream/MediaRecorder unavailable
   if (typeof canvas.captureStream !== 'function' || typeof MediaRecorder === 'undefined') {
     const offscreen = document.createElement('canvas');
     offscreen.width = canvas.width; offscreen.height = canvas.height;
     const offCtx = offscreen.getContext('2d');
-    const bg = offCtx.createLinearGradient(0, 0, 0, offscreen.height);
-    bg.addColorStop(0.00,'#c8ddf5');bg.addColorStop(0.20,'#d8e8f8');bg.addColorStop(0.35,'#b8d4ef');
-    bg.addColorStop(0.50,'#8ab8c8');bg.addColorStop(0.60,'#6da8b8');bg.addColorStop(0.72,'#88b888');
-    bg.addColorStop(0.82,'#6aad6a');bg.addColorStop(1.00,'#5a9050');
-    offCtx.fillStyle=bg; offCtx.fillRect(0,0,offscreen.width,offscreen.height); offCtx.drawImage(canvas,0,0);
-    const dataUrl = offscreen.toDataURL('image/png');
+    paintShareBackground(offCtx, offscreen.width, offscreen.height);
+    offCtx.drawImage(canvas,0,0);
+    paintShareOverlay(offCtx);
+    _shareOverlay = null;
+    let dataUrl;
+    try { dataUrl = offscreen.toDataURL('image/png'); }
+    catch (err) {
+      // Some browsers refuse to export a canvas with SVG images drawn on it;
+      // fall back to the scene without the overlay.
+      paintShareBackground(offCtx, offscreen.width, offscreen.height);
+      offCtx.drawImage(canvas,0,0);
+      dataUrl = offscreen.toDataURL('image/png');
+    }
     const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     if (isMobile && navigator.share) {
       try {
         const blob = await (await fetch(dataUrl)).blob();
-        const file = new File([blob],'cherry-blossom-tree.png',{type:'image/png'});
+        const file = new File([blob],`${fileBase}.png`,{type:'image/png'});
         if (navigator.canShare && navigator.canShare({files:[file]})) {
-          await navigator.share({files:[file],title:'My Cherry Blossom Tree 🌸',text:'made a wish on a cherry blossom tree ✨'});
+          await navigator.share({files:[file],title:shareTitle,text:shareText});
           return;
         }
       } catch(err) { if(err.name==='AbortError') return; }
     }
-    const link = document.createElement('a'); link.download='cherry-blossom-tree.png'; link.href=dataUrl; link.click();
+    const link = document.createElement('a'); link.download=`${fileBase}.png`; link.href=dataUrl; link.click();
     btn.classList.add('confirmed'); label.textContent='saved!';
     setTimeout(()=>{ btn.classList.remove('confirmed'); label.textContent='share'; }, 2000);
     return;
@@ -1215,6 +1432,7 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
   recorder.stop();
   clearInterval(countdown);
   _isRecording = false;
+  _shareOverlay = null;
   await new Promise(resolve => { recorder.onstop = resolve; });
 
   label.textContent = 'sharing...';
@@ -1223,12 +1441,12 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
 
   if (navigator.share) {
     try {
-      const file = new File([blob], `cherry-blossom-tree.${ext}`, { type: mimeType });
+      const file = new File([blob], `${fileBase}.${ext}`, { type: mimeType });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
-          title: 'My Cherry Blossom Tree 🌸',
-          text: 'made a wish on a cherry blossom tree ✨',
+          title: shareTitle,
+          text: shareText,
         });
         label.textContent = 'share';
         btn.disabled = false;
@@ -1246,7 +1464,7 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
   // Fallback: download
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.download = `cherry-blossom-tree.${ext}`;
+  link.download = `${fileBase}.${ext}`;
   link.href = url;
   link.click();
   URL.revokeObjectURL(url);
@@ -1287,7 +1505,9 @@ function rebuildBgCache(){
 }
 function resizeCanvas(){
   const rect=gameContainer.getBoundingClientRect();
-  const newW=rect.width*2,newH=rect.height*2;
+  if(!rect.width||!rect.height)return;
+  const newW=Math.round(rect.width*2),newH=Math.round(rect.height*2);
+  if(newW===W&&newH===H)return;
   const firstLoad=!W||!H;
   const oldW=W||newW,oldH=H||newH;
   canvas.width=newW;canvas.height=newH;
@@ -1302,7 +1522,18 @@ function resizeCanvas(){
     const savedBlossoms=blossoms.map(b=>({...b,x:b.x*scaleX,y:b.y*scaleY,baseX:b.baseX*scaleX,baseY:b.baseY*scaleY}));
     const savedPetals=petals.map(p=>({...p,x:p.x*scaleX,y:p.y*scaleY,groundY:p.groundY*scaleY}));
     const savedWishes=wishes.map(w=>({...w,x:w.x*scaleX,y:w.y*scaleY,tagX:w.tagX*scaleX,tagY:w.tagY*scaleY}));
+    // Autumn progress lives on the leaves themselves (tint + which have fallen).
+    const savedAutumn = season==='autumn'
+      ? {leaves:leaves.map(l=>({...l,x:l.x*scaleX,y:l.y*scaleY})),totalLeavesInit,totalColorShifted,isFullyAutumn}
+      : null;
     _generateTreeSeeded();
+    if(savedAutumn){
+      leaves=savedAutumn.leaves;
+      totalLeavesInit=savedAutumn.totalLeavesInit;
+      totalColorShifted=savedAutumn.totalColorShifted;
+      isFullyAutumn=savedAutumn.isFullyAutumn;
+      _treeDirty=true;
+    }
     // Restore branch bloom state without re-spawning blossoms (avoids opacity:0 fade-in)
     bloomedIdx.forEach(i=>{if(branches[i]&&branches[i].canBloom){branches[i].bloomed=true;branches[i].bloomProgress=1;}});
     totalBloomed=bloomedIdx.filter(i=>branches[i]&&branches[i].canBloom).length;
@@ -1329,11 +1560,31 @@ function initBgPetals(){
 }
 
 // ---- Init ----
+// Stop the animation entirely while the game is scrolled out of view — the
+// biggest battery saver for people reading the links below it.
+new IntersectionObserver((entries)=>{
+  _gameVisible = entries[0].isIntersecting;
+  if(_gameVisible && !_animId && !document.hidden) _animId=requestAnimationFrame(draw);
+}).observe(gameContainer);
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){ if(_animId){cancelAnimationFrame(_animId);_animId=null;} }
   else if(!_animId){ _animId=requestAnimationFrame(draw); }
 });
-window.addEventListener('resize',()=>{clearTimeout(_resizeTimer);_resizeTimer=setTimeout(resizeCanvas,150);});
+// Watch the container, not the window: iOS in-app browser sheets settle their
+// layout after load without firing window 'resize', leaving the canvas buffer
+// a different shape than its CSS box (stretched tree, squashed sprites).
+new ResizeObserver(()=>{clearTimeout(_resizeTimer);_resizeTimer=setTimeout(resizeCanvas,150);}).observe(gameContainer);
+// Allow autumn.js to flip the game between seasons. Regenerates the tree so
+// the player gets a clean canvas (fully leafy for autumn, bare for spring).
+// immediate: skip the gust animation — used on page load so a returning
+// autumn visitor never sees a flash of the spring scene.
+window.__setGardenSeason = function(s, immediate) {
+  if (s !== 'spring' && s !== 'autumn') return;
+  if (s === season) return;
+  season = s;
+  if (immediate) { _generateTreeSeeded(); initFlowers(); return; }
+  resetTree();
+};
 initBgPetals();
 resizeCanvas();
 initClouds();

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jill's Link in Bio</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
+<link rel="icon" id="favicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
 <script data-goatcounter="https://jamspr-ing.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap');
@@ -438,178 +438,8 @@
     .header h1 { font-size: 22px; }
     .game-label { font-size: 10px; }
   }
-
-  /* ---------- Season toggle + autumn layer ---------- */
-  .season-toggle {
-    display: inline-flex;
-    gap: 2px;
-    background: rgba(255, 248, 252, 0.72);
-    border: 1px solid rgba(210, 160, 185, 0.28);
-    border-radius: 999px;
-    padding: 3px;
-    margin-bottom: 12px;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-  }
-  .season-toggle button {
-    background: transparent;
-    border: 0;
-    padding: 5px 14px;
-    border-radius: 999px;
-    font: inherit;
-    font-size: 12px;
-    letter-spacing: 0.3px;
-    color: #8a6878;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-  }
-  .season-toggle button.active {
-    background: rgba(255, 255, 255, 0.95);
-    color: #4a3848;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  }
-
-  body.season-autumn {
-    background: linear-gradient(180deg, #f5ebe0 0%, #faf3eb 30%, #efe2d4 100%);
-  }
-  body.season-autumn .header h1 { color: #6b3f28; }
-  body.season-autumn .header p { color: #a07a60; }
-  body.season-autumn .game-label { color: #a37555; }
-  body.season-autumn .game-container {
-    background: linear-gradient(180deg, #3a2a47 0%, #5c3a5a 15%, #a65a44 38%, #c47a4a 52%, #8a5230 70%, #6b4028 85%, #4a2e1f 100%);
-    border-color: rgba(140, 70, 40, 0.25);
-  }
-  body.season-autumn .game-canvas {
-    filter: hue-rotate(-55deg) saturate(0.78) brightness(0.92);
-  }
-
-  .autumn-overlay {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    display: none;
-    overflow: hidden;
-  }
-  body.season-autumn .autumn-overlay { display: block; }
-  .autumn-overlay .interactive { pointer-events: auto; }
-
-  .autumn-leaf {
-    position: absolute;
-    top: -24px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50% 0 50% 50%;
-    transform-origin: center;
-    animation: leafFall linear forwards;
-    pointer-events: none;
-  }
-  @keyframes leafFall {
-    0%   { transform: translateY(0) translateX(0) rotate(0deg); }
-    100% { transform: translateY(620px) translateX(var(--drift, 0px)) rotate(540deg); }
-  }
-
-  .hidden-cat {
-    position: absolute;
-    bottom: 11%;
-    left: 7%;
-    width: 44px;
-    height: 32px;
-    cursor: pointer;
-    transition: transform 0.5s cubic-bezier(.2,.8,.3,1);
-  }
-  .hidden-cat .cat-body { opacity: 0; transition: opacity 0.4s ease-out 0.1s; }
-  .hidden-cat .cat-eyes { animation: catBlink 5s ease-in-out infinite; }
-  .hidden-cat.out { transform: translate(16px, -4px); }
-  .hidden-cat.out .cat-body { opacity: 1; }
-  .hidden-cat.out .cat-eyes { animation: none; }
-  @keyframes catBlink {
-    0%, 92%, 100% { opacity: 1; }
-    94%, 97%      { opacity: 0.12; }
-  }
-
-  .jack-o-lantern {
-    position: absolute;
-    bottom: 36%;
-    right: 11%;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-  }
-  .jack-o-lantern .lantern-glow { opacity: 0; transition: opacity 0.4s; }
-  .jack-o-lantern.lit .lantern-glow {
-    opacity: 1;
-    animation: flicker 1.1s ease-in-out infinite;
-  }
-  @keyframes flicker {
-    0%, 100% { opacity: 1; }
-    50%      { opacity: 0.72; }
-  }
-
-  .owl-silhouette {
-    position: absolute;
-    top: 24%;
-    right: 28%;
-    width: 22px;
-    height: 26px;
-    opacity: 0.78;
-    pointer-events: none;
-  }
-
-  .crow {
-    position: absolute;
-    top: 14%;
-    left: -40px;
-    width: 32px;
-    height: 10px;
-    opacity: 0.55;
-    animation: crowFly 22s linear infinite;
-    animation-delay: -5s;
-    pointer-events: none;
-  }
-  .crow + .crow { top: 20%; animation-duration: 28s; animation-delay: -12s; }
-  @keyframes crowFly {
-    0%   { transform: translateX(0) translateY(0); }
-    40%  { transform: translateX(45%) translateY(-10px); }
-    70%  { transform: translateX(75%) translateY(6px); }
-    100% { transform: translateX(calc(100% + 60px)) translateY(0); }
-  }
-
-  .wind-haiku-btn {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    background: rgba(255, 250, 245, 0.82);
-    border: 1px solid rgba(140, 80, 40, 0.3);
-    color: #6b3f28;
-    border-radius: 999px;
-    padding: 5px 11px;
-    font: inherit;
-    font-size: 11px;
-    cursor: pointer;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-  }
-  .wind-haiku {
-    position: absolute;
-    bottom: 44px;
-    right: 10px;
-    background: rgba(255, 250, 245, 0.95);
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-family: 'Playfair Display', serif;
-    font-size: 12px;
-    line-height: 1.65;
-    color: #4a2e1f;
-    max-width: 190px;
-    white-space: pre-line;
-    opacity: 0;
-    transform: translateY(4px);
-    pointer-events: none;
-    transition: opacity 0.3s, transform 0.3s;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10);
-  }
-  .wind-haiku.show { opacity: 1; transform: translateY(0); }
 </style>
+<link rel="stylesheet" href="autumn.css">
 </head>
 <body>
 <div class="container">
@@ -625,65 +455,202 @@
     </div>
     <div class="game-container" id="gameContainer">
       <canvas class="game-canvas" id="gameCanvas"></canvas>
-      <div class="autumn-overlay" aria-hidden="true">
-        <!-- Hidden cat: eyes blink in shadow; tap to reveal -->
+      <div class="autumn-overlay">
+        <!-- Crescent moon, top-right -->
+        <svg class="moon" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <mask id="moonMask">
+              <rect width="36" height="36" fill="#fff"/>
+              <circle cx="22" cy="15" r="13" fill="#000"/>
+            </mask>
+          </defs>
+          <circle cx="18" cy="18" r="13" fill="#f5e4a8" mask="url(#moonMask)"/>
+        </svg>
+        <!-- Twinkling stars (positions eyeballed to miss moon + mountains) -->
+        <div class="star"     style="top: 5%;  left: 12%; --twinkle-dur: 3.2s; --twinkle-delay: 0s;"></div>
+        <div class="star big" style="top: 8%;  left: 28%; --twinkle-dur: 4.1s; --twinkle-delay: 1.1s;"></div>
+        <div class="star"     style="top: 4%;  left: 42%; --twinkle-dur: 2.8s; --twinkle-delay: 0.6s;"></div>
+        <div class="star"     style="top: 11%; left: 55%; --twinkle-dur: 3.6s; --twinkle-delay: 1.8s;"></div>
+        <div class="star big" style="top: 6%;  left: 68%; --twinkle-dur: 2.4s; --twinkle-delay: 0.3s;"></div>
+        <div class="star"     style="top: 14%; left: 18%; --twinkle-dur: 3.9s; --twinkle-delay: 2.2s;"></div>
+        <div class="star"     style="top: 16%; left: 48%; --twinkle-dur: 3.1s; --twinkle-delay: 1.4s;"></div>
+        <div class="star"     style="top: 10%; left: 82%; --twinkle-dur: 4.4s; --twinkle-delay: 0.9s;"></div>
+
+        <!-- A couple of plain pumpkins sitting on the grass under the tree -->
+        <!-- Pumpkin shapes, defined once and placed with <use> below. -->
+        <svg class="svg-defs" aria-hidden="true">
+          <defs>
+            <radialGradient id="pkBig" cx="45%" cy="35%" r="70%"><stop offset="0" stop-color="#f7a043"/><stop offset="1" stop-color="#c25a1c"/></radialGradient>
+            <radialGradient id="pkSmall" cx="45%" cy="35%" r="70%"><stop offset="0" stop-color="#f2b04e"/><stop offset="1" stop-color="#c8661e"/></radialGradient>
+            <symbol id="pumpkinVine" viewBox="0 0 60 46">
+              <ellipse cx="13" cy="29" rx="11.5" ry="14" fill="#a8481a"/>
+              <ellipse cx="47" cy="29" rx="11.5" ry="14" fill="#a8481a"/>
+              <ellipse cx="21" cy="28.5" rx="12" ry="16" fill="#d0661f"/>
+              <ellipse cx="39" cy="28.5" rx="12" ry="16" fill="#d0661f"/>
+              <ellipse cx="30" cy="28" rx="11" ry="17" fill="url(#pkBig)"/>
+              <g stroke="#8a3c14" stroke-width="0.9" fill="none" opacity="0.55">
+                <path d="M20 13 Q15 28 20 44"/><path d="M40 13 Q45 28 40 44"/>
+              </g>
+              <ellipse cx="25" cy="21" rx="2.6" ry="6" fill="#ffd8a0" opacity="0.35"/>
+              <path d="M28 13 C27 8 29 4 33 3 L34.5 5.5 C31.5 7 31 10 32 13 Z" fill="#6a5528"/>
+              <path d="M33 6 q7 -3 9 2 q1 3 -2 3" stroke="#56742e" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+              <path d="M35 9 q6 -3 10 2 q-6 3 -10 -2z" fill="#5f8236"/>
+            </symbol>
+            <symbol id="pumpkinPlain" viewBox="0 0 60 46">
+              <ellipse cx="14" cy="30" rx="12" ry="13" fill="#b05420"/>
+              <ellipse cx="46" cy="30" rx="12" ry="13" fill="#b05420"/>
+              <ellipse cx="22" cy="29.5" rx="12" ry="15" fill="#d87a26"/>
+              <ellipse cx="38" cy="29.5" rx="12" ry="15" fill="#d87a26"/>
+              <ellipse cx="30" cy="29" rx="11" ry="16" fill="url(#pkSmall)"/>
+              <g stroke="#8a4416" stroke-width="0.9" fill="none" opacity="0.5">
+                <path d="M21 15 Q16 29 21 44"/><path d="M39 15 Q44 29 39 44"/>
+              </g>
+              <ellipse cx="25" cy="23" rx="2.4" ry="5" fill="#ffe0aa" opacity="0.35"/>
+              <path d="M29 15 C28.5 11 29.5 8 32 6.5 L33.5 8.5 C31.5 10 31.5 12 32 15 Z" fill="#6a5528"/>
+            </symbol>
+          </defs>
+        </svg>
+        <!-- Pumpkin patch around the trunk: back row first so the front row overlaps it. -->
+        <svg class="ground-pumpkin p-far"         viewBox="0 0 60 46"><use href="#pumpkinPlain"/></svg>
+        <svg class="ground-pumpkin p-left-back"   viewBox="0 0 60 46"><use href="#pumpkinPlain"/></svg>
+        <svg class="ground-pumpkin p-right-main"  viewBox="0 0 60 46"><use href="#pumpkinVine"/></svg>
+        <svg class="ground-pumpkin p-left-main"   viewBox="0 0 60 46"><use href="#pumpkinVine"/></svg>
+        <svg class="ground-pumpkin p-right-small" viewBox="0 0 60 46"><use href="#pumpkinPlain"/></svg>
+        <svg class="ground-pumpkin p-left-small"  viewBox="0 0 60 46"><use href="#pumpkinPlain"/></svg>
+
+        <!-- Hidden cat: only its glowing eyes show until tapped -->
         <div class="hidden-cat interactive" id="hiddenCat" title="shh, there's a cat">
-          <svg viewBox="0 0 44 32" xmlns="http://www.w3.org/2000/svg">
-            <!-- Body (hidden until tap) -->
-            <g class="cat-body">
-              <ellipse cx="22" cy="22" rx="15" ry="7" fill="#2a1a14"/>
-              <path d="M10 16 L12 7 L16 14 Z" fill="#2a1a14"/>
-              <path d="M28 14 L32 7 L34 16 Z" fill="#2a1a14"/>
-              <circle cx="22" cy="16" r="8" fill="#2a1a14"/>
-              <path d="M37 20 Q42 16 40 10" stroke="#2a1a14" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <svg viewBox="0 0 54 50" xmlns="http://www.w3.org/2000/svg">
+            <g class="cat-body" fill="#1c1418" stroke="#3a2c34" stroke-width="0.7">
+              <path d="M38 46 C52 46 54 34 47 27" stroke="#1c1418" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+              <path d="M15 47 C11 38 13 28 20 24 L34 24 C41 28 43 38 39 47 Z"/>
+              <ellipse cx="22" cy="47" rx="3.8" ry="2.2"/>
+              <ellipse cx="32" cy="47" rx="3.8" ry="2.2"/>
+              <ellipse cx="27" cy="17" rx="10.5" ry="9"/>
+              <path d="M17.5 13 L17.5 2 L25 9 Z"/>
+              <path d="M36.5 13 L36.5 2 L29 9 Z"/>
+              <path d="M19 10 L19 5 L22.8 8.6 Z" fill="#6b3a4a" stroke="none"/>
+              <path d="M35 10 L35 5 L31.2 8.6 Z" fill="#6b3a4a" stroke="none"/>
+              <path d="M26 20.6 L28 20.6 L27 21.9 Z" fill="#c97a8a" stroke="none"/>
+              <g stroke="#9a8a90" stroke-width="0.45" opacity="0.8">
+                <line x1="22" y1="21" x2="12" y2="19"/><line x1="22" y1="22.2" x2="12" y2="23.4"/>
+                <line x1="32" y1="21" x2="42" y2="19"/><line x1="32" y1="22.2" x2="42" y2="23.4"/>
+              </g>
             </g>
-            <!-- Eyes (always visible when autumn active) -->
             <g class="cat-eyes">
-              <ellipse cx="18" cy="15" rx="2" ry="2.6" fill="#f5c860"/>
-              <ellipse cx="26" cy="15" rx="2" ry="2.6" fill="#f5c860"/>
-              <ellipse cx="18" cy="15" rx="0.6" ry="2.4" fill="#1a0f08"/>
-              <ellipse cx="26" cy="15" rx="0.6" ry="2.4" fill="#1a0f08"/>
+              <ellipse cx="23" cy="16" rx="2.5" ry="3" fill="#f5d060"/>
+              <ellipse cx="31" cy="16" rx="2.5" ry="3" fill="#f5d060"/>
+              <ellipse cx="23" cy="16" rx="0.7" ry="2.6" fill="#120a08"/>
+              <ellipse cx="31" cy="16" rx="0.7" ry="2.6" fill="#120a08"/>
             </g>
           </svg>
         </div>
-        <!-- Jack-o-lantern on the seawall -->
+        <!-- Jack-o-lantern on the seawall (tap to light) -->
         <div class="jack-o-lantern interactive" id="jackOLantern" title="light it up">
-          <svg viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4 10 Q4 4 8 6 Q10 2 15 3 Q20 2 22 6 Q26 4 26 10 L26 20 Q26 28 15 28 Q4 28 4 20 Z" fill="#c86a1e"/>
-            <path d="M8 10 Q8 7 10 7 M22 10 Q22 7 20 7 M15 10 Q15 7 15 5" stroke="#6b3a10" stroke-width="1" fill="none"/>
-            <path d="M14 2 Q15 0 16 2 L16 5 L14 5 Z" fill="#3d5a2a"/>
-            <!-- Face -->
-            <polygon points="9,15 13,13 11,17" fill="#1a0f05"/>
-            <polygon points="21,15 17,13 19,17" fill="#1a0f05"/>
-            <path d="M9 22 L12 20 L14 22 L16 20 L18 22 L21 20 L21 23 L9 23 Z" fill="#1a0f05"/>
-            <!-- Glow (lit state) -->
+          <svg viewBox="0 0 60 50" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="pkJack" cx="45%" cy="35%" r="70%"><stop offset="0" stop-color="#f59a3c"/><stop offset="1" stop-color="#b8521a"/></radialGradient>
+              <radialGradient id="jackInnerGlow"><stop offset="0" stop-color="#ffd36b" stop-opacity="0.55"/><stop offset="1" stop-color="#ffb04a" stop-opacity="0"/></radialGradient>
+            </defs>
+            <ellipse cx="13" cy="32" rx="11.5" ry="14.5" fill="#a8481a"/>
+            <ellipse cx="47" cy="32" rx="11.5" ry="14.5" fill="#a8481a"/>
+            <ellipse cx="21" cy="31.5" rx="12" ry="16.5" fill="#cc6420"/>
+            <ellipse cx="39" cy="31.5" rx="12" ry="16.5" fill="#cc6420"/>
+            <ellipse cx="30" cy="31" rx="11" ry="17.5" fill="url(#pkJack)"/>
+            <path d="M28 15 C27 10 29 6 33 5 L34.5 7.5 C31.5 9 31 12 32 15 Z" fill="#6a5528"/>
+            <g class="lantern-face" fill="#1a0f05">
+              <polygon points="15,27 25,24 22,32"/>
+              <polygon points="45,27 35,24 38,32"/>
+              <polygon points="28,32 32,32 30,36"/>
+              <path d="M14 37 Q30 49 46 37 L42 38.5 L40 42 L36.5 40 L33 43.5 L30 40.5 L27 43.5 L23.5 40 L20 42 L18 38.5 Z"/>
+            </g>
             <g class="lantern-glow">
-              <polygon points="9,15 13,13 11,17" fill="#ffd36b"/>
-              <polygon points="21,15 17,13 19,17" fill="#ffd36b"/>
-              <path d="M9 22 L12 20 L14 22 L16 20 L18 22 L21 20 L21 23 L9 23 Z" fill="#ffd36b"/>
-              <circle cx="15" cy="18" r="14" fill="#ffb04a" opacity="0.22"/>
+              <ellipse cx="30" cy="34" rx="22" ry="12" fill="url(#jackInnerGlow)"/>
+              <g fill="#ffd36b">
+                <polygon points="15,27 25,24 22,32"/>
+                <polygon points="45,27 35,24 38,32"/>
+                <polygon points="28,32 32,32 30,36"/>
+                <path d="M14 37 Q30 49 46 37 L42 38.5 L40 42 L36.5 40 L33 43.5 L30 40.5 L27 43.5 L23.5 40 L20 42 L18 38.5 Z"/>
+              </g>
             </g>
           </svg>
         </div>
-        <!-- Owl silhouette perched in branches -->
-        <svg class="owl-silhouette" viewBox="0 0 22 26" xmlns="http://www.w3.org/2000/svg">
-          <path d="M3 10 Q3 2 11 2 Q19 2 19 10 L19 20 Q19 24 11 24 Q3 24 3 20 Z" fill="#1a0f14"/>
-          <path d="M5 4 L8 1 L9 5 Z M17 4 L14 1 L13 5 Z" fill="#1a0f14"/>
-          <circle cx="8" cy="10" r="2" fill="#f5c860"/>
-          <circle cx="14" cy="10" r="2" fill="#f5c860"/>
-          <circle cx="8" cy="10" r="0.7" fill="#1a0f08"/>
-          <circle cx="14" cy="10" r="0.7" fill="#1a0f08"/>
+        <!-- Horned owl perched on its own branch. Tap: hops, flaps, hoots. -->
+        <div class="owl interactive" id="owl" title="who?">
+        <svg viewBox="0 0 40 50" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 46 Q20 43 40 46.5" stroke="#3a2a22" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <g class="owl-body">
+          <path d="M8 21 C6 35 11 44 20 44 C29 44 34 35 32 21 C31 13 26 9 20 9 C14 9 9 13 8 21 Z" fill="#5c4130"/>
+          <path class="owl-wing left" d="M8 21 C5 31 8 40 14 43 C11 35 11 27 12 21 Z" fill="#3e2c20"/>
+          <path class="owl-wing right" d="M32 21 C35 31 32 40 26 43 C29 35 29 27 28 21 Z" fill="#3e2c20"/>
+          <ellipse cx="20" cy="32" rx="7.5" ry="9.5" fill="#b0926c"/>
+          <g stroke="#6b5040" stroke-width="0.8" fill="none" stroke-linecap="round">
+            <path d="M15 28 l1.6 1.3 l1.6 -1.3"/><path d="M21 28 l1.6 1.3 l1.6 -1.3"/>
+            <path d="M17.5 32 l1.6 1.3 l1.6 -1.3"/><path d="M14.5 33 l1.4 1.1 l1.4 -1.1"/><path d="M22.5 33 l1.4 1.1 l1.4 -1.1"/>
+            <path d="M16 36.5 l1.6 1.3 l1.6 -1.3"/><path d="M20 36.5 l1.6 1.3 l1.6 -1.3"/>
+          </g>
+          <path d="M10 14 L6 2 L15 11 Z" fill="#3e2c20"/>
+          <path d="M30 14 L34 2 L25 11 Z" fill="#3e2c20"/>
+          <circle cx="15" cy="18.5" r="5.8" fill="#c8ab84"/>
+          <circle cx="25" cy="18.5" r="5.8" fill="#c8ab84"/>
+          <g class="owl-eyes">
+            <circle cx="15" cy="18.5" r="3.6" fill="#f5c040"/>
+            <circle cx="25" cy="18.5" r="3.6" fill="#f5c040"/>
+            <circle cx="15" cy="18.5" r="1.8" fill="#120a08"/>
+            <circle cx="25" cy="18.5" r="1.8" fill="#120a08"/>
+            <circle cx="14.2" cy="17.6" r="0.6" fill="#fff"/>
+            <circle cx="24.2" cy="17.6" r="0.6" fill="#fff"/>
+          </g>
+          <path d="M19 20.5 L21 20.5 L20 24.5 Z" fill="#d8a040"/>
+          <g stroke="#d8a040" stroke-width="1.2" stroke-linecap="round">
+            <path d="M16 43 v2.6 M17.6 43 v2.8 M14.4 43 v2.6"/>
+            <path d="M24 43 v2.6 M25.6 43 v2.8 M22.4 43 v2.6"/>
+          </g>
+          </g>
         </svg>
+        </div>
         <!-- Two crows gliding across -->
-        <svg class="crow" viewBox="0 0 32 10" xmlns="http://www.w3.org/2000/svg">
-          <path d="M0 5 Q8 0 16 5 Q24 0 32 5" stroke="#1a0f14" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-        </svg>
-        <svg class="crow" viewBox="0 0 32 10" xmlns="http://www.w3.org/2000/svg">
-          <path d="M0 5 Q8 0 16 5 Q24 0 32 5" stroke="#1a0f14" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-        </svg>
+        <div class="crow"><svg viewBox="0 0 32 10" xmlns="http://www.w3.org/2000/svg"><path d="M0 5 Q8 0 16 5 Q24 0 32 5" stroke="#1a0f14" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+        <div class="crow"><svg viewBox="0 0 32 10" xmlns="http://www.w3.org/2000/svg"><path d="M0 5 Q8 0 16 5 Q24 0 32 5" stroke="#1a0f14" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
         <!-- Daily haiku -->
-        <button class="wind-haiku-btn interactive" id="windHaikuBtn" type="button">🍃 whisper to the wind</button>
-        <div class="wind-haiku" id="windHaiku" aria-live="polite"></div>
+        <!-- Haiku scroll: tap to unroll a new haiku, tap again to roll it up. -->
+        <div class="haiku-scroll interactive" id="haikuScroll" role="button" tabindex="0" aria-expanded="false" aria-label="unroll a haiku">
+          <span class="scroll-caption" aria-hidden="true">a haiku</span>
+          <div class="scroll-roll"></div>
+          <div class="scroll-paper"><p class="scroll-text" id="haikuText" aria-live="polite"></p></div>
+          <div class="scroll-roll"></div>
+          <!-- Closed look: one rolled parchment cylinder tied with a bow -->
+          <svg class="scroll-rolled" viewBox="0 0 64 32" aria-hidden="true">
+            <defs>
+              <linearGradient id="rollBody" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#fff5d8"/>
+                <stop offset="0.3" stop-color="#f3dfae"/>
+                <stop offset="0.72" stop-color="#d9b97c"/>
+                <stop offset="1" stop-color="#ad8247"/>
+              </linearGradient>
+              <linearGradient id="rollRibbon" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#7e1a1a"/>
+                <stop offset="0.5" stop-color="#c0352c"/>
+                <stop offset="1" stop-color="#7e1a1a"/>
+              </linearGradient>
+            </defs>
+            <rect x="7" y="8" width="51" height="18" rx="2" fill="url(#rollBody)"/>
+            <path d="M9 23 Q33 26.5 57 23" stroke="#b8904f" stroke-width="0.8" fill="none" opacity="0.8"/>
+            <ellipse cx="57.5" cy="17" rx="3.5" ry="9" fill="#cfae6e"/>
+            <ellipse cx="7" cy="17" rx="4.5" ry="9" fill="#f1dcaa" stroke="#b58c4c" stroke-width="0.6"/>
+            <g fill="none" stroke="#a87e40" stroke-width="0.6">
+              <ellipse cx="7" cy="17" rx="3.2" ry="6.6"/>
+              <ellipse cx="7" cy="17" rx="2" ry="4.2"/>
+              <ellipse cx="7" cy="17" rx="0.9" ry="1.9"/>
+            </g>
+            <rect x="30" y="7.6" width="5" height="18.8" fill="url(#rollRibbon)"/>
+            <path d="M32.5 23 L29.2 31.5 L31.1 30.4 L32 31.8 Z" fill="#9a2222"/>
+            <path d="M32.5 23 L35.8 31.5 L33.9 30.4 L33 31.8 Z" fill="#8a1d1d"/>
+            <path d="M32.5 8 C26 1 21.5 5.5 30.5 9 Z" fill="#b8302a"/>
+            <path d="M32.5 8 C39 1 43.5 5.5 34.5 9 Z" fill="#a82a24"/>
+            <circle cx="32.5" cy="8.2" r="2.1" fill="#8e2020"/>
+          </svg>
+        </div>
       </div>
     </div>
     <div class="game-hint" id="gameHint">tap the bare branches to make them bloom</div>
@@ -706,7 +673,7 @@
   </div>
   <div class="divider">
     <div class="divider-line"></div>
-    <div class="divider-icon">🌸</div>
+    <div class="divider-icon season-emoji">🌸</div>
     <div class="divider-line"></div>
   </div>
   <div class="section-label">things i've made</div>
@@ -752,8 +719,8 @@
     <div class="book-card">
       <div class="book-emoji">📖</div>
       <div class="book-info">
-        <h3>Lessons in Chemistry</h3>
-        <p>by Bonnie Garmus</p>
+        <h3>The Grey Wolf</h3>
+        <p>by Louise Penny</p>
       </div>
     </div>
   </div>
@@ -837,7 +804,7 @@
     </a>
   </div>
   END FAVOURITE THINGS SECTION -->
-  <div class="footer">made with 🌸 and late nights</div>
+  <div class="footer">made with <span class="season-emoji">🌸</span> and late nights</div>
 </div>
 
 <!-- Wishing Tree Modal -->
@@ -856,7 +823,8 @@
   </div>
 </div>
 
-<script src="garden.js" defer></script>
+<!-- autumn.js first: it publishes the starting season for garden.js. -->
 <script src="autumn.js" defer></script>
+<script src="garden.js" defer></script>
 </body>
 </html>
