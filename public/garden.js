@@ -1301,13 +1301,52 @@ function handleUp(){
   }
   isMouseDown=false;mouseVX=0;mouseVY=0;
 }
-canvas.addEventListener('mousedown',handleDown);
-canvas.addEventListener('mousemove',handleMove);
-canvas.addEventListener('mouseup',handleUp);
-canvas.addEventListener('mouseleave',handleUp);
-canvas.addEventListener('touchstart',(e)=>{e.preventDefault();handleDown(e);},{passive:false});
-canvas.addEventListener('touchmove',(e)=>{e.preventDefault();handleMove(e);},{passive:false});
-canvas.addEventListener('touchend',(e)=>{e.preventDefault();handleUp();},{passive:false});
+// Touch: up/down swipes scroll the page (the game box is touch-action: pan-y
+// in index.html), so the game doesn't trap thumbs on phones. Taps and
+// side-to-side drags still play. A touch is undecided until it moves
+// TOUCH_SLOP px: mostly vertical → page scroll; sideways → game drag; lifted
+// without moving → tap (fired on lift, so starting a scroll on the tree does
+// nothing to it).
+const TOUCH_SLOP = 10; // CSS px
+let touchStart = null, touchMode = null, lastTouchAt = 0; // touchMode: null | 'drag' | 'scroll' | 'ignore'
+// Phones also send emulated mouse events after a touch; skip those.
+const mouseOnly = (fn) => (e) => { if (Date.now() - lastTouchAt > 800) fn(e); };
+canvas.addEventListener('mousedown',mouseOnly(handleDown));
+canvas.addEventListener('mousemove',mouseOnly(handleMove));
+canvas.addEventListener('mouseup',mouseOnly(handleUp));
+canvas.addEventListener('mouseleave',mouseOnly(handleUp));
+canvas.addEventListener('touchstart',(e)=>{
+  lastTouchAt = Date.now();
+  if (e.touches.length !== 1) { touchMode = 'ignore'; return; } // pinch zoom etc.
+  const t = e.touches[0];
+  touchStart = { clientX: t.clientX, clientY: t.clientY };
+  touchMode = null;
+},{passive:true});
+canvas.addEventListener('touchmove',(e)=>{
+  lastTouchAt = Date.now();
+  if (!touchStart || touchMode === 'scroll' || touchMode === 'ignore') return;
+  if (!touchMode) {
+    const t = e.touches[0];
+    const dx = t.clientX - touchStart.clientX, dy = t.clientY - touchStart.clientY;
+    if (Math.abs(dy) > TOUCH_SLOP && Math.abs(dy) >= Math.abs(dx)) { touchMode = 'scroll'; return; }
+    if (Math.abs(dx) <= TOUCH_SLOP) return;
+    touchMode = 'drag';
+    handleDown(touchStart);
+  }
+  if (e.cancelable) e.preventDefault();
+  handleMove(e);
+},{passive:false});
+canvas.addEventListener('touchend',(e)=>{
+  lastTouchAt = Date.now();
+  if (touchMode === null && touchStart) { handleDown(touchStart); handleUp(); } // a tap
+  else if (touchMode === 'drag') handleUp();
+  touchStart = null; touchMode = null;
+  if (e.cancelable) e.preventDefault(); // no emulated click afterwards
+},{passive:false});
+canvas.addEventListener('touchcancel',()=>{
+  if (touchMode === 'drag') handleUp();
+  touchStart = null; touchMode = null;
+});
 
 // ---- UI ----
 function updateWishCount(){
