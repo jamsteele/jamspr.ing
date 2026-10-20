@@ -278,8 +278,11 @@ body.season-autumn .duck-layer { display: block; }
   right: 24%;
   width: 34px;
   height: 42px;
-  cursor: pointer;
 }
+/* The owl sits in the canopy, so only its painted body takes taps (for the
+   hoot). Its box, branch and empty corners pass taps through to the leaves. */
+.autumn-overlay .owl.interactive { pointer-events: none; }
+.owl .owl-body { pointer-events: visiblePainted; cursor: pointer; }
 .owl svg { width: 100%; height: 100%; overflow: visible; }
 .owl .owl-wing { transform-box: fill-box; }
 .owl .owl-wing.left  { transform-origin: top right; }
