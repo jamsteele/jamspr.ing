@@ -368,33 +368,36 @@ body.season-autumn .duck-layer { display: block; }
   96%           { transform: scaleY(0.1); }
 }
 
-/* Crows: the wrapper flies (animating `left` across the whole scene, starting
-   and ending off-screen so the loop restart is never visible); the inner SVG
-   flaps. */
+/* Crows: each .crow is a full-width track that slides across with a
+   transform (cheap: no per-frame layout). Translate % is relative to the
+   track's own width, which is the scene width, so 100% crosses the sky.
+   The crow sits at the track's left edge and starts/ends off-screen so the
+   loop restart is never visible. The inner SVG flaps. */
 .crow {
   position: absolute;
   top: 14%;
-  left: -40px;
-  width: 32px;
+  left: 0;
+  width: 100%;
   height: 10px;
   opacity: 0.6;
   pointer-events: none;
   animation: crowFly 24s linear infinite;
   animation-delay: -6s;
 }
-.crow + .crow { top: 20%; width: 26px; height: 8px; animation-duration: 31s; animation-delay: -19s; }
+.crow + .crow { top: 20%; height: 8px; animation-duration: 31s; animation-delay: -19s; }
 .crow svg {
   display: block;
-  width: 100%;
+  width: 32px;
   height: 100%;
   transform-origin: center;
   animation: crowFlap 0.5s ease-in-out infinite alternate;
 }
+.crow + .crow svg { width: 26px; }
 @keyframes crowFly {
-  0%   { left: -40px;              transform: translateY(0); }
-  40%  {                           transform: translateY(-10px); }
-  70%  {                           transform: translateY(6px); }
-  100% { left: calc(100% + 40px);  transform: translateY(0); }
+  0%   { transform: translate(-40px, 0); }
+  40%  { transform: translate(40%, -10px); }
+  70%  { transform: translate(calc(70% + 12px), 6px); }
+  100% { transform: translate(calc(100% + 40px), 0); }
 }
 @keyframes crowFlap {
   from { transform: scaleY(1); }

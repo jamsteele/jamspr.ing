@@ -8,6 +8,7 @@ const ctx = canvas.getContext('2d');
 const treeCanvas = document.getElementById('treeCanvas');
 const treeCtx = treeCanvas.getContext('2d');
 let _treeCanvasHasTree = false;
+let _treeCanvasLean = null; // lean last drawn to treeCanvas; skip identical frames
 const gameContainer = document.getElementById('gameContainer');
 let W, H;
 let branches = [], leaves = [], blossoms = [], petals = [], wishes = [];
@@ -961,16 +962,24 @@ function drawAutumnTree(c){
   if(!_treeLayer||_treeLayer.width!==W||_treeLayer.height!==H){
     _treeLayer=document.createElement('canvas');_treeLayer.width=W;_treeLayer.height=H;_treeDirty=true;
   }
+  const rebuilt=_treeDirty;
   if(_treeDirty){
-    const c=_treeLayer.getContext('2d');
-    c.clearRect(0,0,W,H);
-    [...branches].sort((a,b)=>a.depth-b.depth).forEach(b=>drawBranch(b,c));
-    leaves.forEach(l=>drawLeaf(l,c));
+    const lc=_treeLayer.getContext('2d');
+    lc.clearRect(0,0,W,H);
+    [...branches].sort((a,b)=>a.depth-b.depth).forEach(b=>drawBranch(b,lc));
+    leaves.forEach(l=>drawLeaf(l,lc));
     _treeDirty=false;
   }
   // Skew around the trunk base: the canopy leans with the wind, the base stays put.
   const baseX=W*0.48, baseY=H*0.92;
   const lean=-windStrength*0.012*(0.8+0.2*Math.sin(frameCount*0.05));
+  // On the separate tree canvas, a frame identical to the last one (no leaf
+  // changes, same lean) is skipped entirely, which is most frames in calm air.
+  if(c===treeCtx){
+    if(!rebuilt && _treeCanvasHasTree && _treeCanvasLean!==null && Math.abs(lean-_treeCanvasLean)<0.0004) return;
+    c.clearRect(0,0,W,H);
+    _treeCanvasLean=lean;
+  }
   c.save();c.translate(baseX,baseY);c.transform(1,0,lean,1,0,0);c.translate(-baseX,-baseY);
   c.drawImage(_treeLayer,0,0);
   c.restore();
@@ -1103,7 +1112,6 @@ function draw(ts){
       paintShareOverlay(ctx,true);
       drawAutumnTree(ctx);
     } else {
-      treeCtx.clearRect(0,0,W,H);
       drawAutumnTree(treeCtx);
       _treeCanvasHasTree=true;
     }
@@ -1115,7 +1123,7 @@ function draw(ts){
   wishes.forEach((w,i)=>drawWish(w,i));
   drawSparkles();
   petals.filter(p=>!p.grounded).forEach(drawPetal);
-  if(season!=='autumn'&&_treeCanvasHasTree){treeCtx.clearRect(0,0,W,H);_treeCanvasHasTree=false;}
+  if(season!=='autumn'&&_treeCanvasHasTree){treeCtx.clearRect(0,0,W,H);_treeCanvasHasTree=false;_treeCanvasLean=null;}
   if(_isRecording)paintShareOverlay(ctx,false);
   if(Math.abs(windStrength)>0.8){
     ctx.save();ctx.globalAlpha=Math.min(Math.abs(windStrength)*0.08,0.15);
@@ -1537,7 +1545,7 @@ function resizeCanvas(){
   const firstLoad=!W||!H;
   const oldW=W||newW,oldH=H||newH;
   canvas.width=newW;canvas.height=newH;
-  treeCanvas.width=newW;treeCanvas.height=newH;
+  treeCanvas.width=newW;treeCanvas.height=newH;_treeCanvasLean=null; // resizing wipes it
   W=newW;H=newH;
   if(firstLoad){
     _treeSeed = (Date.now() ^ (Math.random()*0xffffffff|0)) | 1;

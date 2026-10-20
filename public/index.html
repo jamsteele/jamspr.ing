@@ -483,14 +483,16 @@
   .np-title { font-size: 13px; font-weight: 500; color: #5c3d52; }
   .np-links { display: flex; gap: 5px; opacity: 0; transition: opacity 0.3s; }
   .now-playing.has-song .np-links { opacity: 1; }
+  /* Animates transform (not height) so the browser doesn't recalculate the
+     page layout every frame for these three little bars. */
   .track-bar {
-    width: 3px; height: 12px;
+    width: 3px; height: 14px;
     background: #d4a0b8; border-radius: 2px;
     animation: barPulse 1.2s ease-in-out infinite alternate;
   }
   @keyframes barPulse {
-    0% { height: 6px; opacity: 0.4; }
-    100% { height: 14px; opacity: 0.8; }
+    0% { transform: scaleY(0.43); opacity: 0.4; }
+    100% { transform: scaleY(1); opacity: 0.8; }
   }
   .equalizer { display: flex; gap: 2px; align-items: center; flex-shrink: 0; }
   .footer { text-align: center; margin-top: 40px; font-size: 11px; color: #c8b0be; }
