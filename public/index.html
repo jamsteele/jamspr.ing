@@ -506,22 +506,47 @@
   .orbit-item p { font-size: 12px; line-height: 1.55; color: #9a7b90; }
   .orbit-item strong { color: #5c3d52; font-weight: 600; }
   .orbit-autumn { display: none; }
-  /* A tiny tarot (behaviour in tarot.js) */
-  .tarot-card { text-align: center; overflow: hidden; }
-  .tarot-face {
-    width: 100%;
+  /* A tiny tarot (behaviour in tarot.js). The card flips in 3D: .tarot-flip
+     rotates; each side hides its back face. Back is starry, front shows the
+     fortune. Reduced-motion users get an instant swap instead. */
+  .tarot-card { text-align: center; perspective: 900px; }
+  .tarot-flip {
+    display: grid; width: 100%;
+    padding: 0; border: 0; background: none; font: inherit; color: inherit;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(.4, .1, .3, 1);
+  }
+  .tarot-flip:focus-visible { outline: 2px solid #9a6aa8; outline-offset: 4px; border-radius: 16px; }
+  .tarot-side {
+    grid-area: 1 / 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 196px;
     border: 1px solid rgba(115, 78, 128, 0.22);
     border-radius: 16px;
     padding: 20px 18px 17px;
-    background: linear-gradient(155deg, rgba(63, 41, 84, 0.97), rgba(116, 67, 105, 0.94));
     color: #fff7ed;
-    font: inherit;
-    cursor: pointer;
+    background: linear-gradient(155deg, rgba(63, 41, 84, 0.97), rgba(116, 67, 105, 0.94));
     box-shadow: inset 0 0 0 4px rgba(255, 231, 190, 0.08), 0 10px 26px rgba(82, 46, 91, 0.18);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
-  .tarot-face:hover { transform: translateY(-1px); box-shadow: inset 0 0 0 4px rgba(255, 231, 190, 0.11), 0 13px 30px rgba(82, 46, 91, 0.22); }
-  .tarot-face:focus-visible { outline: 2px solid #9a6aa8; outline-offset: 3px; }
+  .tarot-front { transform: rotateY(180deg); }
+  .tarot-back {
+    background:
+      radial-gradient(circle at 18% 22%, rgba(255, 231, 190, 0.9) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 78% 18%, rgba(255, 231, 190, 0.7) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 64% 74%, rgba(255, 231, 190, 0.8) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 26% 80%, rgba(255, 231, 190, 0.6) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 88% 56%, rgba(255, 231, 190, 0.6) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 10% 52%, rgba(255, 231, 190, 0.5) 0 1px, transparent 1.6px),
+      linear-gradient(155deg, #3a2852, #5e3a66);
+    box-shadow: inset 0 0 0 4px rgba(255, 231, 190, 0.1), inset 0 0 0 8px rgba(58, 40, 82, 1),
+                inset 0 0 0 9px rgba(255, 231, 190, 0.35), 0 10px 26px rgba(82, 46, 91, 0.18);
+  }
+  .tarot-back-art { font-size: 26px; letter-spacing: 8px; color: #f3d38a; text-shadow: 0 0 10px rgba(243, 211, 138, 0.45); }
+  .tarot-back-note { margin-top: 10px; font-size: 11px; font-style: italic; color: #e9c7dd; }
+  @media (prefers-reduced-motion: reduce) { .tarot-flip { transition: none; } }
   .tarot-symbol { display: block; font-size: 37px; line-height: 1; margin-bottom: 8px; }
   .tarot-title { display: block; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 500; margin-bottom: 7px; }
   .tarot-message { display: block; font-size: 12.5px; line-height: 1.6; color: #f4e2ec; min-height: 40px; }
@@ -1033,12 +1058,21 @@
     </div>
   </div>
   <div class="section-label">a tiny tarot</div>
+  <!-- Two-sided card (tarot.js flips it): starry back first, fortune on the
+       front. Both sides share one grid cell so the card keeps one size. -->
   <div class="card tarot-card">
-    <button class="tarot-face" id="tarotDraw" type="button" aria-live="polite">
-      <span class="tarot-symbol" id="tarotSymbol">🌙</span>
-      <span class="tarot-title" id="tarotTitle">The Moon</span>
-      <span class="tarot-message" id="tarotMessage">Tap to draw a tiny fortune. No doom, only vibes.</span>
-      <span class="tarot-cta">draw a card</span>
+    <button class="tarot-flip" id="tarotDraw" type="button" aria-label="Draw a tarot card">
+      <span class="tarot-side tarot-back" aria-hidden="true">
+        <span class="tarot-back-art">✦ ☾ ✦</span>
+        <span class="tarot-back-note">a tiny fortune. no doom, only vibes.</span>
+        <span class="tarot-cta">draw a card</span>
+      </span>
+      <span class="tarot-side tarot-front" aria-live="polite">
+        <span class="tarot-symbol" id="tarotSymbol">🌙</span>
+        <span class="tarot-title" id="tarotTitle">The Moon</span>
+        <span class="tarot-message" id="tarotMessage">Not everything needs solving tonight.</span>
+        <span class="tarot-cta">draw another</span>
+      </span>
     </button>
   </div>
   <div class="section-label">find me in the wild</div>

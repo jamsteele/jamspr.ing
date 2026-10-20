@@ -33,6 +33,35 @@ const PREVIEW_TRACK_IDS = new Set([
 const PREVIEW_CACHE_MS = 10 * 60 * 1000; // under Deezer's ~15 min link expiry
 const previewCache = new Map(); // id -> { url, at }
 
+// Deezer serves previews per country, and this server runs in the US (Railway),
+// where some tracks have no preview. For those, fall back to Apple's public
+// 30-second preview of the same recording (iTunes lookup: no key, links
+// don't expire). Keyed by Deezer ID → Apple track ID (from the page's links).
+const APPLE_FALLBACK = {
+  '101009324': '1525506990', // Loud Places — Jamie xx (no US preview on Deezer)
+};
+
+async function deezerPreview(id) {
+  try {
+    const r = await fetch(`https://api.deezer.com/track/${id}`, { signal: AbortSignal.timeout(8000) });
+    const track = await r.json();
+    return track.preview || null;
+  } catch (err) {
+    return null;
+  }
+}
+async function applePreview(id) {
+  const appleId = APPLE_FALLBACK[id];
+  if (!appleId) return null;
+  try {
+    const r = await fetch(`https://itunes.apple.com/lookup?id=${appleId}&country=ca`, { signal: AbortSignal.timeout(8000) });
+    const data = await r.json();
+    return (data.results && data.results[0] && data.results[0].previewUrl) || null;
+  } catch (err) {
+    return null;
+  }
+}
+
 app.get('/api/preview/:id', async (req, res) => {
   const id = req.params.id;
   if (!PREVIEW_TRACK_IDS.has(id)) return res.status(404).json({ error: 'unknown track' });
@@ -41,15 +70,10 @@ app.get('/api/preview/:id', async (req, res) => {
   if (cached && Date.now() - cached.at < PREVIEW_CACHE_MS && req.query.fresh !== '1') {
     return res.json({ preview: cached.url });
   }
-  try {
-    const r = await fetch(`https://api.deezer.com/track/${id}`, { signal: AbortSignal.timeout(8000) });
-    const track = await r.json();
-    if (!track.preview) return res.status(404).json({ error: 'no preview' });
-    previewCache.set(id, { url: track.preview, at: Date.now() });
-    res.json({ preview: track.preview });
-  } catch (err) {
-    res.status(502).json({ error: 'deezer unavailable' });
-  }
+  const url = (await deezerPreview(id)) || (await applePreview(id));
+  if (!url) return res.status(404).json({ error: 'no preview' });
+  previewCache.set(id, { url, at: Date.now() });
+  res.json({ preview: url });
 });
 
 // Redirect root to /insta for now

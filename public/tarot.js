@@ -33,15 +33,39 @@ const FORTUNES = [
 (() => {
   const card = document.getElementById('tarotDraw');
   if (!card) return;
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const FLIP_MS = 600; // matches .tarot-flip's transition in index.html
+  let angle = 0;       // card rotation; odd multiples of 180 = face up
+  let faceUp = false;
   let last = -1;
-  card.addEventListener('click', () => {
-    let next = Math.floor(Math.random() * FORTUNES.length);
-    if (next === last) next = (next + 1) % FORTUNES.length;
-    last = next;
-    const f = FORTUNES[next];
+  let spinning = false;
+
+  function show(f) {
     document.getElementById('tarotSymbol').textContent = f.symbol;
     document.getElementById('tarotTitle').textContent = f.title;
     document.getElementById('tarotMessage').textContent = f.message;
-    card.querySelector('.tarot-cta').textContent = 'draw another';
+    card.setAttribute('aria-label', `${f.title}: ${f.message} Tap to draw another card.`);
+  }
+
+  card.addEventListener('click', () => {
+    if (spinning) return; // let the current flip finish
+    let next = Math.floor(Math.random() * FORTUNES.length);
+    if (next === last) next = (next + 1) % FORTUNES.length;
+    last = next;
+    const fortune = FORTUNES[next];
+    if (!faceUp) {
+      // First draw: set the fortune, then flip face up.
+      show(fortune);
+      angle += 180;
+      faceUp = true;
+    } else {
+      // Draw another: one full turn; swap the text halfway, while the back
+      // is facing the viewer, so the change is never seen.
+      angle += 360;
+      spinning = true;
+      setTimeout(() => show(fortune), calm ? 0 : FLIP_MS / 2);
+      setTimeout(() => { spinning = false; }, calm ? 0 : FLIP_MS);
+    }
+    card.style.transform = `rotateY(${angle}deg)`;
   });
 })();

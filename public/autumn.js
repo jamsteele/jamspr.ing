@@ -209,6 +209,12 @@ function initHaiku() {
   scroll.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
   });
+  // While open, a tap anywhere else rolls it up too (and still does its normal
+  // thing, e.g. turning leaves). pointerdown, because the game canvas cancels
+  // the touch's default, so no click event would follow a tap on the tree.
+  document.addEventListener('pointerdown', (e) => {
+    if (scroll.classList.contains('open') && !scroll.contains(e.target)) toggle();
+  }, true);
 }
 
 // ---- Share capture ----
