@@ -1301,13 +1301,23 @@ function handleUp(){
   }
   isMouseDown=false;mouseVX=0;mouseVY=0;
 }
-// Touch: up/down swipes scroll the page (the game box is touch-action: pan-y
-// in index.html), so the game doesn't trap thumbs on phones. Taps and
-// side-to-side drags still play. A touch is undecided until it moves
-// TOUCH_SLOP px: mostly vertical → page scroll; sideways → game drag; lifted
-// without moving → tap (fired on lift, so starting a scroll on the tree does
-// nothing to it).
-const TOUCH_SLOP = 10; // CSS px
+// Touch on phones, where the game fills most of the screen:
+//  - A touch that STARTS ON THE TREE is always the game: any-direction drags
+//    paint leaves / bloom branches and the page never scrolls.
+//  - A touch that starts anywhere else (sky, water, seawall, grass) lets the
+//    page scroll: the game box is touch-action: pan-y in index.html. It stays
+//    undecided until it moves TOUCH_SLOP px: mostly vertical → page scroll;
+//    sideways → game drag; lifted without moving → tap (dog, ferry, flowers…).
+const TOUCH_SLOP = 10;        // CSS px
+const TREE_TOUCH_REACH = 48;  // canvas px around any branch that counts as "on the tree"
+function segmentDist(px, py, b) {
+  const dx = b.x2 - b.x1, dy = b.y2 - b.y1;
+  const t = Math.max(0, Math.min(1, ((px - b.x1) * dx + (py - b.y1) * dy) / (dx * dx + dy * dy || 1)));
+  return Math.hypot(px - (b.x1 + t * dx), py - (b.y1 + t * dy));
+}
+function isOnTree(pos) {
+  return branches.some((b) => segmentDist(pos.x, pos.y, b) < TREE_TOUCH_REACH);
+}
 let touchStart = null, touchMode = null, lastTouchAt = 0; // touchMode: null | 'drag' | 'scroll' | 'ignore'
 // Phones also send emulated mouse events after a touch; skip those.
 const mouseOnly = (fn) => (e) => { if (Date.now() - lastTouchAt > 800) fn(e); };
@@ -1321,7 +1331,12 @@ canvas.addEventListener('touchstart',(e)=>{
   const t = e.touches[0];
   touchStart = { clientX: t.clientX, clientY: t.clientY };
   touchMode = null;
-},{passive:true});
+  if (isOnTree(getCanvasPos(touchStart))) {
+    e.preventDefault(); // claim this touch: no page scroll
+    touchMode = 'drag';
+    handleDown(touchStart);
+  }
+},{passive:false});
 canvas.addEventListener('touchmove',(e)=>{
   lastTouchAt = Date.now();
   if (!touchStart || touchMode === 'scroll' || touchMode === 'ignore') return;
