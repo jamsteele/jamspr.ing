@@ -39,14 +39,18 @@ function defaultSeason() {
   return (month >= 8 && month <= 10) ? 'autumn' : 'spring';
 }
 
+// A visitor's toggle choice lasts for this visit only (sessionStorage), so every
+// new visit opens in the real-world season. Also clears the old permanent
+// choice that earlier builds saved in localStorage.
 function getSeason() {
   try {
-    return localStorage.getItem(SEASON_KEY) || defaultSeason();
+    localStorage.removeItem(SEASON_KEY);
+    return sessionStorage.getItem(SEASON_KEY) || defaultSeason();
   } catch { return defaultSeason(); }
 }
 
 function setSeason(s) {
-  try { localStorage.setItem(SEASON_KEY, s); } catch {}
+  try { sessionStorage.setItem(SEASON_KEY, s); } catch {}
   applySeason(s, false);
 }
 
