@@ -114,7 +114,8 @@ body.season-autumn .book-info h3,
 body.season-autumn .playlist-header h3 { color: #f6e6c8; }
 body.season-autumn .book-info p,
 body.season-autumn .playlist-track { color: #cfae8c; }
-body.season-autumn .working-on-item { color: #ecd9bd; }
+body.season-autumn .link-button.upcoming:hover { background: rgba(255, 236, 210, 0.07); border-color: rgba(240, 180, 110, 0.18); }
+body.season-autumn .link-tag { color: #f0c890; background: rgba(232, 133, 58, 0.18); }
 body.season-autumn .orbit-spring { display: none; }
 body.season-autumn .orbit-autumn { display: block; }
 body.season-autumn .orbit-item p { color: #cfae8c; }
@@ -134,7 +135,6 @@ body.season-autumn .np-title { color: #f6e6c8; }
 body.season-autumn .crate-toggle { color: #cfa680; }
 body.season-autumn .vinyl-crate .playlist-track:hover { background: rgba(255, 236, 210, 0.06); }
 body.season-autumn .vinyl-crate .playlist-track.is-playing .track-title { color: #f6e6c8; }
-body.season-autumn .working-on-dot,
 body.season-autumn .track-bar { background: #e8853a; }
 body.season-autumn .footer { color: #a88a6c; }
 body.season-autumn .game-container {

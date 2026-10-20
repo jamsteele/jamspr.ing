@@ -364,20 +364,15 @@
     margin-bottom: 2px;
   }
   .book-info p { font-size: 12px; color: #a0889a; }
-  .working-on-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 6px 0;
-    font-size: 13px;
-    color: #6a4d62;
-  }
-  .working-on-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #d4a0b8;
-    flex-shrink: 0;
+  /* An unreleased project in the links list: same card, but not clickable. */
+  .link-button.upcoming { cursor: default; }
+  .link-button.upcoming:hover { transform: none; background: rgba(255, 255, 255, 0.5); border-color: rgba(200, 170, 185, 0.18); }
+  .link-note { font-style: italic; font-size: 0.82em; opacity: 0.6; font-weight: 400; }
+  .link-tag {
+    margin-left: auto; flex-shrink: 0;
+    padding: 3px 8px; border-radius: 999px;
+    font-size: 10px; letter-spacing: 0.4px;
+    color: #9a6a88; background: rgba(212, 160, 184, 0.18);
   }
   .links-grid { display: flex; flex-direction: column; gap: 10px; }
   .link-button {
@@ -497,7 +492,7 @@
   .equalizer { display: flex; gap: 2px; align-items: center; flex-shrink: 0; }
   .footer { text-align: center; margin-top: 40px; font-size: 11px; color: #c8b0be; }
   /* Finish lines */
-  .trophy-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; }
+  .trophy-item { display: flex; gap: 12px; align-items: center; padding: 8px 0; }
   .trophy-item + .trophy-item { border-top: 1px solid rgba(200, 170, 185, 0.16); }
   .trophy-medal { font-size: 23px; line-height: 1.15; }
   .trophy-copy h3 { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 500; color: #5c3d52; margin-bottom: 2px; }
@@ -860,35 +855,31 @@
       <span>Stepwise Prompt Workflow Manager</span>
       <span class="link-arrow">→</span>
     </a>
-  </div>
-  <div class="section-label">what i'm working on</div>
-  <div class="card">
-    <div class="working-on-item">
-      <div class="working-on-dot"></div>
-      <span>🔮 Opal Tarot — AI-powered iOS app <em style="opacity:0.6;font-size:0.9em">(in development)</em></span>
+    <!-- Not released yet, so not a link. Swap to an <a class="link-button"> when it ships. -->
+    <div class="link-button upcoming">
+      <span class="link-icon">🔮</span>
+      <span>Opal Tarot <em class="link-note">— AI tarot app</em></span>
+      <span class="link-tag">in development</span>
     </div>
   </div>
-  <div class="section-label">finish lines i'm proud of</div>
+  <div class="section-label">finish lines</div>
   <div class="card">
     <div class="trophy-item">
       <div class="trophy-medal">🏅</div>
       <div class="trophy-copy">
         <h3>BMO Half Marathon</h3>
-        <p>21.1 km, countless encouraging strangers, and the deeply satisfying moment it was finally over.</p>
       </div>
     </div>
     <div class="trophy-item">
       <div class="trophy-medal">🏅</div>
       <div class="trophy-copy">
         <h3>Seawheeze Half Marathon</h3>
-        <p>Early miles, big energy, and a finish line that made every alarm feel briefly justified.</p>
       </div>
     </div>
     <div class="trophy-item">
       <div class="trophy-medal">🏅</div>
       <div class="trophy-copy">
         <h3>Whistler Gran Fondo · Medio</h3>
-        <p>55 km, 824 m of climbing, and ice cream at the finish.</p>
       </div>
     </div>
   </div>
