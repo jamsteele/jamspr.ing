@@ -416,6 +416,73 @@
   .track-platform-btn:hover { opacity: 1; transform: scale(1.15); }
   .track-platform-btn.spotify { background: #1DB954; }
   .track-platform-btn.apple { background: #fc3c44; }
+  /* "On repeat" record player (song-previews.js). Songs live in the hidden
+     .vinyl-crate rows; tapping the record plays a random one. The disc spins,
+     the sheen and tone arm stay put. Label emoji swaps with the season. */
+  .playlist-hint { margin: -4px 0 12px; font-size: 11px; font-style: italic; color: #b8949e; }
+  .crate-toggle {
+    display: block; margin: 8px auto 0; padding: 4px 8px;
+    background: none; border: 0; font: inherit; font-size: 11px; color: #b8949e;
+    text-decoration: underline dotted; text-underline-offset: 3px; cursor: pointer;
+  }
+  .vinyl-crate { display: none; margin-top: 10px; }
+  .vinyl-crate.open { display: flex; }
+  .vinyl-crate .playlist-track { cursor: pointer; margin: 0 -6px; padding: 3px 6px; border-radius: 8px; }
+  .vinyl-crate .playlist-track:hover { background: rgba(200, 150, 175, 0.1); }
+  .vinyl-crate .playlist-track.is-playing .track-title { color: #5c3d52; font-weight: 500; }
+  .turntable { position: relative; width: 168px; height: 168px; margin: 6px auto 14px; }
+  .vinyl {
+    position: relative;
+    width: 100%; height: 100%;
+    padding: 0; border: 0; border-radius: 50%;
+    background: #1b1b1f;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .vinyl:focus-visible { outline: 2px solid #c58aa8; outline-offset: 4px; }
+  .vinyl::after { /* light sheen across the grooves */
+    content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+    background: conic-gradient(from 30deg, transparent 0deg, rgba(255,255,255,0.11) 25deg, transparent 60deg,
+                transparent 180deg, rgba(255,255,255,0.08) 205deg, transparent 240deg);
+  }
+  .vinyl-disc {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 100%; border-radius: 50%;
+    background: repeating-radial-gradient(circle, #1b1b1f 0 2px, #2a2a31 2px 3px);
+    animation: vinylSpin 1.8s linear infinite;
+    animation-play-state: paused;
+  }
+  .turntable.spinning .vinyl-disc { animation-play-state: running; }
+  @keyframes vinylSpin { to { transform: rotate(360deg); } }
+  .vinyl-label {
+    position: relative;
+    display: flex; align-items: flex-start; justify-content: center;
+    width: 58px; height: 58px; padding-top: 7px; border-radius: 50%;
+    background: #f2b8c6;
+    font-size: 17px; line-height: 1;
+  }
+  .vinyl-label::after { /* spindle hole */
+    content: ''; position: absolute; top: 50%; left: 50%;
+    width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: #1b1b1f;
+  }
+  .tonearm {
+    position: absolute; top: -8px; right: -14px;
+    width: 16px; height: 100px;
+    transform-origin: 8px 8px; transform: rotate(4deg);
+    transition: transform 0.6s cubic-bezier(.3, .7, .4, 1);
+    pointer-events: none;
+  }
+  .tonearm::before { content: ''; position: absolute; top: 0; left: 0; width: 16px; height: 16px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #f4f4f4, #9a9aa2); box-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+  .tonearm::after { content: ''; position: absolute; top: 8px; left: 6px; width: 4px; height: 84px; border-radius: 2px;
+    background: linear-gradient(90deg, #dcdce0, #8f8f98); box-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+  .tonearm-head { position: absolute; bottom: 0; left: 3px; width: 10px; height: 14px; border-radius: 2px; background: #55555c; }
+  .turntable.spinning .tonearm { transform: rotate(26deg); }
+  .now-playing { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 26px; text-align: center; }
+  .np-title { font-size: 13px; font-weight: 500; color: #5c3d52; }
+  .np-links { display: flex; gap: 5px; opacity: 0; transition: opacity 0.3s; }
+  .now-playing.has-song .np-links { opacity: 1; }
   .track-bar {
     width: 3px; height: 12px;
     background: #d4a0b8; border-radius: 2px;
@@ -427,6 +494,51 @@
   }
   .equalizer { display: flex; gap: 2px; align-items: center; flex-shrink: 0; }
   .footer { text-align: center; margin-top: 40px; font-size: 11px; color: #c8b0be; }
+  /* Finish lines */
+  .trophy-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; }
+  .trophy-item + .trophy-item { border-top: 1px solid rgba(200, 170, 185, 0.16); }
+  .trophy-medal { font-size: 23px; line-height: 1.15; }
+  .trophy-copy h3 { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 500; color: #5c3d52; margin-bottom: 2px; }
+  .trophy-copy p { font-size: 12px; line-height: 1.55; color: #9a7b90; }
+  /* Quick repeat taps (record on/off, tarot draws, critters) would otherwise
+     trigger double-tap zoom on phones. Pinch zoom still works. */
+  button, [role="button"], .interactive { touch-action: manipulation; }
+  /* In my orbit this season (spring set by default; autumn.css swaps) */
+  .orbit-item { display: flex; gap: 11px; align-items: flex-start; padding: 7px 0; }
+  .orbit-icon { font-size: 18px; width: 23px; text-align: center; flex-shrink: 0; }
+  .orbit-item p { font-size: 12px; line-height: 1.55; color: #9a7b90; }
+  .orbit-item strong { color: #5c3d52; font-weight: 600; }
+  .orbit-autumn { display: none; }
+  /* A tiny tarot (behaviour in tarot.js) */
+  .tarot-card { text-align: center; overflow: hidden; }
+  .tarot-face {
+    width: 100%;
+    border: 1px solid rgba(115, 78, 128, 0.22);
+    border-radius: 16px;
+    padding: 20px 18px 17px;
+    background: linear-gradient(155deg, rgba(63, 41, 84, 0.97), rgba(116, 67, 105, 0.94));
+    color: #fff7ed;
+    font: inherit;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 4px rgba(255, 231, 190, 0.08), 0 10px 26px rgba(82, 46, 91, 0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .tarot-face:hover { transform: translateY(-1px); box-shadow: inset 0 0 0 4px rgba(255, 231, 190, 0.11), 0 13px 30px rgba(82, 46, 91, 0.22); }
+  .tarot-face:focus-visible { outline: 2px solid #9a6aa8; outline-offset: 3px; }
+  .tarot-symbol { display: block; font-size: 37px; line-height: 1; margin-bottom: 8px; }
+  .tarot-title { display: block; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 500; margin-bottom: 7px; }
+  .tarot-message { display: block; font-size: 12.5px; line-height: 1.6; color: #f4e2ec; min-height: 40px; }
+  .tarot-cta {
+    display: inline-block;
+    margin-top: 13px;
+    padding: 6px 10px;
+    border: 1px solid rgba(255, 231, 190, 0.38);
+    border-radius: 999px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: #ffe7be;
+  }
   @media (max-width: 480px) {
     .container { padding: 30px 16px 50px; }
     .header h1 { font-size: 24px; }
@@ -455,6 +567,15 @@
     </div>
     <div class="game-container" id="gameContainer">
       <canvas class="game-canvas" id="gameCanvas"></canvas>
+      <!-- Layer order: scene canvas → ducks → autumn tree canvas → overlay, so
+           the ducks walk behind the tree. garden.js draws the autumn tree on
+           #treeCanvas; pointer-events pass through it to the game. -->
+      <div class="duck-layer">
+        <!-- A mallard pair on the seawall: they wander together (autumn.js) and quack when tapped. -->
+        <div class="duck d1 facing-right interactive" title="quack"><svg viewBox="0 0 40 30"><use href="#duckDrake"/></svg></div>
+        <div class="duck d2 interactive" title="quack"><svg viewBox="0 0 40 30"><use href="#duckHen"/></svg></div>
+      </div>
+      <canvas class="tree-canvas" id="treeCanvas" aria-hidden="true"></canvas>
       <div class="autumn-overlay">
         <!-- Crescent moon, top-right -->
         <svg class="moon" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
@@ -507,6 +628,45 @@
               </g>
               <ellipse cx="25" cy="23" rx="2.4" ry="5" fill="#ffe0aa" opacity="0.35"/>
               <path d="M29 15 C28.5 11 29.5 8 32 6.5 L33.5 8.5 C31.5 10 31.5 12 32 15 Z" fill="#6a5528"/>
+            </symbol>
+            <!-- Mallards, facing left. Feet sit on the bottom edge of the viewBox. -->
+            <symbol id="duckDrake" viewBox="0 0 40 30">
+              <path d="M31 15 Q39 12 38 19 Q35 21 31 20 Z" fill="#2b2b2b"/>
+              <path d="M36 14.5 q2 -2 1 -3.5" stroke="#f2f2f2" stroke-width="0.9" fill="none" stroke-linecap="round"/>
+              <ellipse cx="22" cy="19" rx="12.5" ry="7" fill="#a3a39b"/>
+              <ellipse cx="12.5" cy="19" rx="6" ry="6" fill="#7a3f2c"/>
+              <path d="M16 15.5 Q26 11.5 33 16.5 Q26 22 17 20 Z" fill="#8a877f"/>
+              <path d="M24 17.6 L29.5 17.4 L29 19 L24 19.2 Z" fill="#3a5fc4"/>
+              <path d="M10 13.5 Q9 10.5 10 8" stroke="#1f6b3a" stroke-width="5" fill="none" stroke-linecap="round"/>
+              <path d="M8.2 14 Q10.5 14.8 12.6 13.8" stroke="#f4f4f0" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+              <circle cx="9.5" cy="7.5" r="5" fill="#1f6b3a"/>
+              <ellipse cx="10.5" cy="6" rx="2" ry="1.2" fill="#3f9a5e" opacity="0.7"/>
+              <path d="M5 7.6 Q0.8 8.4 1.2 10 Q4.2 10.4 5.8 9.4 Z" fill="#e3b437"/>
+              <circle cx="7.6" cy="6.8" r="0.8" fill="#111"/>
+              <g stroke="#e8822a" stroke-width="1.1" stroke-linecap="round" fill="none">
+                <path d="M19 25.5 V29.2 M17.4 29.6 H20.4"/>
+                <path d="M24 25.5 V29.2 M22.4 29.6 H25.4"/>
+              </g>
+            </symbol>
+            <symbol id="duckHen" viewBox="0 0 40 30">
+              <path d="M31 15.5 Q38.5 13 37.5 19.5 Q34.5 21 31 20 Z" fill="#6e5236"/>
+              <ellipse cx="22" cy="19" rx="12.5" ry="7" fill="#8e6b46"/>
+              <ellipse cx="12.5" cy="19" rx="6" ry="6" fill="#8e6b46"/>
+              <g fill="#5e4428" opacity="0.7">
+                <ellipse cx="15" cy="20" rx="1.4" ry="0.8"/><ellipse cx="19" cy="22" rx="1.4" ry="0.8"/>
+                <ellipse cx="11" cy="22" rx="1.2" ry="0.7"/><ellipse cx="27" cy="22.5" rx="1.4" ry="0.8"/>
+              </g>
+              <path d="M16 15.5 Q26 11.5 33 16.5 Q26 22 17 20 Z" fill="#735433"/>
+              <path d="M24 17.6 L29.5 17.4 L29 19 L24 19.2 Z" fill="#3a5fc4"/>
+              <path d="M10 13.5 Q9 10.5 10 8" stroke="#8e6b46" stroke-width="5" fill="none" stroke-linecap="round"/>
+              <circle cx="9.5" cy="7.5" r="5" fill="#8e6b46"/>
+              <path d="M5 6.6 Q9 5.8 13.8 7" stroke="#4e3820" stroke-width="0.9" fill="none" stroke-linecap="round"/>
+              <path d="M5 7.6 Q0.8 8.4 1.2 10 Q4.2 10.4 5.8 9.4 Z" fill="#c8823a"/>
+              <circle cx="7.6" cy="7" r="0.8" fill="#111"/>
+              <g stroke="#e8822a" stroke-width="1.1" stroke-linecap="round" fill="none">
+                <path d="M19 25.5 V29.2 M17.4 29.6 H20.4"/>
+                <path d="M24 25.5 V29.2 M22.4 29.6 H25.4"/>
+              </g>
             </symbol>
           </defs>
         </svg>
@@ -705,13 +865,62 @@
       <div class="working-on-dot"></div>
       <span>🔮 Opal Tarot — AI-powered iOS app <em style="opacity:0.6;font-size:0.9em">(in development)</em></span>
     </div>
-    <div class="working-on-item">
-      <div class="working-on-dot"></div>
-      <span>🏃🏻‍♀️ BMO Half Marathon</span>
+  </div>
+  <div class="section-label">finish lines i'm proud of</div>
+  <div class="card">
+    <div class="trophy-item">
+      <div class="trophy-medal">🏅</div>
+      <div class="trophy-copy">
+        <h3>BMO Half Marathon</h3>
+        <p>21.1 km, countless encouraging strangers, and the deeply satisfying moment it was finally over.</p>
+      </div>
     </div>
-    <div class="working-on-item">
-      <div class="working-on-dot"></div>
-      <span>🏃🏻‍♀️ Seawheeze Half Marathon</span>
+    <div class="trophy-item">
+      <div class="trophy-medal">🏅</div>
+      <div class="trophy-copy">
+        <h3>Seawheeze Half Marathon</h3>
+        <p>Early miles, big energy, and a finish line that made every alarm feel briefly justified.</p>
+      </div>
+    </div>
+    <div class="trophy-item">
+      <div class="trophy-medal">🏅</div>
+      <div class="trophy-copy">
+        <h3>Whistler Gran Fondo · Medio</h3>
+        <p>55 km, 824 m of climbing, and ice cream at the finish.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section-label">in my orbit this season</div>
+  <!-- Swaps with the season toggle (autumn.css shows one set). Keep these to
+       taste and interests, not routines or places you are at set times. -->
+  <div class="card">
+    <div class="orbit-set orbit-spring">
+      <div class="orbit-item">
+        <div class="orbit-icon">🌸</div>
+        <p><strong>Cherry blossom hunting.</strong> Side streets in April. Look up, walk slowly.</p>
+      </div>
+      <div class="orbit-item">
+        <div class="orbit-icon">🏃‍♀️</div>
+        <p><strong>Race season.</strong> Training for the next half, one long run at a time.</p>
+      </div>
+      <div class="orbit-item">
+        <div class="orbit-icon">🥕</div>
+        <p><strong>Farmers market hauls.</strong> Buying the weird vegetable on purpose.</p>
+      </div>
+    </div>
+    <div class="orbit-set orbit-autumn">
+      <div class="orbit-item">
+        <div class="orbit-icon">🎷</div>
+        <p><strong>Live jazz.</strong> Especially in a room small enough to hear every note.</p>
+      </div>
+      <div class="orbit-item">
+        <div class="orbit-icon">🚴‍♀️</div>
+        <p><strong>Autumn rides.</strong> Squeezing in the last golden kilometres before ski season starts whispering.</p>
+      </div>
+      <div class="orbit-item">
+        <div class="orbit-icon">☕</div>
+        <p><strong>Serious café research.</strong> Coffee quality is assessed first. The pastry case is judged separately.</p>
+      </div>
     </div>
   </div>
   <div class="section-label">what i'm reading</div>
@@ -732,36 +941,81 @@
       </div>
       <h3>on repeat</h3>
     </div>
-    <div class="playlist-tracks">
-      <div class="playlist-track">
+    <p class="playlist-hint">tap the record for a song from my rotation</p>
+    <!-- Record player (song-previews.js): each tap spins up a random 30-second
+         preview from the crate below. -->
+    <div class="turntable" id="turntable">
+      <button class="vinyl" id="vinyl" type="button" aria-label="Play a random song from my rotation">
+        <span class="vinyl-disc"><span class="vinyl-label"><span class="season-emoji">🌸</span></span></span>
+      </button>
+      <div class="tonearm" aria-hidden="true"><span class="tonearm-head"></span></div>
+    </div>
+    <div class="now-playing" aria-live="polite">
+      <span class="np-title" id="npTitle"></span>
+      <span class="np-links" id="npLinks"></span>
+    </div>
+    <button class="crate-toggle" id="crateToggle" type="button" aria-expanded="false" aria-controls="vinylCrate">see the crate</button>
+    <!-- The crate: every song the record can play, hidden until "see the
+         crate" is tapped; tapping a row plays that song. Each row needs a
+         data-deezer ID that is also in PREVIEW_TRACK_IDS in server.js. -->
+    <div class="playlist-tracks vinyl-crate" id="vinylCrate">
+      <div class="playlist-track" data-deezer="3742100882">
         <span class="track-title">DREAMS COME TRUE — excape.</span>
         <div class="track-links">
           <a href="https://open.spotify.com/track/3tgd6md5mmQDTHUZVjE6lF" target="_blank" rel="noopener" class="track-platform-btn spotify" title="Spotify"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
           <a href="https://music.apple.com/us/album/dreams-come-true-single/1864666479" target="_blank" rel="noopener" class="track-platform-btn apple" title="Apple Music"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.762-.69c-.927-.143-1.874-.1-2.811.03L7.647.49a3.47 3.47 0 00-.492.058 2.595 2.595 0 00-1.885 1.32 3.19 3.19 0 00-.28.77c-.096.416-.107.84-.107 1.268v12.83A3.47 3.47 0 004 17.648a3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 001 21.408C1 23.374 2.61 24 4 24a3.5 3.5 0 003.5-3.5V9.5l11-1.5V16a3.47 3.47 0 00-.883-.12 3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 0014 19.408c0 1.966 1.61 2.592 3 2.592a3.5 3.5 0 003.5-3.5L20.5 5.5l3.494-.001z"/></svg></a>
         </div>
       </div>
-      <div class="playlist-track">
+      <div class="playlist-track" data-deezer="1095607382">
+        <span class="track-title">Oh No — Biig Piig</span>
+        <div class="track-links">
+          <a href="https://open.spotify.com/search/Biig%20Piig%20Oh%20No" target="_blank" rel="noopener" class="track-platform-btn spotify" title="Spotify"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
+          <a href="https://music.apple.com/ca/album/oh-no/1535076098?i=1535076105" target="_blank" rel="noopener" class="track-platform-btn apple" title="Apple Music"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.762-.69c-.927-.143-1.874-.1-2.811.03L7.647.49a3.47 3.47 0 00-.492.058 2.595 2.595 0 00-1.885 1.32 3.19 3.19 0 00-.28.77c-.096.416-.107.84-.107 1.268v12.83A3.47 3.47 0 004 17.648a3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 001 21.408C1 23.374 2.61 24 4 24a3.5 3.5 0 003.5-3.5V9.5l11-1.5V16a3.47 3.47 0 00-.883-.12 3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 0014 19.408c0 1.966 1.61 2.592 3 2.592a3.5 3.5 0 003.5-3.5L20.5 5.5l3.494-.001z"/></svg></a>
+        </div>
+      </div>
+      <div class="playlist-track" data-deezer="4094689641">
+        <span class="track-title">Make Me Feel — oskar med k</span>
+        <div class="track-links">
+          <a href="https://open.spotify.com/search/oskar%20med%20k%20Make%20Me%20Feel" target="_blank" rel="noopener" class="track-platform-btn spotify" title="Spotify"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
+          <a href="https://music.apple.com/ca/album/make-me-feel/6781394920?i=6781394921" target="_blank" rel="noopener" class="track-platform-btn apple" title="Apple Music"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.762-.69c-.927-.143-1.874-.1-2.811.03L7.647.49a3.47 3.47 0 00-.492.058 2.595 2.595 0 00-1.885 1.32 3.19 3.19 0 00-.28.77c-.096.416-.107.84-.107 1.268v12.83A3.47 3.47 0 004 17.648a3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 001 21.408C1 23.374 2.61 24 4 24a3.5 3.5 0 003.5-3.5V9.5l11-1.5V16a3.47 3.47 0 00-.883-.12 3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 0014 19.408c0 1.966 1.61 2.592 3 2.592a3.5 3.5 0 003.5-3.5L20.5 5.5l3.494-.001z"/></svg></a>
+        </div>
+      </div>
+      <div class="playlist-track" data-deezer="122222962">
         <span class="track-title">Warm Magic — Jadu Heart</span>
         <div class="track-links">
           <a href="https://open.spotify.com/track/479xhIMpUhIw1cjUXe6OO4" target="_blank" rel="noopener" class="track-platform-btn spotify" title="Spotify"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
           <a href="https://music.apple.com/gb/song/warm-magic/1099893509?i=1099893967" target="_blank" rel="noopener" class="track-platform-btn apple" title="Apple Music"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.762-.69c-.927-.143-1.874-.1-2.811.03L7.647.49a3.47 3.47 0 00-.492.058 2.595 2.595 0 00-1.885 1.32 3.19 3.19 0 00-.28.77c-.096.416-.107.84-.107 1.268v12.83A3.47 3.47 0 004 17.648a3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 001 21.408C1 23.374 2.61 24 4 24a3.5 3.5 0 003.5-3.5V9.5l11-1.5V16a3.47 3.47 0 00-.883-.12 3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 0014 19.408c0 1.966 1.61 2.592 3 2.592a3.5 3.5 0 003.5-3.5L20.5 5.5l3.494-.001z"/></svg></a>
         </div>
       </div>
-      <div class="playlist-track">
-        <span class="track-title">Platonic Romance — DRAMA</span>
+      <div class="playlist-track" data-deezer="623876072">
+        <span class="track-title">DMMH — TRAILS</span>
         <div class="track-links">
-          <a href="https://open.spotify.com/track/0fJO3Wb7HjiLottJ73DB1P" target="_blank" rel="noopener" class="track-platform-btn spotify" title="Spotify"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
-          <a href="https://music.apple.com/ca/song/platonic-romance/1841970850" target="_blank" rel="noopener" class="track-platform-btn apple" title="Apple Music"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.762-.69c-.927-.143-1.874-.1-2.811.03L7.647.49a3.47 3.47 0 00-.492.058 2.595 2.595 0 00-1.885 1.32 3.19 3.19 0 00-.28.77c-.096.416-.107.84-.107 1.268v12.83A3.47 3.47 0 004 17.648a3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 001 21.408C1 23.374 2.61 24 4 24a3.5 3.5 0 003.5-3.5V9.5l11-1.5V16a3.47 3.47 0 00-.883-.12 3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 0014 19.408c0 1.966 1.61 2.592 3 2.592a3.5 3.5 0 003.5-3.5L20.5 5.5l3.494-.001z"/></svg></a>
+          <a href="https://open.spotify.com/search/TRAILS%20DMMH" target="_blank" rel="noopener" class="track-platform-btn spotify" title="Spotify"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
+          <a href="https://music.apple.com/ca/album/dmmh/1450762283?i=1450762436" target="_blank" rel="noopener" class="track-platform-btn apple" title="Apple Music"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.762-.69c-.927-.143-1.874-.1-2.811.03L7.647.49a3.47 3.47 0 00-.492.058 2.595 2.595 0 00-1.885 1.32 3.19 3.19 0 00-.28.77c-.096.416-.107.84-.107 1.268v12.83A3.47 3.47 0 004 17.648a3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 001 21.408C1 23.374 2.61 24 4 24a3.5 3.5 0 003.5-3.5V9.5l11-1.5V16a3.47 3.47 0 00-.883-.12 3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 0014 19.408c0 1.966 1.61 2.592 3 2.592a3.5 3.5 0 003.5-3.5L20.5 5.5l3.494-.001z"/></svg></a>
         </div>
       </div>
-      <div class="playlist-track">
+      <div class="playlist-track" data-deezer="1217594102">
+        <span class="track-title">You’ve Done Enough — Gorgon City &amp; DRAMA</span>
+        <div class="track-links">
+          <a href="https://open.spotify.com/search/Gorgon%20City%20DRAMA%20You%27ve%20Done%20Enough" target="_blank" rel="noopener" class="track-platform-btn spotify" title="Spotify"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
+          <a href="https://music.apple.com/ca/album/youve-done-enough/1549094184?i=1549094400" target="_blank" rel="noopener" class="track-platform-btn apple" title="Apple Music"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.762-.69c-.927-.143-1.874-.1-2.811.03L7.647.49a3.47 3.47 0 00-.492.058 2.595 2.595 0 00-1.885 1.32 3.19 3.19 0 00-.28.77c-.096.416-.107.84-.107 1.268v12.83A3.47 3.47 0 004 17.648a3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 001 21.408C1 23.374 2.61 24 4 24a3.5 3.5 0 003.5-3.5V9.5l11-1.5V16a3.47 3.47 0 00-.883-.12 3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 0014 19.408c0 1.966 1.61 2.592 3 2.592a3.5 3.5 0 003.5-3.5L20.5 5.5l3.494-.001z"/></svg></a>
+        </div>
+      </div>
+      <div class="playlist-track" data-deezer="3958705891">
+        <span class="track-title">Lullabies (Adventure Club Remix) — Yuna</span>
+        <div class="track-links">
+          <a href="https://open.spotify.com/search/Yuna%20Lullabies%20Adventure%20Club%20Remix" target="_blank" rel="noopener" class="track-platform-btn spotify" title="Spotify"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
+          <a href="https://music.apple.com/ca/album/lullabies-adventure-club-remix/1893163090?i=1893163098" target="_blank" rel="noopener" class="track-platform-btn apple" title="Apple Music"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.762-.69c-.927-.143-1.874-.1-2.811.03L7.647.49a3.47 3.47 0 00-.492.058 2.595 2.595 0 00-1.885 1.32 3.19 3.19 0 00-.28.77c-.096.416-.107.84-.107 1.268v12.83A3.47 3.47 0 004 17.648a3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 001 21.408C1 23.374 2.61 24 4 24a3.5 3.5 0 003.5-3.5V9.5l11-1.5V16a3.47 3.47 0 00-.883-.12 3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 0014 19.408c0 1.966 1.61 2.592 3 2.592a3.5 3.5 0 003.5-3.5L20.5 5.5l3.494-.001z"/></svg></a>
+        </div>
+      </div>
+      <div class="playlist-track" data-deezer="101009324">
         <span class="track-title">Loud Places (feat. Romy) — Jamie xx</span>
         <div class="track-links">
           <a href="https://open.spotify.com/track/1jy7SkRcmBCTcv4ZMtwz29?si=86a66cafc05b4200" target="_blank" rel="noopener" class="track-platform-btn spotify" title="Spotify"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
           <a href="https://music.apple.com/us/song/loud-places-feat-romy/1525506990" target="_blank" rel="noopener" class="track-platform-btn apple" title="Apple Music"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.762-.69c-.927-.143-1.874-.1-2.811.03L7.647.49a3.47 3.47 0 00-.492.058 2.595 2.595 0 00-1.885 1.32 3.19 3.19 0 00-.28.77c-.096.416-.107.84-.107 1.268v12.83A3.47 3.47 0 004 17.648a3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 001 21.408C1 23.374 2.61 24 4 24a3.5 3.5 0 003.5-3.5V9.5l11-1.5V16a3.47 3.47 0 00-.883-.12 3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 0014 19.408c0 1.966 1.61 2.592 3 2.592a3.5 3.5 0 003.5-3.5L20.5 5.5l3.494-.001z"/></svg></a>
         </div>
       </div>
-      <div class="playlist-track">
+      <div class="playlist-track" data-deezer="1033112652">
         <span class="track-title">Fire for You — Cannons</span>
         <div class="track-links">
           <a href="https://open.spotify.com/track/4o0LyB69tylqDG6eTGhmig" target="_blank" rel="noopener" class="track-platform-btn spotify" title="Spotify"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
@@ -769,7 +1023,30 @@
 
         </div>
       </div>
+      <div class="playlist-track" data-deezer="378940811">
+        <span class="track-title">Because You Move Me — Tinlicker &amp; Helsloot</span>
+        <div class="track-links">
+          <a href="https://open.spotify.com/search/Tinlicker%20Helsloot%20Because%20You%20Move%20Me" target="_blank" rel="noopener" class="track-platform-btn spotify" title="Spotify"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
+          <a href="https://music.apple.com/ca/album/because-you-move-me/1254370033?i=1254370042" target="_blank" rel="noopener" class="track-platform-btn apple" title="Apple Music"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.762-.69c-.927-.143-1.874-.1-2.811.03L7.647.49a3.47 3.47 0 00-.492.058 2.595 2.595 0 00-1.885 1.32 3.19 3.19 0 00-.28.77c-.096.416-.107.84-.107 1.268v12.83A3.47 3.47 0 004 17.648a3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 001 21.408C1 23.374 2.61 24 4 24a3.5 3.5 0 003.5-3.5V9.5l11-1.5V16a3.47 3.47 0 00-.883-.12 3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 0014 19.408c0 1.966 1.61 2.592 3 2.592a3.5 3.5 0 003.5-3.5L20.5 5.5l3.494-.001z"/></svg></a>
+        </div>
+      </div>
+      <div class="playlist-track" data-deezer="403915272">
+        <span class="track-title">A Moment Apart — ODESZA</span>
+        <div class="track-links">
+          <a href="https://open.spotify.com/search/ODESZA%20A%20Moment%20Apart" target="_blank" rel="noopener" class="track-platform-btn spotify" title="Spotify"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a>
+          <a href="https://music.apple.com/ca/album/a-moment-apart/1240361817?i=1240362777" target="_blank" rel="noopener" class="track-platform-btn apple" title="Apple Music"><svg viewBox="0 0 24 24" width="11" height="11" fill="white"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.762-.69c-.927-.143-1.874-.1-2.811.03L7.647.49a3.47 3.47 0 00-.492.058 2.595 2.595 0 00-1.885 1.32 3.19 3.19 0 00-.28.77c-.096.416-.107.84-.107 1.268v12.83A3.47 3.47 0 004 17.648a3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 001 21.408C1 23.374 2.61 24 4 24a3.5 3.5 0 003.5-3.5V9.5l11-1.5V16a3.47 3.47 0 00-.883-.12 3.53 3.53 0 00-2.694 2.343A4.07 4.07 0 0014 19.408c0 1.966 1.61 2.592 3 2.592a3.5 3.5 0 003.5-3.5L20.5 5.5l3.494-.001z"/></svg></a>
+        </div>
+      </div>
     </div>
+  </div>
+  <div class="section-label">a tiny tarot</div>
+  <div class="card tarot-card">
+    <button class="tarot-face" id="tarotDraw" type="button" aria-live="polite">
+      <span class="tarot-symbol" id="tarotSymbol">🌙</span>
+      <span class="tarot-title" id="tarotTitle">The Moon</span>
+      <span class="tarot-message" id="tarotMessage">Tap to draw a tiny fortune. No doom, only vibes.</span>
+      <span class="tarot-cta">draw a card</span>
+    </button>
   </div>
   <div class="section-label">find me in the wild</div>
   <div class="links-grid">
@@ -826,5 +1103,7 @@
 <!-- autumn.js first: it publishes the starting season for garden.js. -->
 <script src="autumn.js" defer></script>
 <script src="garden.js" defer></script>
+<script src="tarot.js" defer></script>
+<script src="song-previews.js" defer></script>
 </body>
 </html>

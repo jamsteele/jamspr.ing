@@ -10,6 +10,48 @@ app.get('/insta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// ---- Song previews ("what i'm listening to" card, public/song-previews.js) ----
+// Deezer's API can't be called from the browser (no CORS) and its 30-second
+// preview links expire ~15 min after they're fetched, so the page asks here at
+// play time. Only these pinned track IDs are served, so this isn't an open
+// proxy. They mirror the data-deezer attributes in public/index.html; IDs were
+// checked by hand (original versions, right artists) because Deezer search can
+// return a different band with the same name.
+const PREVIEW_TRACK_IDS = new Set([
+  '3742100882', // DREAMS COME TRUE — excape.
+  '1095607382', // Oh No — Biig Piig
+  '4094689641', // Make Me Feel — oskar med k
+  '623876072',  // DMMH — TRAILS
+  '122222962',  // Warm Magic — Jadu Heart
+  '1217594102', // You've Done Enough — Gorgon City & DRAMA
+  '3958705891', // Lullabies (Adventure Club Remix) — Yuna
+  '101009324',  // Loud Places — Jamie xx
+  '1033112652', // Fire for You — Cannons
+  '378940811',  // Because You Move Me — Tinlicker & Helsloot
+  '403915272',  // A Moment Apart — ODESZA
+]);
+const PREVIEW_CACHE_MS = 10 * 60 * 1000; // under Deezer's ~15 min link expiry
+const previewCache = new Map(); // id -> { url, at }
+
+app.get('/api/preview/:id', async (req, res) => {
+  const id = req.params.id;
+  if (!PREVIEW_TRACK_IDS.has(id)) return res.status(404).json({ error: 'unknown track' });
+  res.set('Cache-Control', 'no-store');
+  const cached = previewCache.get(id);
+  if (cached && Date.now() - cached.at < PREVIEW_CACHE_MS && req.query.fresh !== '1') {
+    return res.json({ preview: cached.url });
+  }
+  try {
+    const r = await fetch(`https://api.deezer.com/track/${id}`, { signal: AbortSignal.timeout(8000) });
+    const track = await r.json();
+    if (!track.preview) return res.status(404).json({ error: 'no preview' });
+    previewCache.set(id, { url: track.preview, at: Date.now() });
+    res.json({ preview: track.preview });
+  } catch (err) {
+    res.status(502).json({ error: 'deezer unavailable' });
+  }
+});
+
 // Redirect root to /insta for now
 app.get('/', (req, res) => {
   res.redirect(301, '/insta');

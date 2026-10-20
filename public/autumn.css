@@ -64,9 +64,9 @@ body.season-autumn .bg-petal:nth-of-type(4n+3) { background: #e8b04a; }
 body.season-autumn .bg-petal:nth-of-type(4n)   { background: #9a4a22; }
 body.season-autumn .bg-petal:nth-of-type(5n)   { width: 22px; height: 22px; }
 @keyframes leafDrift {
-  0%   { transform: translateY(0) rotate(0deg);                     opacity: 0.35; }
-  40%  { transform: translateY(-40px) translateX(14px) rotate(170deg); opacity: 0.7; }
-  100% { transform: translateY(22px) translateX(-10px) rotate(360deg); opacity: 0.35; }
+  0%   { transform: translateY(0) rotate(0deg);                     opacity: 0.16; }
+  40%  { transform: translateY(-40px) translateX(14px) rotate(170deg); opacity: 0.38; }
+  100% { transform: translateY(22px) translateX(-10px) rotate(360deg); opacity: 0.16; }
 }
 body.season-autumn .header h1 { color: #f6e6c8; }
 body.season-autumn .header p { color: #d9b48c; }
@@ -115,6 +115,25 @@ body.season-autumn .playlist-header h3 { color: #f6e6c8; }
 body.season-autumn .book-info p,
 body.season-autumn .playlist-track { color: #cfae8c; }
 body.season-autumn .working-on-item { color: #ecd9bd; }
+body.season-autumn .orbit-spring { display: none; }
+body.season-autumn .orbit-autumn { display: block; }
+body.season-autumn .orbit-item p { color: #cfae8c; }
+body.season-autumn .orbit-item strong { color: #f6e6c8; }
+body.season-autumn .trophy-copy h3 { color: #f6e6c8; }
+body.season-autumn .trophy-copy p { color: #cfae8c; }
+body.season-autumn .trophy-item + .trophy-item { border-top-color: rgba(240, 180, 110, 0.15); }
+/* The tarot face is purple already; an amber edge keeps it from melting into
+   the purple page. */
+body.season-autumn .tarot-face {
+  border-color: rgba(240, 180, 110, 0.35);
+  box-shadow: inset 0 0 0 4px rgba(255, 231, 190, 0.08), 0 10px 26px rgba(0, 0, 0, 0.3);
+}
+body.season-autumn .vinyl-label { background: #d4793a; }
+body.season-autumn .playlist-hint { color: #cfa680; }
+body.season-autumn .np-title { color: #f6e6c8; }
+body.season-autumn .crate-toggle { color: #cfa680; }
+body.season-autumn .vinyl-crate .playlist-track:hover { background: rgba(255, 236, 210, 0.06); }
+body.season-autumn .vinyl-crate .playlist-track.is-playing .track-title { color: #f6e6c8; }
 body.season-autumn .working-on-dot,
 body.season-autumn .track-bar { background: #e8853a; }
 body.season-autumn .footer { color: #a88a6c; }
@@ -203,6 +222,11 @@ body.season-autumn .share-btn:hover {
   overflow: hidden;
 }
 body.season-autumn .autumn-overlay { display: block; }
+/* Ducks get their own layer under the tree canvas (see index.html). */
+.duck-layer { position: absolute; inset: 0; display: none; overflow: hidden; pointer-events: none; }
+body.season-autumn .duck-layer { display: block; }
+.duck-layer .interactive { pointer-events: auto; }
+.tree-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .autumn-overlay .interactive { pointer-events: auto; }
 
 .hidden-cat {
@@ -277,6 +301,46 @@ body.season-autumn .autumn-overlay { display: block; }
   0%, 50%, 100% { transform: rotate(0); }
   25%, 75%      { transform: rotate(-55deg); }
 }
+/* Mallards on the seawall path (the canvas draws the path at 63–70% of the
+   scene height, so feet sit at ~31–33% from the bottom). autumn.js wanders
+   them: waddle to a spot (.walking, moving `left`), stop and peck, repeat.
+   Tapping one hops it and floats a "quack" (reuses .hoot). The symbol faces
+   left; .facing-right mirrors it. */
+.duck {
+  position: absolute;
+  cursor: pointer;
+  transform-origin: 50% 100%;
+  animation: duckPeck 7s ease-in-out infinite;
+  filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.25));
+}
+.duck svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.duck.facing-right svg { transform: scaleX(-1); }
+.duck.d1 { left: 9%;  bottom: 31.5%; width: 30px; height: 23px; animation-delay: -1s; }
+.duck.d2 { left: 18%; bottom: 31%;   width: 28px; height: 21px; animation-delay: -4s; }
+@keyframes duckPeck {
+  0%, 82%, 100% { transform: rotate(0); }
+  86%           { transform: rotate(-14deg); }
+  90%           { transform: rotate(0); }
+  93%           { transform: rotate(-14deg); }
+}
+.duck.facing-right { animation-name: duckPeckRight; }
+@keyframes duckPeckRight {
+  0%, 82%, 100% { transform: rotate(0); }
+  86%           { transform: rotate(14deg); }
+  90%           { transform: rotate(0); }
+  93%           { transform: rotate(14deg); }
+}
+.duck.walking { animation: duckWaddle 0.3s ease-in-out infinite alternate; }
+@keyframes duckWaddle {
+  from { transform: rotate(-6deg); }
+  to   { transform: rotate(6deg) translateY(-1px); }
+}
+.duck.quacking { animation: duckHop 0.45s ease-out; }
+@keyframes duckHop {
+  0%, 100% { transform: translateY(0); }
+  40%      { transform: translateY(-7px); }
+}
+
 .hoot {
   position: absolute;
   top: -6px;

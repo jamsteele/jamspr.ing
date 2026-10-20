@@ -2,8 +2,8 @@
 // Autumn layer — season toggle + overlay critters.
 // Flips the canvas game (garden.js) between seasons via
 // window.__setGardenSeason, and wires the autumn-only SVG
-// overlay in index.html: hidden cat, owl, jack-o-lantern,
-// and the "whisper to the wind" haiku card.
+// overlay in index.html: hidden cat, owl, ducks, jack-o-lantern,
+// and the haiku scroll.
 // Gotcha: the hint text under the game is owned by
 // garden.js updateUI(), not this file.
 // ============================================
@@ -109,6 +109,71 @@ function initOwl() {
   });
 }
 
+// ---- Ducks on the seawall: wander, and tap → hop + a floating "quack" ----
+// A mallard pair: the drake (.d1) picks a spot along the seawall and waddles
+// there; the hen (.d2) follows a step behind him. Then they stand and peck.
+const DUCK_RANGE = [4, 80];           // % of scene width they roam within
+const DUCK_SPEED = 3.5;               // % of scene width per second
+const DUCK_REST_MS = [2500, 7000];    // how long they stand and peck between walks
+const HEN_GAP = 7;                    // % she trails behind him
+const HEN_DELAY_MS = 600;             // she sets off a beat after he does
+
+function duckPct(duck) {
+  return (duck.offsetLeft / duck.parentElement.clientWidth) * 100;
+}
+// Returns the walk's duration in ms. Timers (not transitionend) end the walk,
+// because transitionend can go missing if the tab is backgrounded mid-walk.
+function walkDuckTo(duck, to) {
+  const from = duckPct(duck);
+  const ms = (Math.abs(to - from) / DUCK_SPEED) * 1000;
+  duck.classList.toggle('facing-right', to > from);
+  duck.style.transition = `left ${ms.toFixed(0)}ms linear`;
+  duck.classList.add('walking');
+  duck.style.left = `${to.toFixed(2)}%`;
+  setTimeout(() => duck.classList.remove('walking'), ms);
+  return ms;
+}
+function wanderPair(drake, hen) {
+  const [min, max] = DUCK_RANGE;
+  const rest = () => setTimeout(walk, DUCK_REST_MS[0] + Math.random() * (DUCK_REST_MS[1] - DUCK_REST_MS[0]));
+  function walk() {
+    // Don't animate what nobody can see; check again after the next rest.
+    if (document.hidden || !document.body.classList.contains('season-autumn')) return rest();
+    const from = duckPct(drake);
+    let to = min + Math.random() * (max - min);
+    if (Math.abs(to - from) < 6) to = from < (min + max) / 2 ? Math.min(max, from + 12) : Math.max(min, from - 12);
+    const ms = walkDuckTo(drake, to);
+    const dir = to > from ? 1 : -1;
+    setTimeout(() => walkDuckTo(hen, Math.min(max, Math.max(min, to - dir * HEN_GAP))), HEN_DELAY_MS);
+    setTimeout(rest, ms + HEN_DELAY_MS);
+  }
+  rest();
+}
+
+function initDucks() {
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const drake = document.querySelector('.duck.d1');
+  const hen = document.querySelector('.duck.d2');
+  if (!calm && drake && hen) wanderPair(drake, hen);
+  document.querySelectorAll('.duck').forEach((duck) => {
+    duck.addEventListener('click', () => {
+      duck.classList.remove('quacking');
+      void duck.offsetWidth;
+      duck.classList.add('quacking');
+      const quack = document.createElement('span');
+      quack.className = 'hoot';
+      quack.textContent = 'quack';
+      quack.style.left = '-4px';
+      quack.addEventListener('animationend', () => quack.remove());
+      duck.appendChild(quack);
+    });
+    // Return to the idle peck once the hop finishes.
+    duck.addEventListener('animationend', (e) => {
+      if (e.animationName === 'duckHop') duck.classList.remove('quacking');
+    });
+  });
+}
+
 // ---- Jack-o-lantern (tap to light; state persists this session) ----
 function initLantern() {
   const lantern = document.getElementById('jackOLantern');
@@ -177,8 +242,9 @@ window.__autumnShareLayers = async function (canvas) {
     await img.decode();
     return { img, ...b, flip: getComputedStyle(el).transform.startsWith('matrix(-1') };
   }
-  // Pumpkins reference shared <symbol>s; inline them so the image stands alone.
-  function inlinePumpkin(clone) {
+  // Pumpkins and ducks reference shared <symbol>s; inline them so the image
+  // stands alone.
+  function inlineUse(clone) {
     const use = clone.querySelector('use');
     const symbol = document.querySelector(use.getAttribute('href'));
     clone.appendChild(sharedDefs.cloneNode(true));
@@ -195,7 +261,8 @@ window.__autumnShareLayers = async function (canvas) {
   const pieces = await Promise.all([
     svgLayer(document.querySelector('.autumn-overlay .moon')),
     svgLayer(document.querySelector('#owl svg')),
-    ...[...document.querySelectorAll('.ground-pumpkin')].map((el) => svgLayer(el, inlinePumpkin)),
+    ...[...document.querySelectorAll('.duck svg')].map((el) => svgLayer(el, inlineUse).then((l) => l && { ...l, behindTree: true })),
+    ...[...document.querySelectorAll('.ground-pumpkin')].map((el) => svgLayer(el, inlineUse)),
     svgLayer(cat.querySelector('svg'), (c) => {
       if (!cat.classList.contains('out')) c.querySelector('.cat-body').remove();
     }),
@@ -218,6 +285,7 @@ function boot() {
   initCat();
   initLantern();
   initOwl();
+  initDucks();
   initHaiku();
 }
 

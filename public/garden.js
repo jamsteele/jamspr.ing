@@ -3,6 +3,11 @@
 // ============================================
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+// Autumn draws its tree on a separate canvas stacked above the duck layer, so
+// the ducks walk behind the tree (layer order is in index.html).
+const treeCanvas = document.getElementById('treeCanvas');
+const treeCtx = treeCanvas.getContext('2d');
+let _treeCanvasHasTree = false;
 const gameContainer = document.getElementById('gameContainer');
 let W, H;
 let branches = [], leaves = [], blossoms = [], petals = [], wishes = [];
@@ -30,6 +35,10 @@ const AUTUMN_LEAVES_PER_PX = 0.35;
 // Per-leaf odds of falling on one tap / one drag movement once fully turned.
 const KNOCK_CHANCE_TAP = 0.2;
 const KNOCK_CHANCE_DRAG = 0.02;
+// How far a tap / drag reaches, in canvas px (2x CSS px). Generous so a
+// thumb on a phone catches plenty of leaves.
+const AUTUMN_TAP_RADIUS = 72;
+const AUTUMN_DRAG_RADIUS = 44;
 function pickAutumnFinal() {
   return AUTUMN_FINALS[Math.floor(Math.random() * AUTUMN_FINALS.length)];
 }
@@ -948,7 +957,7 @@ function drawLeaf(l, c=ctx){
   c.restore();c.globalAlpha=1;
 }
 // Autumn: draw the cached tree layer, re-rendering it first if a leaf changed.
-function drawAutumnTree(){
+function drawAutumnTree(c){
   if(!_treeLayer||_treeLayer.width!==W||_treeLayer.height!==H){
     _treeLayer=document.createElement('canvas');_treeLayer.width=W;_treeLayer.height=H;_treeDirty=true;
   }
@@ -962,9 +971,9 @@ function drawAutumnTree(){
   // Skew around the trunk base: the canopy leans with the wind, the base stays put.
   const baseX=W*0.48, baseY=H*0.92;
   const lean=-windStrength*0.012*(0.8+0.2*Math.sin(frameCount*0.05));
-  ctx.save();ctx.translate(baseX,baseY);ctx.transform(1,0,lean,1,0,0);ctx.translate(-baseX,-baseY);
-  ctx.drawImage(_treeLayer,0,0);
-  ctx.restore();
+  c.save();c.translate(baseX,baseY);c.transform(1,0,lean,1,0,0);c.translate(-baseX,-baseY);
+  c.drawImage(_treeLayer,0,0);
+  c.restore();
 }
 function drawBlossom(b){
   if(b.opacity<=0)return;
@@ -1087,7 +1096,18 @@ function draw(ts){
   if(_bgFront)ctx.drawImage(_bgFront,0,0);else{drawSeawall();drawGround();}
   if(season!=='autumn')drawDog();
   drawFlowers();
-  if(season==='autumn') drawAutumnTree();
+  if(season==='autumn'){
+    if(_isRecording){
+      // The recording only captures the main canvas, so stack everything here:
+      // ducks, then the tree, then (at the end of the frame) the rest.
+      paintShareOverlay(ctx,true);
+      drawAutumnTree(ctx);
+    } else {
+      treeCtx.clearRect(0,0,W,H);
+      drawAutumnTree(treeCtx);
+      _treeCanvasHasTree=true;
+    }
+  }
   else { const sorted=[...branches].sort((a,b)=>a.depth-b.depth);sorted.forEach(b=>drawBranch(b));leaves.forEach(l=>drawLeaf(l)); }
   petals.filter(p=>p.grounded).forEach(drawPetal);
   blossoms.forEach(drawBlossom);
@@ -1095,7 +1115,8 @@ function draw(ts){
   wishes.forEach((w,i)=>drawWish(w,i));
   drawSparkles();
   petals.filter(p=>!p.grounded).forEach(drawPetal);
-  if(_isRecording)paintShareOverlay(ctx);
+  if(season!=='autumn'&&_treeCanvasHasTree){treeCtx.clearRect(0,0,W,H);_treeCanvasHasTree=false;}
+  if(_isRecording)paintShareOverlay(ctx,false);
   if(Math.abs(windStrength)>0.8){
     ctx.save();ctx.globalAlpha=Math.min(Math.abs(windStrength)*0.08,0.15);
     for(let i=0;i<3;i++){const y=H*(0.2+i*0.25)+Math.sin(frameCount*0.02+i)*20;const sx=windStrength>0?W*0.1+i*40:W*0.9-i*40;ctx.beginPath();ctx.moveTo(sx,y);ctx.lineTo(sx+windStrength*15,y);ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=1;ctx.stroke();}
@@ -1187,7 +1208,7 @@ function pokeAutumnLeaves(pos, radius, knockChance) {
 
 function handleTap(e){
   const pos=getCanvasPos(e);
-  if (season === 'autumn') { pokeAutumnLeaves(pos, 42, KNOCK_CHANCE_TAP); return; }
+  if (season === 'autumn') { pokeAutumnLeaves(pos, AUTUMN_TAP_RADIUS, KNOCK_CHANCE_TAP); return; }
   if(isFullyBloomed&&selectedWishIdx!==-1){selectedWishIdx=-1;document.getElementById('gameHint').textContent='swirl the petals... or make a wish 🎋';}
   let bloomedSomething=false;
   const alreadyBloomed=new Set();
@@ -1210,7 +1231,7 @@ function handleMove(e){
   const pos=getCanvasPos(e);
   mouseVX=pos.x-lastMouseX;mouseVY=pos.y-lastMouseY;lastMouseX=pos.x;lastMouseY=pos.y;
   if (season === 'autumn') {
-    pokeAutumnLeaves(pos, 24, KNOCK_CHANCE_DRAG);
+    pokeAutumnLeaves(pos, AUTUMN_DRAG_RADIUS, KNOCK_CHANCE_DRAG);
     petals.forEach(p=>{const dist=Math.sqrt((pos.x-p.x)**2+(pos.y-p.y)**2);if(dist<70){const force=(70-dist)/70;p.vx+=mouseVX*force*0.3;p.vy+=mouseVY*force*0.3-force*0.5;if(p.grounded){p.grounded=false;p.vy=-2-Math.random()*2;}}});
     return;
   }
@@ -1346,9 +1367,11 @@ function paintShareBackground(c,w,h){
   }
   c.fillStyle=bg;c.fillRect(0,0,w,h);
 }
-function paintShareOverlay(c){
+// behindTree: true paints the layers that sit under the tree (the ducks),
+// false paints everything above it.
+function paintShareOverlay(c, behindTree){
   if(!_shareOverlay)return;
-  _shareOverlay.forEach(l=>{
+  _shareOverlay.filter(l=>!!l.behindTree===behindTree).forEach(l=>{
     if(l.dot){c.beginPath();c.arc(l.x,l.y,l.r,0,Math.PI*2);c.fillStyle=l.color;c.fill();return;}
     if(l.flip){c.save();c.translate(l.x+l.w,l.y);c.scale(-1,1);c.drawImage(l.img,0,0,l.w,l.h);c.restore();}
     else c.drawImage(l.img,l.x,l.y,l.w,l.h);
@@ -1378,7 +1401,9 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
     const offCtx = offscreen.getContext('2d');
     paintShareBackground(offCtx, offscreen.width, offscreen.height);
     offCtx.drawImage(canvas,0,0);
-    paintShareOverlay(offCtx);
+    paintShareOverlay(offCtx, true);
+    if (season === 'autumn') offCtx.drawImage(treeCanvas,0,0);
+    paintShareOverlay(offCtx, false);
     _shareOverlay = null;
     let dataUrl;
     try { dataUrl = offscreen.toDataURL('image/png'); }
@@ -1387,6 +1412,7 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
       // fall back to the scene without the overlay.
       paintShareBackground(offCtx, offscreen.width, offscreen.height);
       offCtx.drawImage(canvas,0,0);
+      if (season === 'autumn') offCtx.drawImage(treeCanvas,0,0);
       dataUrl = offscreen.toDataURL('image/png');
     }
     const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -1511,6 +1537,7 @@ function resizeCanvas(){
   const firstLoad=!W||!H;
   const oldW=W||newW,oldH=H||newH;
   canvas.width=newW;canvas.height=newH;
+  treeCanvas.width=newW;treeCanvas.height=newH;
   W=newW;H=newH;
   if(firstLoad){
     _treeSeed = (Date.now() ^ (Math.random()*0xffffffff|0)) | 1;
