@@ -33,6 +33,10 @@ const AUTUMN_TURN_STEPS = 3;
 // branch length (canvas is 2x CSS px). Raise these for a fuller tree.
 const AUTUMN_LEAVES_PER_BRANCH = 6;
 const AUTUMN_LEAVES_PER_PX = 0.35;
+// Leaf counts are computed as if the canvas were this tall, so every screen
+// size grows the same leaves in the same order. That keeps each leaf's uid
+// stable when a resize regenerates the tree (see resizeCanvas).
+const AUTUMN_REF_HEIGHT = 800;
 // Per-leaf odds of falling on one tap / one drag movement once fully turned.
 const KNOCK_CHANCE_TAP = 0.2;
 const KNOCK_CHANCE_DRAG = 0.02;
@@ -102,7 +106,7 @@ function generateTree() {
     const autumn = season === 'autumn';
     if (canBloom || (autumn && depth >= 1)) {
       const numLeaves = autumn
-        ? AUTUMN_LEAVES_PER_BRANCH + Math.round(length * AUTUMN_LEAVES_PER_PX)
+        ? AUTUMN_LEAVES_PER_BRANCH + Math.round((length / H) * AUTUMN_REF_HEIGHT * AUTUMN_LEAVES_PER_PX)
         : (isTip ? 4 : 2) + Math.floor(Math.random() * (isTip ? 5 : 3));
       const tStart = autumn ? 0.04 : 0.15; // 0 = branch base, 1 = tip
       const jitter = autumn ? 22 : 12;
@@ -120,6 +124,7 @@ function generateTree() {
           opacity:0.6+Math.random()*0.35,
           branchIdx,
           tintStage:0,
+          uid:leaves.length, // stable across regenerations (same seed → same order)
           autumnFinal:autumn ? pickAutumnFinal() : null,
         });
       }
@@ -1557,13 +1562,18 @@ function resizeCanvas(){
     const savedBlossoms=blossoms.map(b=>({...b,x:b.x*scaleX,y:b.y*scaleY,baseX:b.baseX*scaleX,baseY:b.baseY*scaleY}));
     const savedPetals=petals.map(p=>({...p,x:p.x*scaleX,y:p.y*scaleY,groundY:p.groundY*scaleY}));
     const savedWishes=wishes.map(w=>({...w,x:w.x*scaleX,y:w.y*scaleY,tagX:w.tagX*scaleX,tagY:w.tagY*scaleY}));
-    // Autumn progress lives on the leaves themselves (tint + which have fallen).
+    // Autumn progress lives on the leaves (tint + which have fallen). Don't
+    // stretch old leaf positions: if the box changed shape (phones settle
+    // their layout after load), stretched leaves stop matching the branches.
+    // Instead the seeded regeneration rebuilds every leaf in place, and each
+    // one gets its tint back by uid; leaves missing from the saved set fell.
     const savedAutumn = season==='autumn'
-      ? {leaves:leaves.map(l=>({...l,x:l.x*scaleX,y:l.y*scaleY})),totalLeavesInit,totalColorShifted,isFullyAutumn}
+      ? {tintByUid:new Map(leaves.map(l=>[l.uid,l.tintStage])),totalLeavesInit,totalColorShifted,isFullyAutumn}
       : null;
     _generateTreeSeeded();
     if(savedAutumn){
-      leaves=savedAutumn.leaves;
+      leaves=leaves.filter(l=>savedAutumn.tintByUid.has(l.uid));
+      leaves.forEach(l=>{l.tintStage=savedAutumn.tintByUid.get(l.uid);});
       totalLeavesInit=savedAutumn.totalLeavesInit;
       totalColorShifted=savedAutumn.totalColorShifted;
       isFullyAutumn=savedAutumn.isFullyAutumn;
