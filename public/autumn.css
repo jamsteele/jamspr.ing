@@ -64,9 +64,9 @@ body.season-autumn .bg-petal:nth-of-type(4n+3) { background: #e8b04a; }
 body.season-autumn .bg-petal:nth-of-type(4n)   { background: #9a4a22; }
 body.season-autumn .bg-petal:nth-of-type(5n)   { width: 22px; height: 22px; }
 @keyframes leafDrift {
-  0%   { transform: translateY(0) rotate(0deg);                     opacity: 0.16; }
-  40%  { transform: translateY(-40px) translateX(14px) rotate(170deg); opacity: 0.38; }
-  100% { transform: translateY(22px) translateX(-10px) rotate(360deg); opacity: 0.16; }
+  0%   { transform: translateY(0) rotate(0deg);                     opacity: 0.08; }
+  40%  { transform: translateY(-40px) translateX(14px) rotate(170deg); opacity: 0.2; }
+  100% { transform: translateY(22px) translateX(-10px) rotate(360deg); opacity: 0.08; }
 }
 body.season-autumn .header h1 { color: #f6e6c8; }
 body.season-autumn .header p { color: #d9b48c; }
