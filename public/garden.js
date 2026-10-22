@@ -962,6 +962,17 @@ function drawLeaf(l, c=ctx){
   c.fillStyle=`hsla(${hue},${sat}%,${light}%,0.8)`;c.fill();
   c.restore();c.globalAlpha=1;
 }
+// The owl (an overlay element in index.html, perched on its own drawn branch)
+// isn't part of the tree canvas, so shift it sideways by the same lean the
+// tree has at the owl's feet. Only runs when the tree's lean changes.
+const owlEl = document.getElementById('owl');
+function swayOwl(lean, baseY){
+  if(!owlEl || !gameContainer.clientHeight) return;
+  const toCanvas = H / gameContainer.clientHeight;          // CSS px → canvas px
+  const feetY = (owlEl.offsetTop + owlEl.offsetHeight * 0.92) * toCanvas;
+  const dxCss = (lean * (feetY - baseY)) / toCanvas;
+  owlEl.style.transform = `translateX(${dxCss.toFixed(2)}px)`;
+}
 // Autumn: draw the cached tree layer, re-rendering it first if a leaf changed.
 function drawAutumnTree(c){
   if(!_treeLayer||_treeLayer.width!==W||_treeLayer.height!==H){
@@ -984,6 +995,7 @@ function drawAutumnTree(c){
     if(!rebuilt && _treeCanvasHasTree && _treeCanvasLean!==null && Math.abs(lean-_treeCanvasLean)<0.0004) return;
     c.clearRect(0,0,W,H);
     _treeCanvasLean=lean;
+    swayOwl(lean, baseY);
   }
   c.save();c.translate(baseX,baseY);c.transform(1,0,lean,1,0,0);c.translate(-baseX,-baseY);
   c.drawImage(_treeLayer,0,0);
