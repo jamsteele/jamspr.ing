@@ -1,7 +1,11 @@
 // ============================================
-// A tiny tarot — tap the card on the link page to draw a gentle fortune.
-// Markup lives in index.html (#tarotDraw); styles in index.html's <style>,
-// autumn colour tweaks in autumn.css. Never draws the same card twice in a row.
+// A tiny tarot — a 5-card spread on the link page. Tap one of the face-down
+// cards and it flips to show a fortune underneath. "Draw again" or a sideways
+// swipe across the cards shuffles and starts over.
+//
+// Markup lives in index.html (#tarotSpread, #tarotReading, #tarotReset);
+// styles in index.html's <style>, autumn colour tweaks in autumn.css.
+// Each hand of five is a fresh random pick — no repeats within the hand.
 // Edit FORTUNES freely: short, warm, a little wry. No doom, only vibes.
 // ============================================
 
@@ -30,42 +34,143 @@ const FORTUNES = [
   { symbol: '😈', title: 'The Devil', message: 'One more episode is fine. Three is a choice.' },
 ];
 
-(() => {
-  const card = document.getElementById('tarotDraw');
-  if (!card) return;
-  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const FLIP_MS = 600; // matches .tarot-flip's transition in index.html
-  let angle = 0;       // card rotation; odd multiples of 180 = face up
-  let faceUp = false;
-  let last = -1;
-  let spinning = false;
+const SPREAD_SIZE = 5;
+// Fan geometry: the i-th card gets angle FAN_ANGLES[i], lift FAN_LIFTS[i], and
+// slides toward the centre when picked (translateX by -centreOffsetFromCard).
+const FAN_ANGLES = [-14, -7, 0, 7, 14];
+const FAN_LIFTS = [10, 2, 0, 2, 10]; // px
+const SWIPE_THRESHOLD = 50; // px of sideways travel inside the spread → reset
 
-  function show(f) {
-    document.getElementById('tarotSymbol').textContent = f.symbol;
-    document.getElementById('tarotTitle').textContent = f.title;
-    document.getElementById('tarotMessage').textContent = f.message;
-    card.setAttribute('aria-label', `${f.title}: ${f.message} Tap to draw another card.`);
+(() => {
+  const spread = document.getElementById('tarotSpread');
+  const reading = document.getElementById('tarotReading');
+  const resetWrap = document.getElementById('tarotResetWrap');
+  const reset = document.getElementById('tarotReset');
+  const prompt = document.getElementById('tarotPrompt');
+  const symbol = document.getElementById('tarotSymbol');
+  const title = document.getElementById('tarotTitle');
+  const message = document.getElementById('tarotMessage');
+  if (!spread || !reading || !reset) return;
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function dealHand() {
+    // 5 distinct fortunes, in random order.
+    const pool = FORTUNES.slice();
+    const hand = [];
+    for (let i = 0; i < SPREAD_SIZE && pool.length; i++) {
+      hand.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+    }
+    return hand;
   }
 
-  card.addEventListener('click', () => {
-    if (spinning) return; // let the current flip finish
-    let next = Math.floor(Math.random() * FORTUNES.length);
-    if (next === last) next = (next + 1) % FORTUNES.length;
-    last = next;
-    const fortune = FORTUNES[next];
-    if (!faceUp) {
-      // First draw: set the fortune, then flip face up.
-      show(fortune);
-      angle += 180;
-      faceUp = true;
-    } else {
-      // Draw another: one full turn; swap the text halfway, while the back
-      // is facing the viewer, so the change is never seen.
-      angle += 360;
-      spinning = true;
-      setTimeout(() => show(fortune), calm ? 0 : FLIP_MS / 2);
-      setTimeout(() => { spinning = false; }, calm ? 0 : FLIP_MS);
+  function build() {
+    spread.classList.remove('is-picked');
+    reading.classList.remove('is-visible');
+    resetWrap.classList.remove('is-visible');
+    prompt.classList.remove('hidden');
+    spread.replaceChildren();
+    const hand = dealHand();
+    hand.forEach((fortune, i) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tarot-fan';
+      btn.style.setProperty('--fan-angle', `${FAN_ANGLES[i]}deg`);
+      btn.style.setProperty('--fan-lift', `${-FAN_LIFTS[i]}px`);
+      btn.setAttribute('aria-label', `Face-down tarot card ${i + 1} of ${SPREAD_SIZE}`);
+      btn.innerHTML = `
+        <span class="tarot-flip">
+          <span class="tarot-side tarot-back"><span class="tarot-back-art">✦</span></span>
+          <span class="tarot-side tarot-front">
+            <span class="tarot-face-art">${fortune.symbol}</span>
+            <span class="tarot-face-name">${fortune.title}</span>
+          </span>
+        </span>`;
+      btn.addEventListener('click', () => pick(btn, fortune));
+      spread.appendChild(btn);
+    });
+  }
+
+  function sparkleBurst(btn) {
+    if (calm) return;
+    const burst = document.createElement('span');
+    burst.className = 'tarot-sparkles';
+    burst.setAttribute('aria-hidden', 'true');
+    for (let i = 0; i < 10; i++) {
+      const s = document.createElement('span');
+      s.className = 'sparkle';
+      s.textContent = '✦';
+      s.style.setProperty('--angle', `${Math.random() * 360}deg`);
+      s.style.setProperty('--dist', `${40 + Math.random() * 40}px`);
+      s.style.setProperty('--delay', `${Math.random() * 180}ms`);
+      s.addEventListener('animationend', () => s.remove());
+      burst.appendChild(s);
     }
-    card.style.transform = `rotateY(${angle}deg)`;
+    btn.appendChild(burst);
+    setTimeout(() => burst.remove(), 1600);
+  }
+
+  function pick(btn, fortune) {
+    if (spread.classList.contains('is-picked')) return;
+    // Slide the picked card to the centre of the spread.
+    const spreadRect = spread.getBoundingClientRect();
+    const cardRect = btn.getBoundingClientRect();
+    const centreX = spreadRect.left + spreadRect.width / 2;
+    const cardCentreX = cardRect.left + cardRect.width / 2;
+    btn.style.setProperty('--pick-dx', `${(centreX - cardCentreX).toFixed(1)}px`);
+    btn.classList.add('is-picked');
+    btn.setAttribute('aria-label', `${fortune.title}. ${fortune.message}`);
+    spread.classList.add('is-picked');
+    prompt.classList.add('hidden');
+    sparkleBurst(btn);
+    // Reveal the reading halfway through the flip, so the text appears when
+    // the card is already face up (or straight away if reduced motion is on).
+    const delay = calm ? 0 : 400;
+    // Set the text up front so max-height can transition from the real height.
+    symbol.textContent = fortune.symbol;
+    title.textContent = fortune.title;
+    message.textContent = fortune.message;
+    setTimeout(() => {
+      reading.classList.add('is-visible');
+      resetWrap.classList.add('is-visible');
+    }, delay);
+  }
+
+  // Reset: fade the chosen card and reading out, then deal a fresh hand that
+  // fades in. (Transitions are set on .tarot-spread, .tarot-reading and
+  // .tarot-reset-wrap in index.html.)
+  function reshuffle() {
+    const fading = calm ? 0 : 350; // matches the .is-fading transition
+    spread.classList.add('is-fading');
+    reading.classList.remove('is-visible');
+    resetWrap.classList.remove('is-visible');
+    setTimeout(() => {
+      build();                   // deal fresh, prompt back on
+      spread.classList.add('is-fading'); // keep hidden through the swap
+      requestAnimationFrame(() => requestAnimationFrame(() => spread.classList.remove('is-fading')));
+    }, fading);
+  }
+  reset.addEventListener('click', reshuffle);
+
+  // Sideways swipe across the spread also resets (only after a card is picked,
+  // so the pick tap itself doesn't trigger it).
+  let touchStartX = null, touchStartY = null, swiped = false;
+  spread.addEventListener('pointerdown', (e) => {
+    if (!spread.classList.contains('is-picked')) return;
+    touchStartX = e.clientX; touchStartY = e.clientY; swiped = false;
   });
+  spread.addEventListener('pointermove', (e) => {
+    if (touchStartX === null || swiped) return;
+    const dx = e.clientX - touchStartX, dy = e.clientY - touchStartY;
+    // Mostly sideways travel past the threshold.
+    if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
+      swiped = true;
+      reshuffle();
+    }
+  });
+  const endSwipe = () => { touchStartX = null; touchStartY = null; };
+  spread.addEventListener('pointerup', endSwipe);
+  spread.addEventListener('pointercancel', endSwipe);
+  spread.addEventListener('pointerleave', endSwipe);
+
+  build();
 })();

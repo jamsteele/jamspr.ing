@@ -935,6 +935,24 @@ function updateWind(){
     if(isFullyBloomed&&Math.abs(windTarget)>1.0) blossoms.forEach(b=>{if(Math.random()<0.15)spawnPetal(b.x,b.y,windTarget*0.5,-1);});
   }
   windStrength+=(windTarget-windStrength)*0.02;windTarget*=0.995;
+  // Autumn breeze: once a few leaves have turned, a real gust has a tiny
+  // chance each frame to pluck ONE turned leaf off. Scales with wind, caps
+  // low so a gust drops a handful at most, not a shower.
+  if (season === 'autumn' && totalColorShifted > 30 && Math.abs(windStrength) > 1.4 && leaves.length) {
+    const chance = Math.min(0.04, (Math.abs(windStrength) - 1.4) * 0.02);
+    if (Math.random() < chance) {
+      // Pick a random turned leaf. Try a handful of times, then give up.
+      for (let tries = 0; tries < 6; tries++) {
+        const i = Math.floor(Math.random() * leaves.length);
+        if (leaves[i].tintStage > 0) {
+          spawnFallenLeaf(leaves[i]);
+          leaves.splice(i, 1);
+          _treeDirty = true;
+          break;
+        }
+      }
+    }
+  }
 }
 
 // ---- Draw helpers ----
@@ -1456,7 +1474,9 @@ function paintShareOverlay(c, behindTree){
     else c.drawImage(l.img,l.x,l.y,l.w,l.h);
   });
 }
-document.getElementById('shareBtn').addEventListener('click', async () => {
+// Share button was removed from the page; keep the handler defined but only
+// wire it up when the button is present, so garden.js doesn't error out.
+document.getElementById('shareBtn')?.addEventListener('click', async () => {
   const btn = document.getElementById('shareBtn');
   if (_isRecording) return;
 

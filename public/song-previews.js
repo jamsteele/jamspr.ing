@@ -36,6 +36,10 @@
   let current = null;   // the song playing (or loading)
   let lastPick = null;  // never pick the same song twice in a row
   let retried = false;  // one expired-link retry per play
+  // Bag shuffle: play every song once before any repeats. When the bag empties
+  // we refill it (minus lastPick, so the cycle boundary doesn't play the same
+  // song back-to-back).
+  let bag = [];
 
   async function fetchUrl(id, fresh) {
     const res = await fetch(`/api/preview/${id}${fresh ? '?fresh=1' : ''}`);
@@ -49,8 +53,11 @@
     return c && Date.now() - c.at < URL_FRESH_MS ? c.url : null;
   }
   function randomSong() {
-    const pool = crate.length > 1 ? crate.filter((s) => s !== lastPick) : crate;
-    return pool[Math.floor(Math.random() * pool.length)];
+    if (!bag.length) {
+      bag = crate.length > 1 ? crate.filter((s) => s !== lastPick) : crate.slice();
+    }
+    const i = Math.floor(Math.random() * bag.length);
+    return bag.splice(i, 1)[0];
   }
 
   function show(song) {

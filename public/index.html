@@ -420,8 +420,18 @@
     background: none; border: 0; font: inherit; font-size: 11px; color: #b8949e;
     text-decoration: underline dotted; text-underline-offset: 3px; cursor: pointer;
   }
-  .vinyl-crate { display: none; margin-top: 10px; }
-  .vinyl-crate.open { display: flex; }
+  /* The crate itself always keeps its layout (flex column); max-height +
+     opacity + margin transition so expand/collapse is smooth. 800px is a
+     generous cap so a longer list still fits; the real height is less. */
+  .vinyl-crate {
+    display: flex;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    transition: max-height 0.45s ease, opacity 0.3s ease 0.05s, margin-top 0.45s ease;
+  }
+  .vinyl-crate.open { max-height: 800px; opacity: 1; margin-top: 10px; }
   .vinyl-crate .playlist-track { cursor: pointer; margin: 0 -6px; padding: 3px 6px; border-radius: 8px; }
   .vinyl-crate .playlist-track:hover { background: rgba(200, 150, 175, 0.1); }
   .vinyl-crate .playlist-track.is-playing .track-title { color: #5c3d52; font-weight: 500; }
@@ -506,61 +516,196 @@
   .orbit-item p { font-size: 12px; line-height: 1.55; color: #9a7b90; }
   .orbit-item strong { color: #5c3d52; font-weight: 600; }
   .orbit-autumn { display: none; }
-  /* A tiny tarot (behaviour in tarot.js). The card flips in 3D: .tarot-flip
-     rotates; each side hides its back face. Back is starry, front shows the
-     fortune. Reduced-motion users get an instant swap instead. */
+  /* A tiny tarot (behaviour in tarot.js). Five face-down cards fanned out
+     with .tarot-fan on each; tap one and tarot.js adds .is-picked, which
+     flips it (3D) and gets its siblings out of the way. The fortune then
+     appears below. Reduced-motion users get an instant swap.
+     The sibling-dim selectors rely on tarot-spread having .is-picked once a
+     card is chosen; without that, hover alone could blank the row. */
   .tarot-card { text-align: center; perspective: 900px; }
-  .tarot-flip {
-    display: grid; width: 100%;
-    padding: 0; border: 0; background: none; font: inherit; color: inherit;
+  .tarot-prompt {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: #a888a0;
+    margin: 2px 0 4px;
+    transition: opacity 0.3s;
+  }
+  .tarot-prompt.hidden { opacity: 0; height: 0; margin: 0; pointer-events: none; }
+  /* Once a card is picked, add space above the spread so the chosen card
+     doesn't hug the top of the box while the reading fills the bottom. */
+  .tarot-spread.is-picked { padding-top: 28px; }
+  .tarot-spread {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 150px;
+    touch-action: pan-y; /* vertical swipes still scroll; the swipe-to-reset is a sideways gesture */
+    opacity: 1;
+    transition: opacity 0.35s ease;
+  }
+  .tarot-spread.is-fading { opacity: 0; pointer-events: none; }
+  .tarot-fan {
+    position: relative;
+    width: 76px; height: 118px;
+    margin: 0 -14px; /* overlap so five cards fit on a phone */
+    padding: 0; border: 0; background: none; font: inherit;
     cursor: pointer;
+    perspective: 900px;
+    transform: rotate(var(--fan-angle, 0deg)) translateY(var(--fan-lift, 0));
+    transition: transform 0.3s ease, opacity 0.4s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tarot-fan:hover:not(.is-picked) { transform: rotate(var(--fan-angle, 0deg)) translateY(calc(var(--fan-lift, 0px) - 6px)); }
+  .tarot-fan:focus-visible { outline: none; }
+  .tarot-fan:focus-visible .tarot-side { box-shadow: inset 0 0 0 4px rgba(255, 231, 190, 0.2), 0 0 0 2px #9a6aa8, 0 10px 26px rgba(82, 46, 91, 0.3); }
+  .tarot-flip {
+    display: block;
+    position: relative;
+    width: 100%; height: 100%;
     transform-style: preserve-3d;
     transition: transform 0.6s cubic-bezier(.4, .1, .3, 1);
   }
-  .tarot-flip:focus-visible { outline: 2px solid #9a6aa8; outline-offset: 4px; border-radius: 16px; }
+  .tarot-side { display: flex; }
   .tarot-side {
-    grid-area: 1 / 1;
+    position: absolute; inset: 0;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    min-height: 196px;
+    padding: 10px 8px;
     border: 1px solid rgba(115, 78, 128, 0.22);
-    border-radius: 16px;
-    padding: 20px 18px 17px;
+    border-radius: 10px;
     color: #fff7ed;
     background: linear-gradient(155deg, rgba(63, 41, 84, 0.97), rgba(116, 67, 105, 0.94));
-    box-shadow: inset 0 0 0 4px rgba(255, 231, 190, 0.08), 0 10px 26px rgba(82, 46, 91, 0.18);
+    box-shadow: inset 0 0 0 3px rgba(255, 231, 190, 0.08), 0 6px 14px rgba(0, 0, 0, 0.3);
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
   }
-  .tarot-front { transform: rotateY(180deg); }
+  .tarot-front {
+    /* Parchment front (was the shared purple gradient). To revert, delete
+       these two overrides and the card will inherit the purple back look. */
+    background: linear-gradient(165deg, #faf0d6, #f0e0b8);
+    color: #5a3b22;
+    transform: rotateY(180deg);
+  }
   .tarot-back {
     background:
-      radial-gradient(circle at 18% 22%, rgba(255, 231, 190, 0.9) 0 1px, transparent 1.6px),
-      radial-gradient(circle at 78% 18%, rgba(255, 231, 190, 0.7) 0 1px, transparent 1.6px),
-      radial-gradient(circle at 64% 74%, rgba(255, 231, 190, 0.8) 0 1px, transparent 1.6px),
-      radial-gradient(circle at 26% 80%, rgba(255, 231, 190, 0.6) 0 1px, transparent 1.6px),
-      radial-gradient(circle at 88% 56%, rgba(255, 231, 190, 0.6) 0 1px, transparent 1.6px),
-      radial-gradient(circle at 10% 52%, rgba(255, 231, 190, 0.5) 0 1px, transparent 1.6px),
+      /* Scattered stars */
+      radial-gradient(circle at 18% 18%, rgba(255, 231, 190, 0.9) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 82% 22%, rgba(255, 231, 190, 0.75) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 72% 76%, rgba(255, 231, 190, 0.8) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 24% 82%, rgba(255, 231, 190, 0.7) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 88% 52%, rgba(255, 231, 190, 0.65) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 12% 48%, rgba(255, 231, 190, 0.6) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 50% 12%, rgba(255, 231, 190, 0.55) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 50% 88%, rgba(255, 231, 190, 0.55) 0 1px, transparent 1.6px),
       linear-gradient(155deg, #3a2852, #5e3a66);
-    box-shadow: inset 0 0 0 4px rgba(255, 231, 190, 0.1), inset 0 0 0 8px rgba(58, 40, 82, 1),
-                inset 0 0 0 9px rgba(255, 231, 190, 0.35), 0 10px 26px rgba(82, 46, 91, 0.18);
+    box-shadow: inset 0 0 0 3px rgba(255, 231, 190, 0.1), inset 0 0 0 6px rgba(58, 40, 82, 1),
+                inset 0 0 0 7px rgba(255, 231, 190, 0.4), 0 6px 14px rgba(0, 0, 0, 0.3);
   }
-  .tarot-back-art { font-size: 26px; letter-spacing: 8px; color: #f3d38a; text-shadow: 0 0 10px rgba(243, 211, 138, 0.45); }
-  .tarot-back-note { margin-top: 10px; font-size: 11px; font-style: italic; color: #e9c7dd; }
-  @media (prefers-reduced-motion: reduce) { .tarot-flip { transition: none; } }
-  .tarot-symbol { display: block; font-size: 37px; line-height: 1; margin-bottom: 8px; }
-  .tarot-title { display: block; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 500; margin-bottom: 7px; }
-  .tarot-message { display: block; font-size: 12.5px; line-height: 1.6; color: #f4e2ec; min-height: 40px; }
-  .tarot-cta {
-    display: inline-block;
-    margin-top: 13px;
-    padding: 6px 10px;
-    border: 1px solid rgba(255, 231, 190, 0.38);
+  /* Inner golden border on the back only — the front stays clean so the big
+     emoji dominates. */
+  .tarot-back::before {
+    content: ''; position: absolute; inset: 6px;
+    border-radius: 6px;
+    border: 1px solid rgba(243, 211, 138, 0.35);
+    pointer-events: none;
+  }
+  /* Corner marks on the back: four small ✦. */
+  .tarot-back::after {
+    content: ''; position: absolute; inset: 9px;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 2px 2px, rgba(243, 211, 138, 0.9) 0 1px, transparent 1.6px),
+      radial-gradient(circle at calc(100% - 2px) 2px, rgba(243, 211, 138, 0.9) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 2px calc(100% - 2px), rgba(243, 211, 138, 0.9) 0 1px, transparent 1.6px),
+      radial-gradient(circle at calc(100% - 2px) calc(100% - 2px), rgba(243, 211, 138, 0.9) 0 1px, transparent 1.6px);
+  }
+  .tarot-fan .tarot-back-art { font-size: 24px; color: #f3d38a; }
+  .tarot-fan .tarot-front { padding: 10px 6px 8px; }
+  .tarot-fan .tarot-front .tarot-face-art {
+    display: block;
+    font-size: 42px; line-height: 1;
+    filter: drop-shadow(0 0 10px rgba(243, 211, 138, 0.35));
+  }
+  .tarot-fan .tarot-front .tarot-face-name {
+    display: block; margin-top: 6px;
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 10px; letter-spacing: 0.5px;
+    color: #7a4a2a;
+    text-align: center;
+    line-height: 1.15;
+  }
+  /* Sparkle burst when the chosen card flips. tarot.js inserts <span class=sparkle>
+     elements with --angle, --dist and --delay set from a small random spread. */
+  .tarot-sparkles {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    overflow: visible;
+  }
+  .tarot-sparkles .sparkle {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 10px; height: 10px;
+    margin: -5px 0 0 -5px;
+    font-size: 10px; line-height: 10px;
+    color: #f3d38a;
+    text-shadow: 0 0 6px rgba(243, 211, 138, 0.8);
+    opacity: 0;
+    transform-origin: 50% 50%;
+    animation: sparkleFly 0.9s ease-out forwards;
+    animation-delay: var(--delay, 0ms);
+  }
+  @keyframes sparkleFly {
+    0%   { opacity: 0; transform: rotate(var(--angle, 0deg)) translateX(0) scale(0.4) rotate(calc(var(--angle, 0deg) * -1)); }
+    30%  { opacity: 1; }
+    100% { opacity: 0; transform: rotate(var(--angle, 0deg)) translateX(var(--dist, 50px)) scale(1.2) rotate(calc(var(--angle, 0deg) * -1)); }
+  }
+  /* Chosen card: slide to the centre, flip, enlarge a touch. */
+  .tarot-fan.is-picked {
+    z-index: 2;
+    transform: translateX(var(--pick-dx, 0)) translateY(-10px) scale(1.1);
+  }
+  .tarot-fan.is-picked .tarot-flip { transform: rotateY(180deg); }
+  /* Other cards fade out of the way when one is picked. */
+  .tarot-spread.is-picked .tarot-fan:not(.is-picked) {
+    opacity: 0;
+    transform: rotate(var(--fan-angle, 0deg)) translateY(14px) scale(0.9);
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tarot-flip, .tarot-fan, .tarot-spread .tarot-fan { transition: none; }
+  }
+  /* Reveal: tarot.js adds .is-visible after the card flips. max-height, opacity
+     and spacing all transition together so the containing card grows smoothly
+     instead of popping to a new size. The max-heights are generous caps, so a
+     slightly longer fortune still fits. */
+  .tarot-reading, .tarot-reset-wrap {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    transform: translateY(4px);
+    transition: max-height 0.55s ease, opacity 0.4s ease 0.1s,
+                margin-top 0.55s ease, transform 0.4s ease 0.1s;
+  }
+  .tarot-reading.is-visible { max-height: 260px; opacity: 1; margin-top: 18px; transform: translateY(0); }
+  .tarot-reset-wrap.is-visible { max-height: 60px; opacity: 1; margin-top: 16px; transform: translateY(0); }
+  /* The chosen card already shows the big emoji; don't repeat it. */
+  .tarot-symbol { display: none; }
+  .tarot-title { display: block; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 500; color: #5c3d52; margin-bottom: 7px; }
+  .tarot-message { display: block; font-size: 12.5px; line-height: 1.6; color: #9a7b90; max-width: 320px; margin: 0 auto; }
+  .tarot-reset {
+    padding: 7px 16px;
+    background: rgba(255, 248, 252, 0.65);
+    border: 1px solid rgba(210, 160, 185, 0.32);
     border-radius: 999px;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1.4px;
-    color: #ffe7be;
+    font: inherit; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+    color: #7a5068;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
   }
+  .tarot-reset:hover { background: rgba(255, 240, 250, 0.9); border-color: rgba(210, 148, 178, 0.5); }
   @media (max-width: 480px) {
     .container { padding: 30px 16px 50px; }
     .header h1 { font-size: 24px; }
@@ -596,6 +741,9 @@
         <!-- A mallard pair on the seawall: they wander together (autumn.js) and quack when tapped. -->
         <div class="duck d1 facing-right interactive" title="quack"><svg viewBox="0 0 40 30"><use href="#duckDrake"/></svg></div>
         <div class="duck d2 interactive" title="quack"><svg viewBox="0 0 40 30"><use href="#duckHen"/></svg></div>
+        <!-- Crows glide behind the tree (the tree canvas sits above this layer). -->
+        <div class="crow"><svg viewBox="0 0 32 10" xmlns="http://www.w3.org/2000/svg"><path d="M0 5 Q8 0 16 5 Q24 0 32 5" stroke="#1a0f14" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+        <div class="crow"><svg viewBox="0 0 32 10" xmlns="http://www.w3.org/2000/svg"><path d="M0 5 Q8 0 16 5 Q24 0 32 5" stroke="#1a0f14" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
       </div>
       <canvas class="tree-canvas" id="treeCanvas" aria-hidden="true"></canvas>
       <div class="autumn-overlay">
@@ -791,13 +939,9 @@
           </g>
         </svg>
         </div>
-        <!-- Two crows gliding across -->
-        <div class="crow"><svg viewBox="0 0 32 10" xmlns="http://www.w3.org/2000/svg"><path d="M0 5 Q8 0 16 5 Q24 0 32 5" stroke="#1a0f14" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
-        <div class="crow"><svg viewBox="0 0 32 10" xmlns="http://www.w3.org/2000/svg"><path d="M0 5 Q8 0 16 5 Q24 0 32 5" stroke="#1a0f14" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
         <!-- Daily haiku -->
         <!-- Haiku scroll: tap to unroll a new haiku, tap again to roll it up. -->
         <div class="haiku-scroll interactive" id="haikuScroll" role="button" tabindex="0" aria-expanded="false" aria-label="unroll a haiku">
-          <span class="scroll-caption" aria-hidden="true">a haiku</span>
           <div class="scroll-roll"></div>
           <div class="scroll-paper"><p class="scroll-text" id="haikuText" aria-live="polite"></p></div>
           <div class="scroll-roll"></div>
@@ -840,10 +984,6 @@
     <div class="wish-btn-wrap">
       <div class="action-row">
         <button class="wish-btn" id="wishBtn">🎋 make a wish</button>
-        <button class="share-btn" id="shareBtn" title="Share your tree">
-          <span class="share-btn-icon">📷</span>
-          <span>share my tree</span>
-        </button>
       </div>
       <div class="wish-count" id="wishCount"></div>
     </div>
@@ -1058,22 +1198,22 @@
     </div>
   </div>
   <div class="section-label">a tiny tarot</div>
-  <!-- Two-sided card (tarot.js flips it): starry back first, fortune on the
-       front. Both sides share one grid cell so the card keeps one size. -->
+  <!-- Tarot spread (tarot.js). Five face-down cards fanned out; tap one and
+       it flips to show a fortune below. Swipe across the cards or tap the
+       button to shuffle and start again. -->
   <div class="card tarot-card">
-    <button class="tarot-flip" id="tarotDraw" type="button" aria-label="Draw a tarot card">
-      <span class="tarot-side tarot-back" aria-hidden="true">
-        <span class="tarot-back-art">✦ ☾ ✦</span>
-        <span class="tarot-back-note">a tiny fortune. no doom, only vibes.</span>
-        <span class="tarot-cta">draw a card</span>
-      </span>
-      <span class="tarot-side tarot-front" aria-live="polite">
-        <span class="tarot-symbol" id="tarotSymbol">🌙</span>
-        <span class="tarot-title" id="tarotTitle">The Moon</span>
-        <span class="tarot-message" id="tarotMessage">Not everything needs solving tonight.</span>
-        <span class="tarot-cta">draw another</span>
-      </span>
-    </button>
+    <p class="tarot-prompt" id="tarotPrompt">trust your hand</p>
+    <div class="tarot-spread" id="tarotSpread" role="group" aria-label="Pick a tarot card">
+      <!-- Buttons added by tarot.js -->
+    </div>
+    <div class="tarot-reading" id="tarotReading" aria-live="polite">
+      <span class="tarot-symbol" id="tarotSymbol"></span>
+      <span class="tarot-title" id="tarotTitle"></span>
+      <span class="tarot-message" id="tarotMessage"></span>
+    </div>
+    <div class="tarot-reset-wrap" id="tarotResetWrap">
+      <button class="tarot-reset" id="tarotReset" type="button">draw again</button>
+    </div>
   </div>
   <div class="section-label">find me in the wild</div>
   <div class="links-grid">
